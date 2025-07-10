@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { BusinessForm } from "./BusinessForm";
+import { AnalysisResults } from "./AnalysisResults";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Building, TrendingUp, Target, Users } from "lucide-react";
+import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain } from "lucide-react";
 
 interface Business {
   id: string;
@@ -14,12 +16,18 @@ interface Business {
   company_size: string;
   website_url: string | null;
   created_at: string;
+  analysis_result: any;
+  overall_score: number | null;
+  analysis_status: string;
+  analyzed_at: string | null;
 }
 
 export function Dashboard() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAnalyzing, setIsAnalyzing] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
@@ -67,6 +75,51 @@ export function Dashboard() {
     fetchBusinesses();
   };
 
+  const reAnalyzeBusiness = async (business: Business) => {
+    setIsAnalyzing(business.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-business', {
+        body: {
+          companyName: business.company_name,
+          businessDescription: business.business_description,
+          industry: business.industry,
+          companySize: business.company_size,
+          websiteUrl: business.website_url
+        }
+      });
+
+      if (error) throw error;
+
+      const { error: updateError } = await supabase
+        .from('businesses')
+        .update({
+          analysis_result: data,
+          overall_score: data.overallScore,
+          analysis_status: 'completed',
+          analyzed_at: new Date().toISOString()
+        })
+        .eq('id', business.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Re-analysis Complete!",
+        description: `Updated UK market readiness score: ${data.overallScore}%`
+      });
+
+      fetchBusinesses();
+    } catch (error) {
+      console.error("Error re-analyzing business:", error);
+      toast({
+        title: "Re-analysis Failed",
+        description: "Could not re-analyze your business. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(null);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -109,6 +162,29 @@ export function Dashboard() {
           <div className="flex justify-center">
             <BusinessForm onSuccess={handleFormSuccess} />
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show detailed analysis view
+  if (selectedBusiness && selectedBusiness.analysis_result) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedBusiness(null)}
+              className="mb-4"
+            >
+              ← Back to Dashboard
+            </Button>
+          </div>
+          <AnalysisResults 
+            analysis={selectedBusiness.analysis_result} 
+            companyName={selectedBusiness.company_name}
+          />
         </div>
       </div>
     );
@@ -163,9 +239,11 @@ export function Dashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">
+                {businesses.filter(b => b.analysis_status === 'completed').length}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Coming in Phase 2
+                Businesses analyzed
               </p>
             </CardContent>
           </Card>
@@ -217,10 +295,17 @@ export function Dashboard() {
               {businesses.map((business) => (
                 <Card key={business.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building className="h-5 w-5 text-primary" />
-                      {business.company_name}
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Building className="h-5 w-5 text-primary" />
+                        {business.company_name}
+                      </CardTitle>
+                      {business.overall_score && (
+                        <Badge variant={business.overall_score >= 70 ? 'default' : 'secondary'}>
+                          {business.overall_score}%
+                        </Badge>
+                      )}
+                    </div>
                     <CardDescription>
                       {business.industry} • {business.company_size}
                     </CardDescription>
@@ -230,13 +315,63 @@ export function Dashboard() {
                       {business.business_description}
                     </p>
                     {business.website_url && (
-                      <p className="text-sm text-primary underline">
+                      <p className="text-sm text-primary underline mb-3">
                         {business.website_url}
                       </p>
                     )}
+                    
+                    {/* Analysis Status */}
+                    <div className="space-y-3">
+                      {business.analysis_status === 'pending' && (
+                        <Badge variant="outline" className="w-full justify-center">
+                          Analysis Pending
+                        </Badge>
+                      )}
+                      {business.analysis_status === 'failed' && (
+                        <Badge variant="destructive" className="w-full justify-center">
+                          Analysis Failed
+                        </Badge>
+                      )}
+                      {business.analysis_status === 'completed' && business.analysis_result && (
+                        <div className="space-y-2">
+                          <Badge variant="default" className="w-full justify-center">
+                            Analysis Complete
+                          </Badge>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="flex-1"
+                              onClick={() => setSelectedBusiness(business)}
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View Report
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => reAnalyzeBusiness(business)}
+                              disabled={isAnalyzing === business.id}
+                            >
+                              {isAnalyzing === business.id ? (
+                                <Brain className="h-3 w-3 animate-pulse" />
+                              ) : (
+                                <RotateCcw className="h-3 w-3" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-xs text-muted-foreground">
                         Added {new Date(business.created_at).toLocaleDateString()}
+                        {business.analyzed_at && (
+                          <span className="block">
+                            Analyzed {new Date(business.analyzed_at).toLocaleDateString()}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </CardContent>

@@ -16,34 +16,46 @@ export type Database = {
     Tables: {
       businesses: {
         Row: {
+          analysis_result: Json | null
+          analysis_status: string | null
+          analyzed_at: string | null
           business_description: string
           company_name: string
           company_size: string
           created_at: string
           id: string
           industry: string
+          overall_score: number | null
           updated_at: string
           user_id: string
           website_url: string | null
         }
         Insert: {
+          analysis_result?: Json | null
+          analysis_status?: string | null
+          analyzed_at?: string | null
           business_description: string
           company_name: string
           company_size: string
           created_at?: string
           id?: string
           industry: string
+          overall_score?: number | null
           updated_at?: string
           user_id: string
           website_url?: string | null
         }
         Update: {
+          analysis_result?: Json | null
+          analysis_status?: string | null
+          analyzed_at?: string | null
           business_description?: string
           company_name?: string
           company_size?: string
           created_at?: string
           id?: string
           industry?: string
+          overall_score?: number | null
           updated_at?: string
           user_id?: string
           website_url?: string | null

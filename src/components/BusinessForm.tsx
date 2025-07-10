@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Building, FileText, Globe, Users, Briefcase } from "lucide-react";
+import { Building, FileText, Globe, Users, Briefcase, Brain } from "lucide-react";
 
 const industries = [
   "Technology & Software",
@@ -53,7 +53,61 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     websiteUrl: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
+
+  const analyzeWithAI = async (businessId: string) => {
+    setIsAnalyzing(true);
+    try {
+      // Call the edge function to analyze the business
+      const { data, error } = await supabase.functions.invoke('analyze-business', {
+        body: {
+          companyName: formData.companyName,
+          businessDescription: formData.businessDescription,
+          industry: formData.industry,
+          companySize: formData.companySize,
+          websiteUrl: formData.websiteUrl
+        }
+      });
+
+      if (error) throw error;
+
+      // Update the business record with the analysis results
+      const { error: updateError } = await supabase
+        .from('businesses')
+        .update({
+          analysis_result: data,
+          overall_score: data.overallScore,
+          analysis_status: 'completed',
+          analyzed_at: new Date().toISOString()
+        })
+        .eq('id', businessId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Analysis Complete!",
+        description: `Your UK market readiness score is ${data.overallScore}%`
+      });
+
+    } catch (error) {
+      console.error("Error analyzing business:", error);
+      
+      // Update status to failed
+      await supabase
+        .from('businesses')
+        .update({ analysis_status: 'failed' })
+        .eq('id', businessId);
+
+      toast({
+        title: "Analysis Failed",
+        description: "Could not analyze your business. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,20 +125,20 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         return;
       }
 
-      const { error } = await supabase.from("businesses").insert({
+      const { data: businessData, error } = await supabase.from("businesses").insert({
         user_id: user.id,
         company_name: formData.companyName,
         business_description: formData.businessDescription,
         industry: formData.industry,
         company_size: formData.companySize,
         website_url: formData.websiteUrl || null
-      });
+      }).select().single();
 
       if (error) throw error;
 
       toast({
         title: "Success!",
-        description: "Your business information has been saved successfully."
+        description: "Your business information has been saved. Starting AI analysis..."
       });
 
       // Reset form
@@ -95,6 +149,9 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         companySize: "",
         websiteUrl: ""
       });
+
+      // Start AI analysis
+      await analyzeWithAI(businessData.id);
 
       onSuccess?.();
     } catch (error) {
@@ -215,9 +272,15 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={isSubmitting}
+            disabled={isSubmitting || isAnalyzing}
           >
-            {isSubmitting ? "Saving..." : "Save Business Information"}
+            {isSubmitting ? "Saving..." : 
+             isAnalyzing ? (
+               <div className="flex items-center gap-2">
+                 <Brain className="h-4 w-4 animate-pulse" />
+                 Analyzing with AI...
+               </div>
+             ) : "Save & Analyze Business"}
           </Button>
         </form>
       </CardContent>
