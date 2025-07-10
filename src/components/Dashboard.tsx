@@ -121,54 +121,7 @@ export function Dashboard() {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Target className="h-6 w-6 text-primary" />
-              UK Market Entry Platform
-            </CardTitle>
-            <CardDescription>
-              Please sign in to access your dashboard and get your UK market readiness assessment.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={async () => {
-                try {
-                  const { data, error } = await supabase.auth.signInWithOAuth({ 
-                    provider: 'google',
-                    options: {
-                      redirectTo: window.location.origin
-                    }
-                  });
-                  
-                  if (error) {
-                    console.error('Auth error:', error);
-                    toast({
-                      title: "Authentication Error",
-                      description: error.message || "Failed to sign in with Google",
-                      variant: "destructive"
-                    });
-                  }
-                } catch (err) {
-                  console.error('Sign in error:', err);
-                  toast({
-                    title: "Sign In Failed", 
-                    description: "Please check your authentication configuration",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="w-full"
-            >
-              Sign In with Google
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return null; // Let the routing handle authentication
   }
 
   if (showForm) {
