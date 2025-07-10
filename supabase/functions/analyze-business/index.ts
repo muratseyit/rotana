@@ -113,7 +113,13 @@ Be specific about UK market requirements, regulatory considerations, and actiona
     console.log('OpenAI response status:', response.status);
     
     if (!response.ok) {
-      console.error('OpenAI API error:', response.statusText);
+      const errorBody = await response.text();
+      console.error('OpenAI API error:', response.statusText, errorBody);
+      
+      if (response.status === 429) {
+        throw new Error(`OpenAI API rate limit exceeded. Please wait a few minutes before trying again, or upgrade your OpenAI plan for higher rate limits.`);
+      }
+      
       throw new Error(`OpenAI API error: ${response.statusText}`);
     }
 
