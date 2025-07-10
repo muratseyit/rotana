@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Target, Loader2 } from "lucide-react";
+import { Target, Loader2, ArrowLeft } from "lucide-react";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -96,12 +96,22 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Target className="h-6 w-6 text-primary" />
-            <CardTitle>UK Market Entry Platform</CardTitle>
-          </div>
+      <div className="w-full max-w-md space-y-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Button>
+        
+        <Card className="w-full">
+          <CardHeader className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Target className="h-6 w-6 text-primary" />
+              <CardTitle>Business Analysis Platform</CardTitle>
+            </div>
           <CardDescription>
             Sign in to access your dashboard and get your UK market readiness assessment
           </CardDescription>
@@ -176,7 +186,8 @@ export default function Auth() {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
