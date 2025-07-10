@@ -33,12 +33,16 @@ interface AnalysisResult {
 }
 
 serve(async (req) => {
+  console.log('Analyze business function called');
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Processing business analysis request');
     const businessData: BusinessData = await req.json();
+    console.log('Business data received:', businessData);
 
     const prompt = `
 As a UK market entry expert, analyze this Turkish SME business for UK market readiness. Provide scores (0-100) and specific recommendations.
@@ -81,6 +85,8 @@ RESPONSE FORMAT (JSON):
 
 Be specific about UK market requirements, regulatory considerations, and actionable next steps.`;
 
+    console.log('Calling OpenAI API...');
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -104,7 +110,10 @@ Be specific about UK market requirements, regulatory considerations, and actiona
       }),
     });
 
+    console.log('OpenAI response status:', response.status);
+    
     if (!response.ok) {
+      console.error('OpenAI API error:', response.statusText);
       throw new Error(`OpenAI API error: ${response.statusText}`);
     }
 

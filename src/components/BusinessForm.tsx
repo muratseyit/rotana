@@ -59,6 +59,9 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
   const analyzeWithAI = async (businessId: string) => {
     setIsAnalyzing(true);
     try {
+      console.log('Starting business analysis for ID:', businessId);
+      console.log('Form data:', formData);
+      
       // Call the edge function to analyze the business
       const { data, error } = await supabase.functions.invoke('analyze-business', {
         body: {
@@ -70,6 +73,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         }
       });
 
+      console.log('Analysis response:', { data, error });
       if (error) throw error;
 
       // Update the business record with the analysis results
