@@ -135,7 +135,32 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <Button 
-              onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
+              onClick={async () => {
+                try {
+                  const { data, error } = await supabase.auth.signInWithOAuth({ 
+                    provider: 'google',
+                    options: {
+                      redirectTo: window.location.origin
+                    }
+                  });
+                  
+                  if (error) {
+                    console.error('Auth error:', error);
+                    toast({
+                      title: "Authentication Error",
+                      description: error.message || "Failed to sign in with Google",
+                      variant: "destructive"
+                    });
+                  }
+                } catch (err) {
+                  console.error('Sign in error:', err);
+                  toast({
+                    title: "Sign In Failed", 
+                    description: "Please check your authentication configuration",
+                    variant: "destructive"
+                  });
+                }
+              }}
               className="w-full"
             >
               Sign In with Google
