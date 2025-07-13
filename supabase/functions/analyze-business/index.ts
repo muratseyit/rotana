@@ -14,6 +14,18 @@ interface BusinessData {
   industry: string;
   companySize: string;
   websiteUrl?: string;
+  financialMetrics?: {
+    annualRevenue: number;
+    grossMargin: number;
+    netProfit: number;
+    monthlyGrowthRate: number;
+    cashPosition: number;
+    fundingStage: string;
+    exportPercentage: number;
+    avgOrderValue: number;
+    customerAcquisitionCost: number;
+    customerLifetimeValue: number;
+  };
 }
 
 interface ScoreBreakdown {
@@ -25,11 +37,35 @@ interface ScoreBreakdown {
   founderTeamStrength: number;
 }
 
+interface DetailedInsight {
+  category: keyof ScoreBreakdown;
+  score: number;
+  strengths: string[];
+  weaknesses: string[];
+  actionItems: {
+    action: string;
+    priority: "high" | "medium" | "low";
+    timeframe: string;
+    resources?: string[];
+  }[];
+}
+
 interface AnalysisResult {
   overallScore: number;
   scoreBreakdown: ScoreBreakdown;
   roadmap: string[];
   summary: string;
+  detailedInsights: DetailedInsight[];
+  recommendations: {
+    immediate: string[];
+    shortTerm: string[];
+    longTerm: string[];
+  };
+  complianceAssessment: {
+    criticalRequirements: string[];
+    riskAreas: string[];
+    complianceScore: number;
+  };
 }
 
 serve(async (req) => {
@@ -44,8 +80,21 @@ serve(async (req) => {
     const businessData: BusinessData = await req.json();
     console.log('Business data received:', businessData);
 
+    const financialInfo = businessData.financialMetrics ? `
+FINANCIAL METRICS:
+Annual Revenue: $${businessData.financialMetrics.annualRevenue?.toLocaleString() || 'Not provided'}
+Gross Margin: ${businessData.financialMetrics.grossMargin}%
+Net Profit: $${businessData.financialMetrics.netProfit?.toLocaleString() || 'Not provided'}
+Monthly Growth Rate: ${businessData.financialMetrics.monthlyGrowthRate}%
+Cash Position: $${businessData.financialMetrics.cashPosition?.toLocaleString() || 'Not provided'}
+Funding Stage: ${businessData.financialMetrics.fundingStage}
+Export Percentage: ${businessData.financialMetrics.exportPercentage}%
+Avg Order Value: $${businessData.financialMetrics.avgOrderValue}
+Customer Acquisition Cost: $${businessData.financialMetrics.customerAcquisitionCost}
+Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}` : '';
+
     const prompt = `
-As a UK market entry expert, analyze this Turkish SME business for UK market readiness. Provide scores (0-100) and specific recommendations.
+As a UK market entry expert, provide a comprehensive analysis of this Turkish SME for UK market readiness. Include detailed insights, actionable recommendations, and compliance considerations.
 
 BUSINESS DETAILS:
 Company: ${businessData.companyName}
@@ -53,37 +102,64 @@ Industry: ${businessData.industry}
 Size: ${businessData.companySize}
 Description: ${businessData.businessDescription}
 Website: ${businessData.websiteUrl || 'Not provided'}
+${financialInfo}
 
-SCORING CRITERIA (0-100 each):
-1. Product-Market Fit: UK demand, competition, uniqueness
-2. Regulatory Compatibility: UK regulations, compliance requirements
-3. Digital Readiness: Online presence, e-commerce capability
-4. Logistics/Fulfillment: Supply chain, shipping, warehousing
-5. Scalability & Automation: Growth potential, operational efficiency
-6. Founder/Team Strength: Experience, UK market knowledge
+ANALYSIS REQUIREMENTS:
+1. Score each category (0-100) with detailed justification
+2. Identify specific strengths and weaknesses for each category
+3. Provide actionable recommendations with timelines and priorities
+4. Include UK-specific compliance and regulatory considerations
+5. Consider financial readiness for UK expansion
 
 RESPONSE FORMAT (JSON):
 {
-  "overallScore": [average of all scores],
+  "overallScore": [weighted average of all scores],
   "scoreBreakdown": {
-    "productMarketFit": [score],
-    "regulatoryCompatibility": [score],
-    "digitalReadiness": [score],
-    "logisticsPotential": [score],
-    "scalabilityAutomation": [score],
-    "founderTeamStrength": [score]
+    "productMarketFit": [score 0-100],
+    "regulatoryCompatibility": [score 0-100],
+    "digitalReadiness": [score 0-100],
+    "logisticsPotential": [score 0-100],
+    "scalabilityAutomation": [score 0-100],
+    "founderTeamStrength": [score 0-100]
   },
-  "summary": "[2-3 sentence overall assessment]",
+  "summary": "[3-4 sentence comprehensive assessment]",
   "roadmap": [
-    "[Priority action 1]",
-    "[Priority action 2]",
-    "[Priority action 3]",
-    "[Priority action 4]",
-    "[Priority action 5]"
-  ]
+    "[Priority action 1 with specific steps]",
+    "[Priority action 2 with specific steps]",
+    "[Priority action 3 with specific steps]",
+    "[Priority action 4 with specific steps]",
+    "[Priority action 5 with specific steps]"
+  ],
+  "detailedInsights": [
+    {
+      "category": "productMarketFit",
+      "score": [score],
+      "strengths": ["specific strength 1", "specific strength 2"],
+      "weaknesses": ["specific weakness 1", "specific weakness 2"],
+      "actionItems": [
+        {
+          "action": "specific action",
+          "priority": "high|medium|low",
+          "timeframe": "1-2 weeks|1-3 months|3-6 months|6+ months",
+          "resources": ["https://resource-url.com"]
+        }
+      ]
+    }
+    // ... repeat for all categories
+  ],
+  "recommendations": {
+    "immediate": ["action for next 30 days"],
+    "shortTerm": ["action for 3-6 months"],
+    "longTerm": ["action for 6+ months"]
+  },
+  "complianceAssessment": {
+    "criticalRequirements": ["UK legal requirement 1", "UK legal requirement 2"],
+    "riskAreas": ["compliance risk 1", "compliance risk 2"],
+    "complianceScore": [score 0-100]
+  }
 }
 
-Be specific about UK market requirements, regulatory considerations, and actionable next steps.`;
+Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT, product standards), and provide actionable, prioritized recommendations based on the business size and industry.`;
 
     console.log('Calling OpenAI API...');
 
@@ -106,7 +182,7 @@ Be specific about UK market requirements, regulatory considerations, and actiona
           }
         ],
         temperature: 0.3,
-        max_tokens: 1500,
+        max_tokens: 2500,
       }),
     });
 
@@ -155,7 +231,18 @@ Be specific about UK market requirements, regulatory considerations, and actiona
           "Develop a comprehensive digital marketing strategy",
           "Establish UK logistics and fulfillment partnerships",
           "Create a detailed business expansion plan"
-        ]
+        ],
+        detailedInsights: [],
+        recommendations: {
+          immediate: ["Research UK market regulations", "Validate product-market fit"],
+          shortTerm: ["Develop digital presence", "Establish partnerships"],
+          longTerm: ["Scale operations", "Build local team"]
+        },
+        complianceAssessment: {
+          criticalRequirements: ["GDPR compliance", "VAT registration", "Company registration"],
+          riskAreas: ["Data protection", "Product standards"],
+          complianceScore: 40
+        }
       };
     }
 

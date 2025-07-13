@@ -89,6 +89,22 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
 
       if (updateError) throw updateError;
 
+      // Save analysis to history
+      const { error: historyError } = await supabase
+        .from('business_analysis_history')
+        .insert({
+          business_id: businessId,
+          overall_score: data.overallScore,
+          score_breakdown: data.scoreBreakdown,
+          analysis_result: data,
+          analysis_version: 'v2'
+        });
+
+      if (historyError) {
+        console.error('Error saving analysis history:', historyError);
+        // Don't throw error for history save failure
+      }
+
       toast({
         title: "Analysis Complete!",
         description: `Your UK market readiness score is ${data.overallScore}%`

@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_analysis_history: {
+        Row: {
+          analysis_date: string
+          analysis_result: Json | null
+          analysis_version: string | null
+          business_id: string
+          created_at: string
+          id: string
+          overall_score: number | null
+          score_breakdown: Json | null
+        }
+        Insert: {
+          analysis_date?: string
+          analysis_result?: Json | null
+          analysis_version?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          overall_score?: number | null
+          score_breakdown?: Json | null
+        }
+        Update: {
+          analysis_date?: string
+          analysis_result?: Json | null
+          analysis_version?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          overall_score?: number | null
+          score_breakdown?: Json | null
+        }
+        Relationships: []
+      }
       businesses: {
         Row: {
           analysis_result: Json | null
@@ -22,7 +55,9 @@ export type Database = {
           business_description: string
           company_name: string
           company_size: string
+          compliance_status: Json | null
           created_at: string
+          financial_metrics: Json | null
           id: string
           industry: string
           overall_score: number | null
@@ -37,7 +72,9 @@ export type Database = {
           business_description: string
           company_name: string
           company_size: string
+          compliance_status?: Json | null
           created_at?: string
+          financial_metrics?: Json | null
           id?: string
           industry: string
           overall_score?: number | null
@@ -52,7 +89,9 @@ export type Database = {
           business_description?: string
           company_name?: string
           company_size?: string
+          compliance_status?: Json | null
           created_at?: string
+          financial_metrics?: Json | null
           id?: string
           industry?: string
           overall_score?: number | null

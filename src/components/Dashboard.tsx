@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BusinessForm } from "./BusinessForm";
-import { AnalysisResults } from "./AnalysisResults";
+import { BusinessDetailsModal } from "./BusinessDetailsModal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -145,28 +145,6 @@ export function Dashboard() {
     );
   }
 
-  // Show detailed analysis view
-  if (selectedBusiness && selectedBusiness.analysis_result) {
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-6">
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedBusiness(null)}
-              className="mb-4"
-            >
-              ← Back to Dashboard
-            </Button>
-          </div>
-          <AnalysisResults 
-            analysis={selectedBusiness.analysis_result} 
-            companyName={selectedBusiness.company_name}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -359,6 +337,13 @@ export function Dashboard() {
           )}
         </div>
       </main>
+
+      <BusinessDetailsModal
+        business={selectedBusiness}
+        isOpen={!!selectedBusiness}
+        onOpenChange={(open) => !open && setSelectedBusiness(null)}
+        onUpdate={fetchBusinesses}
+      />
     </div>
   );
 }
