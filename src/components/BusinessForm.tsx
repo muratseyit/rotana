@@ -103,9 +103,12 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         .update({ analysis_status: 'failed' })
         .eq('id', businessId);
 
+      // Show specific error message if available
+      const errorMessage = error instanceof Error ? error.message : "Could not analyze your business. Please try again later.";
+      
       toast({
         title: "Analysis Failed",
-        description: "Could not analyze your business. Please try again later.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
