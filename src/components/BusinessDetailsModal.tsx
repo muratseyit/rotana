@@ -39,6 +39,11 @@ export function BusinessDetailsModal({ business, isOpen, onOpenChange, onUpdate 
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
 
+  // Early return if business is null
+  if (!business) {
+    return null;
+  }
+
   const handleFinancialMetricsSubmit = async (metrics: FinancialMetrics) => {
     setIsUpdating(true);
     try {
