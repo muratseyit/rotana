@@ -98,11 +98,19 @@ Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}
     if (businessData.websiteUrl) {
       try {
         console.log('Fetching website content from:', businessData.websiteUrl);
+        
+        // Set a timeout for the website fetch to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         const websiteResponse = await fetch(businessData.websiteUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-          }
+          },
+          signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         if (websiteResponse.ok) {
           const html = await websiteResponse.text();
@@ -117,6 +125,7 @@ Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}
           
           websiteContent = `\nWEBSITE CONTENT ANALYSIS:
 ${textContent}`;
+          console.log('Website content extracted successfully');
         } else {
           console.log('Failed to fetch website, status:', websiteResponse.status);
           websiteContent = '\nWEBSITE: Could not fetch content from the provided URL.';

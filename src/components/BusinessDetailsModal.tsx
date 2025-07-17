@@ -44,6 +44,90 @@ export function BusinessDetailsModal({ business, isOpen, onOpenChange, onUpdate 
     return null;
   }
 
+  const retryAnalysis = async () => {
+    setIsUpdating(true);
+    try {
+      console.log('Retrying analysis for business ID:', business.id);
+      
+      // Call the edge function to re-analyze the business
+      const { data, error } = await supabase.functions.invoke('analyze-business', {
+        body: {
+          companyName: business.company_name,
+          businessDescription: business.business_description,
+          industry: business.industry,
+          companySize: business.company_size,
+          websiteUrl: business.website_url,
+          financialMetrics: business.financial_metrics
+        },
+      });
+
+      if (error) {
+        console.error('Analysis error:', error);
+        toast({
+          title: "Analysis Error",
+          description: error.message || "Failed to analyze business. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Analysis response:', { data, error });
+
+      // Update the business with analysis results
+      const { error: updateError } = await supabase
+        .from('businesses')
+        .update({
+          analysis_result: data,
+          overall_score: data.overallScore,
+          analysis_status: 'completed',
+          analyzed_at: new Date().toISOString(),
+        })
+        .eq('id', business.id);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        toast({
+          title: "Database Error",
+          description: "Failed to save analysis results.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save to history
+      const { error: historyError } = await supabase
+        .from('business_analysis_history')
+        .insert({
+          business_id: business.id,
+          analysis_result: data,
+          overall_score: data.overallScore,
+          score_breakdown: data.scoreBreakdown,
+        });
+
+      if (historyError) {
+        console.error('History save error:', historyError);
+      }
+
+      toast({
+        title: "Analysis Complete",
+        description: "Business analysis has been completed successfully.",
+      });
+
+      // Refresh by calling onUpdate
+      onUpdate?.();
+      
+    } catch (error) {
+      console.error('Retry analysis error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to retry analysis. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleFinancialMetricsSubmit = async (metrics: FinancialMetrics) => {
     setIsUpdating(true);
     try {
@@ -163,7 +247,7 @@ export function BusinessDetailsModal({ business, isOpen, onOpenChange, onUpdate 
     }
   };
 
-  if (!business.analysis_result) {
+  if (!business.analysis_result || business.analysis_status === 'pending') {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl">
@@ -173,10 +257,30 @@ export function BusinessDetailsModal({ business, isOpen, onOpenChange, onUpdate 
               {business.company_name}
             </DialogTitle>
           </DialogHeader>
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              No analysis data available for this business yet.
-            </p>
+          <div className="text-center py-8 space-y-4">
+            {business.analysis_status === 'pending' ? (
+              <>
+                <div className="flex items-center justify-center gap-2">
+                  <Badge variant="outline" className="animate-pulse">
+                    Analysis Pending
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground">
+                  The analysis for this business is currently pending. This might be due to a network issue or website fetching delay.
+                </p>
+                <Button 
+                  onClick={retryAnalysis}
+                  disabled={isUpdating}
+                  className="w-full max-w-md"
+                >
+                  {isUpdating ? "Retrying Analysis..." : "Retry Analysis"}
+                </Button>
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                No analysis data available for this business yet.
+              </p>
+            )}
           </div>
         </DialogContent>
       </Dialog>
