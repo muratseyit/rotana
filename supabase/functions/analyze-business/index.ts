@@ -93,6 +93,40 @@ Avg Order Value: $${businessData.financialMetrics.avgOrderValue}
 Customer Acquisition Cost: $${businessData.financialMetrics.customerAcquisitionCost}
 Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}` : '';
 
+    // Fetch website content if URL is provided
+    let websiteContent = '';
+    if (businessData.websiteUrl) {
+      try {
+        console.log('Fetching website content from:', businessData.websiteUrl);
+        const websiteResponse = await fetch(businessData.websiteUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        });
+        
+        if (websiteResponse.ok) {
+          const html = await websiteResponse.text();
+          // Extract basic text content from HTML (simple approach)
+          const textContent = html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .substring(0, 2000); // Limit to 2000 characters
+          
+          websiteContent = `\nWEBSITE CONTENT ANALYSIS:
+${textContent}`;
+        } else {
+          console.log('Failed to fetch website, status:', websiteResponse.status);
+          websiteContent = '\nWEBSITE: Could not fetch content from the provided URL.';
+        }
+      } catch (error) {
+        console.error('Error fetching website:', error);
+        websiteContent = '\nWEBSITE: Could not fetch content from the provided URL.';
+      }
+    }
+
     const prompt = `
 As a UK market entry expert, provide a comprehensive analysis of this Turkish SME for UK market readiness. Include detailed insights, actionable recommendations, and compliance considerations.
 
@@ -102,7 +136,7 @@ Industry: ${businessData.industry}
 Size: ${businessData.companySize}
 Description: ${businessData.businessDescription}
 Website: ${businessData.websiteUrl || 'Not provided'}
-${financialInfo}
+${financialInfo}${websiteContent}
 
 ANALYSIS REQUIREMENTS:
 1. Score each category (0-100) with detailed justification
