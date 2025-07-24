@@ -5,9 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Building, FileText, Globe, Users, Briefcase, Brain } from "lucide-react";
+import { Building, FileText, Globe, Users, Briefcase, Brain, ArrowRight, ArrowLeft, DollarSign } from "lucide-react";
+import { FinancialMetricsForm, type FinancialMetrics } from "./FinancialMetricsForm";
 
 const industries = [
   "Technology & Software",
@@ -40,11 +42,16 @@ interface BusinessFormData {
   websiteUrl: string;
 }
 
+interface CombinedFormData extends BusinessFormData {
+  financialMetrics: FinancialMetrics;
+}
+
 interface BusinessFormProps {
   onSuccess?: () => void;
 }
 
 export function BusinessForm({ onSuccess }: BusinessFormProps) {
+  const [activeTab, setActiveTab] = useState("business");
   const [formData, setFormData] = useState<BusinessFormData>({
     companyName: "",
     businessDescription: "",
@@ -52,24 +59,37 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     companySize: "",
     websiteUrl: ""
   });
+  const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics>({
+    annualRevenue: 0,
+    grossMargin: 0,
+    netProfit: 0,
+    monthlyGrowthRate: 0,
+    cashPosition: 0,
+    fundingStage: "",
+    exportPercentage: 0,
+    avgOrderValue: 0,
+    customerAcquisitionCost: 0,
+    customerLifetimeValue: 0,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
-  const analyzeWithAI = async (businessId: string) => {
+  const analyzeWithAI = async (businessId: string, combinedData: CombinedFormData) => {
     setIsAnalyzing(true);
     try {
       console.log('Starting business analysis for ID:', businessId);
-      console.log('Form data:', formData);
+      console.log('Form data:', combinedData);
       
       // Call the edge function to analyze the business
       const { data, error } = await supabase.functions.invoke('analyze-business', {
         body: {
-          companyName: formData.companyName,
-          businessDescription: formData.businessDescription,
-          industry: formData.industry,
-          companySize: formData.companySize,
-          websiteUrl: formData.websiteUrl
+          companyName: combinedData.companyName,
+          businessDescription: combinedData.businessDescription,
+          industry: combinedData.industry,
+          companySize: combinedData.companySize,
+          websiteUrl: combinedData.websiteUrl,
+          financialMetrics: combinedData.financialMetrics
         }
       });
 
@@ -132,8 +152,20 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBusinessInfoNext = () => {
+    // Validate required fields
+    if (!formData.companyName || !formData.businessDescription || !formData.industry || !formData.companySize) {
+      toast({
+        title: "Required Fields",
+        description: "Please fill in all required business information fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setActiveTab("financial");
+  };
+
+  const handleSubmit = async (metrics: FinancialMetrics) => {
     setIsSubmitting(true);
 
     try {
@@ -154,7 +186,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         business_description: formData.businessDescription,
         industry: formData.industry,
         company_size: formData.companySize,
-        website_url: formData.websiteUrl || null
+        website_url: formData.websiteUrl || null,
+        financial_metrics: metrics as any
       }).select().single();
 
       if (error) throw error;
@@ -164,6 +197,14 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         description: "Your business information has been saved. Starting AI analysis..."
       });
 
+      const combinedData: CombinedFormData = {
+        ...formData,
+        financialMetrics: metrics
+      };
+
+      // Start AI analysis with combined data
+      await analyzeWithAI(businessData.id, combinedData);
+
       // Reset form
       setFormData({
         companyName: "",
@@ -172,9 +213,19 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         companySize: "",
         websiteUrl: ""
       });
-
-      // Start AI analysis
-      await analyzeWithAI(businessData.id);
+      setFinancialMetrics({
+        annualRevenue: 0,
+        grossMargin: 0,
+        netProfit: 0,
+        monthlyGrowthRate: 0,
+        cashPosition: 0,
+        fundingStage: "",
+        exportPercentage: 0,
+        avgOrderValue: 0,
+        customerAcquisitionCost: 0,
+        customerLifetimeValue: 0,
+      });
+      setActiveTab("business");
 
       onSuccess?.();
     } catch (error) {
@@ -190,122 +241,158 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-4xl">
       <CardHeader className="space-y-2">
         <CardTitle className="flex items-center gap-2 text-2xl">
           <Building className="h-6 w-6 text-primary" />
-          Business Information
+          Business Analysis Setup
         </CardTitle>
         <CardDescription>
-          Tell us about your business to get a personalized UK market readiness assessment
+          Complete both business information and financial metrics for a comprehensive UK market readiness assessment
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="companyName" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Company Name *
-            </Label>
-            <Input
-              id="companyName"
-              type="text"
-              placeholder="Enter your company name"
-              value={formData.companyName}
-              onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="businessDescription" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Business Description *
-            </Label>
-            <Textarea
-              id="businessDescription"
-              placeholder="Describe your business, products/services, and target market..."
-              value={formData.businessDescription}
-              onChange={(e) => setFormData(prev => ({ ...prev, businessDescription: e.target.value }))}
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="business" className="flex items-center gap-2">
               <Building className="h-4 w-4" />
-              Industry *
-            </Label>
-            <Select 
-              value={formData.industry} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select your industry" />
-              </SelectTrigger>
-              <SelectContent>
-                {industries.map((industry) => (
-                  <SelectItem key={industry} value={industry}>
-                    {industry}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              Business Info
+            </TabsTrigger>
+            <TabsTrigger value="financial" className="flex items-center gap-2" disabled={!formData.companyName || !formData.businessDescription || !formData.industry || !formData.companySize}>
+              <DollarSign className="h-4 w-4" />
+              Financial Metrics
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="business" className="space-y-6">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="companyName" className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Company Name *
+                </Label>
+                <Input
+                  id="companyName"
+                  type="text"
+                  placeholder="Enter your company name"
+                  value={formData.companyName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+                  required
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Company Size *
-            </Label>
-            <Select 
-              value={formData.companySize} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, companySize: value }))}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select company size" />
-              </SelectTrigger>
-              <SelectContent>
-                {companySizes.map((size) => (
-                  <SelectItem key={size} value={size}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="businessDescription" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Business Description *
+                </Label>
+                <Textarea
+                  id="businessDescription"
+                  placeholder="Describe your business, products/services, and target market..."
+                  value={formData.businessDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, businessDescription: e.target.value }))}
+                  rows={4}
+                  required
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="websiteUrl" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              Website URL
-            </Label>
-            <Input
-              id="websiteUrl"
-              type="url"
-              placeholder="https://yourcompany.com"
-              value={formData.websiteUrl}
-              onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  Industry *
+                </Label>
+                <Select 
+                  value={formData.industry} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map((industry) => (
+                      <SelectItem key={industry} value={industry}>
+                        {industry}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Company Size *
+                </Label>
+                <Select 
+                  value={formData.companySize} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, companySize: value }))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select company size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companySizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="websiteUrl" className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  Website URL
+                </Label>
+                <Input
+                  id="websiteUrl"
+                  type="url"
+                  placeholder="https://yourcompany.com"
+                  value={formData.websiteUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
+                />
+              </div>
+
+              <Button 
+                onClick={handleBusinessInfoNext}
+                className="w-full"
+                disabled={!formData.companyName || !formData.businessDescription || !formData.industry || !formData.companySize}
+              >
+                Next: Financial Metrics
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="financial" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveTab("business")}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Business Info
+              </Button>
+            </div>
+            
+            <FinancialMetricsForm
+              onSubmit={handleSubmit}
+              initialData={financialMetrics}
+              isLoading={isSubmitting || isAnalyzing}
             />
-          </div>
-
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isSubmitting || isAnalyzing}
-          >
-            {isSubmitting ? "Saving..." : 
-             isAnalyzing ? (
-               <div className="flex items-center gap-2">
-                 <Brain className="h-4 w-4 animate-pulse" />
-                 Analyzing with AI...
-               </div>
-             ) : "Save & Analyze Business"}
-          </Button>
-        </form>
+            
+            {isAnalyzing && (
+              <div className="flex items-center justify-center gap-2 p-4 bg-muted rounded-lg">
+                <Brain className="h-5 w-5 animate-pulse text-primary" />
+                <span className="text-sm font-medium">Analyzing your business with AI...</span>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
