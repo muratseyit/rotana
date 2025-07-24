@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Building, FileText, Globe, Users, Briefcase, Brain, ArrowRight, ArrowLeft, DollarSign } from "lucide-react";
+import { Building, FileText, Globe, Users, Briefcase, Brain, ArrowRight, ArrowLeft, DollarSign, Shield } from "lucide-react";
 import { FinancialMetricsForm, type FinancialMetrics } from "./FinancialMetricsForm";
+import { ComplianceAssessment, type ComplianceStatus } from "./ComplianceAssessment";
 
 const industries = [
   "Technology & Software",
@@ -44,6 +45,7 @@ interface BusinessFormData {
 
 interface CombinedFormData extends BusinessFormData {
   financialMetrics: FinancialMetrics;
+  complianceStatus: ComplianceStatus;
 }
 
 interface BusinessFormProps {
@@ -71,6 +73,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     customerAcquisitionCost: 0,
     customerLifetimeValue: 0,
   });
+  const [complianceStatus, setComplianceStatus] = useState<ComplianceStatus | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
@@ -89,7 +92,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
           industry: combinedData.industry,
           companySize: combinedData.companySize,
           websiteUrl: combinedData.websiteUrl,
-          financialMetrics: combinedData.financialMetrics
+          financialMetrics: combinedData.financialMetrics,
+          complianceStatus: combinedData.complianceStatus
         }
       });
 
@@ -165,7 +169,25 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     setActiveTab("financial");
   };
 
-  const handleSubmit = async (metrics: FinancialMetrics) => {
+  const handleFinancialNext = (metrics: FinancialMetrics) => {
+    setFinancialMetrics(metrics);
+    setActiveTab("compliance");
+  };
+
+  const handleComplianceUpdate = (status: ComplianceStatus) => {
+    setComplianceStatus(status);
+  };
+
+  const handleSubmit = async () => {
+    if (!complianceStatus) {
+      toast({
+        title: "Compliance Assessment Required",
+        description: "Please complete the compliance assessment first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -187,7 +209,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         industry: formData.industry,
         company_size: formData.companySize,
         website_url: formData.websiteUrl || null,
-        financial_metrics: metrics as any
+        financial_metrics: financialMetrics as any,
+        compliance_status: complianceStatus as any
       }).select().single();
 
       if (error) throw error;
@@ -199,7 +222,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
 
       const combinedData: CombinedFormData = {
         ...formData,
-        financialMetrics: metrics
+        financialMetrics,
+        complianceStatus
       };
 
       // Start AI analysis with combined data
@@ -225,6 +249,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         customerAcquisitionCost: 0,
         customerLifetimeValue: 0,
       });
+      setComplianceStatus(null);
       setActiveTab("business");
 
       onSuccess?.();
@@ -248,12 +273,12 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
           Business Analysis Setup
         </CardTitle>
         <CardDescription>
-          Complete both business information and financial metrics for a comprehensive UK market readiness assessment
+          Complete business information, financial metrics, and compliance assessment for a comprehensive UK market readiness analysis
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="business" className="flex items-center gap-2">
               <Building className="h-4 w-4" />
               Business Info
@@ -261,6 +286,10 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
             <TabsTrigger value="financial" className="flex items-center gap-2" disabled={!formData.companyName || !formData.businessDescription || !formData.industry || !formData.companySize}>
               <DollarSign className="h-4 w-4" />
               Financial Metrics
+            </TabsTrigger>
+            <TabsTrigger value="compliance" className="flex items-center gap-2" disabled={!formData.companyName || !formData.businessDescription || !formData.industry || !formData.companySize}>
+              <Shield className="h-4 w-4" />
+              Compliance
             </TabsTrigger>
           </TabsList>
           
@@ -380,10 +409,53 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
             </div>
             
             <FinancialMetricsForm
-              onSubmit={handleSubmit}
+              onSubmit={handleFinancialNext}
               initialData={financialMetrics}
               isLoading={isSubmitting || isAnalyzing}
             />
+            <Button 
+              onClick={() => handleFinancialNext(financialMetrics)}
+              className="w-full mt-4"
+              disabled={isSubmitting || isAnalyzing}
+            >
+              Next: Compliance Assessment
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+            
+            {isAnalyzing && (
+              <div className="flex items-center justify-center gap-2 p-4 bg-muted rounded-lg">
+                <Brain className="h-5 w-5 animate-pulse text-primary" />
+                <span className="text-sm font-medium">Analyzing your business with AI...</span>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="compliance" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveTab("financial")}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Financial Metrics
+              </Button>
+            </div>
+            
+            <ComplianceAssessment
+              complianceStatus={complianceStatus || undefined}
+              onUpdate={handleComplianceUpdate}
+              isLoading={isSubmitting || isAnalyzing}
+            />
+            
+            <Button 
+              onClick={handleSubmit}
+              className="w-full mt-4"
+              disabled={!complianceStatus || isSubmitting || isAnalyzing}
+            >
+              Complete Analysis
+              <Brain className="h-4 w-4 ml-2" />
+            </Button>
             
             {isAnalyzing && (
               <div className="flex items-center justify-center gap-2 p-4 bg-muted rounded-lg">

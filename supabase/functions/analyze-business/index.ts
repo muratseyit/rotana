@@ -26,6 +26,16 @@ interface BusinessData {
     customerAcquisitionCost: number;
     customerLifetimeValue: number;
   };
+  complianceStatus?: {
+    overallScore: number;
+    items: Array<{
+      id: string;
+      category: string;
+      requirement: string;
+      priority: string;
+      completed: boolean;
+    }>;
+  };
 }
 
 interface ScoreBreakdown {
@@ -93,6 +103,16 @@ Avg Order Value: $${businessData.financialMetrics.avgOrderValue}
 Customer Acquisition Cost: $${businessData.financialMetrics.customerAcquisitionCost}
 Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}` : '';
 
+    const complianceInfo = businessData.complianceStatus ? `
+COMPLIANCE STATUS:
+Overall Compliance Score: ${businessData.complianceStatus.overallScore}%
+Completed Requirements: ${businessData.complianceStatus.items.filter(item => item.completed).length}/${businessData.complianceStatus.items.length}
+
+COMPLIANCE ITEMS:
+${businessData.complianceStatus.items.map(item => 
+  `- ${item.requirement} (${item.category}): ${item.completed ? '✅ COMPLETED' : '❌ PENDING'} [Priority: ${item.priority}]`
+).join('\n')}` : '';
+
     // Fetch website content if URL is provided
     let websiteContent = '';
     if (businessData.websiteUrl) {
@@ -145,7 +165,7 @@ Industry: ${businessData.industry}
 Size: ${businessData.companySize}
 Description: ${businessData.businessDescription}
 Website: ${businessData.websiteUrl || 'Not provided'}
-${financialInfo}${websiteContent}
+${financialInfo}${complianceInfo}${websiteContent}
 
 ANALYSIS REQUIREMENTS:
 1. Score each category (0-100) with detailed justification
