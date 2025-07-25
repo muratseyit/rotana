@@ -208,7 +208,7 @@ ANALYSIS REQUIREMENTS:
 
 RESPONSE FORMAT (JSON):
 {
-  "overallScore": [weighted average of all scores],
+  "overallScore": [Calculate as: (productMarketFit + regulatoryCompatibility + digitalReadiness + logisticsPotential + scalabilityAutomation + founderTeamStrength + investmentReadiness) / 7],
   "scoreBreakdown": {
     "productMarketFit": [score 0-100],
     "regulatoryCompatibility": [score 0-100],
@@ -216,7 +216,7 @@ RESPONSE FORMAT (JSON):
     "logisticsPotential": [score 0-100],
     "scalabilityAutomation": [score 0-100],
     "founderTeamStrength": [score 0-100],
-    "investmentReadiness": [USE THE CALCULATED SCORE: ${budgetScore}]
+    "investmentReadiness": ${budgetScore}
   },
   "summary": "[3-4 sentence comprehensive assessment]",
   "roadmap": [
