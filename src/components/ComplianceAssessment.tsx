@@ -14,6 +14,7 @@ export interface ComplianceItem {
   priority: "high" | "medium" | "low";
   completed: boolean;
   resources?: string[];
+  industries: string[]; // Industries this item applies to
 }
 
 export interface ComplianceStatus {
@@ -26,18 +27,206 @@ interface ComplianceAssessmentProps {
   complianceStatus?: ComplianceStatus;
   onUpdate: (status: ComplianceStatus) => void;
   isLoading?: boolean;
+  selectedIndustry: string; // The industry selected in the business form
 }
 
-const defaultComplianceItems: ComplianceItem[] = [
-  {
-    id: "gdpr",
-    category: "Data Protection",
-    requirement: "GDPR Compliance",
-    description: "Implement GDPR requirements for data processing and privacy",
-    priority: "high",
-    completed: false,
-    resources: ["https://ico.org.uk/for-organisations/guide-to-data-protection/"]
-  },
+const industrySpecificCompliance: Record<string, ComplianceItem[]> = {
+  "Technology & Software": [
+    {
+      id: "gdpr-tech",
+      category: "Data Protection",
+      requirement: "GDPR & Data Protection",
+      description: "Implement GDPR requirements for data processing, privacy policies, and user consent",
+      priority: "high",
+      completed: false,
+      resources: ["https://ico.org.uk/for-organisations/guide-to-data-protection/"],
+      industries: ["Technology & Software"]
+    },
+    {
+      id: "software-licensing",
+      category: "Intellectual Property",
+      requirement: "Software Licensing Compliance",
+      description: "Ensure proper software licensing and open source compliance",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.gov.uk/government/publications/intellectual-property-law"],
+      industries: ["Technology & Software"]
+    },
+    {
+      id: "cybersecurity-standards",
+      category: "Security",
+      requirement: "Cyber Essentials Certification",
+      description: "Obtain Cyber Essentials certification for government contracts",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.ncsc.gov.uk/cyberessentials/overview"],
+      industries: ["Technology & Software"]
+    }
+  ],
+  "Financial Services": [
+    {
+      id: "fca-authorization",
+      category: "Financial Regulation",
+      requirement: "FCA Authorization",
+      description: "Obtain FCA authorization for financial services activities",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.fca.org.uk/"],
+      industries: ["Financial Services"]
+    },
+    {
+      id: "anti-money-laundering",
+      category: "Financial Regulation",
+      requirement: "Anti-Money Laundering (AML)",
+      description: "Implement AML procedures and customer due diligence",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.fca.org.uk/firms/financial-crime/money-laundering-regulations"],
+      industries: ["Financial Services"]
+    },
+    {
+      id: "capital-requirements",
+      category: "Financial Regulation",
+      requirement: "Capital Requirements",
+      description: "Meet minimum capital and liquidity requirements",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.bankofengland.co.uk/prudential-regulation"],
+      industries: ["Financial Services"]
+    }
+  ],
+  "Healthcare & Medical": [
+    {
+      id: "mhra-approval",
+      category: "Medical Regulation",
+      requirement: "MHRA Medical Device Approval",
+      description: "Obtain MHRA approval for medical devices and pharmaceuticals",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency"],
+      industries: ["Healthcare & Medical"]
+    },
+    {
+      id: "gmp-standards",
+      category: "Quality Standards",
+      requirement: "Good Manufacturing Practice (GMP)",
+      description: "Comply with GMP standards for pharmaceutical manufacturing",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.gov.uk/guidance/good-manufacturing-practice-and-good-distribution-practice"],
+      industries: ["Healthcare & Medical"]
+    },
+    {
+      id: "clinical-trials",
+      category: "Medical Regulation",
+      requirement: "Clinical Trial Regulations",
+      description: "Follow UK clinical trial regulations and ethics approval",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.gov.uk/guidance/clinical-trials-for-medicines"],
+      industries: ["Healthcare & Medical"]
+    }
+  ],
+  "Food & Beverage": [
+    {
+      id: "food-safety",
+      category: "Food Safety",
+      requirement: "Food Safety Standards",
+      description: "Comply with UK food safety and hygiene regulations",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.food.gov.uk/business-guidance"],
+      industries: ["Food & Beverage"]
+    },
+    {
+      id: "food-labelling",
+      category: "Food Safety",
+      requirement: "Food Labelling Requirements",
+      description: "Ensure proper food labelling and allergen information",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.food.gov.uk/business-guidance/food-labelling"],
+      industries: ["Food & Beverage"]
+    },
+    {
+      id: "alcohol-licensing",
+      category: "Licensing",
+      requirement: "Alcohol Licensing (if applicable)",
+      description: "Obtain appropriate alcohol licenses for production or sale",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.gov.uk/guidance/alcohol-licensing"],
+      industries: ["Food & Beverage"]
+    }
+  ],
+  "Manufacturing": [
+    {
+      id: "ce-ukca-marking",
+      category: "Product Standards",
+      requirement: "CE/UKCA Marking",
+      description: "Ensure products meet UK conformity assessment marking requirements",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.gov.uk/guidance/using-the-ukca-marking"],
+      industries: ["Manufacturing"]
+    },
+    {
+      id: "iso-quality",
+      category: "Quality Standards",
+      requirement: "ISO Quality Management",
+      description: "Implement ISO 9001 quality management system",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.iso.org/iso-9001-quality-management.html"],
+      industries: ["Manufacturing"]
+    },
+    {
+      id: "health-safety-work",
+      category: "Health & Safety",
+      requirement: "Health & Safety at Work Act",
+      description: "Comply with UK workplace health and safety regulations",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.hse.gov.uk/legislation/hswa.htm"],
+      industries: ["Manufacturing"]
+    }
+  ],
+  "E-commerce & Retail": [
+    {
+      id: "distance-selling",
+      category: "Consumer Protection",
+      requirement: "Distance Selling Regulations",
+      description: "Comply with UK distance selling and consumer contract regulations",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.gov.uk/online-and-distance-selling-for-businesses"],
+      industries: ["E-commerce & Retail"]
+    },
+    {
+      id: "payment-processing",
+      category: "Payment Compliance",
+      requirement: "PCI DSS Compliance",
+      description: "Ensure secure payment processing and PCI DSS compliance",
+      priority: "high",
+      completed: false,
+      resources: ["https://www.pcisecuritystandards.org/"],
+      industries: ["E-commerce & Retail"]
+    },
+    {
+      id: "product-liability",
+      category: "Product Standards",
+      requirement: "Product Liability Insurance",
+      description: "Obtain appropriate product liability insurance coverage",
+      priority: "medium",
+      completed: false,
+      resources: ["https://www.gov.uk/product-liability"],
+      industries: ["E-commerce & Retail"]
+    }
+  ]
+};
+
+// Common compliance items that apply to all industries
+const commonComplianceItems: ComplianceItem[] = [
   {
     id: "company-registration",
     category: "Legal Structure",
@@ -45,7 +234,8 @@ const defaultComplianceItems: ComplianceItem[] = [
     description: "Register company with Companies House or establish UK subsidiary",
     priority: "high",
     completed: false,
-    resources: ["https://www.gov.uk/government/organisations/companies-house"]
+    resources: ["https://www.gov.uk/government/organisations/companies-house"],
+    industries: ["all"]
   },
   {
     id: "vat-registration",
@@ -54,25 +244,8 @@ const defaultComplianceItems: ComplianceItem[] = [
     description: "Register for VAT if turnover exceeds £85,000",
     priority: "high",
     completed: false,
-    resources: ["https://www.gov.uk/vat-registration"]
-  },
-  {
-    id: "consumer-rights",
-    category: "Consumer Protection",
-    requirement: "Consumer Rights Act 2015",
-    description: "Comply with UK consumer protection laws",
-    priority: "medium",
-    completed: false,
-    resources: ["https://www.gov.uk/government/publications/consumer-rights-act-2015"]
-  },
-  {
-    id: "product-safety",
-    category: "Product Standards",
-    requirement: "UK Product Safety Standards",
-    description: "Ensure products meet UK/UKCA marking requirements",
-    priority: "high",
-    completed: false,
-    resources: ["https://www.gov.uk/guidance/using-the-ukca-marking"]
+    resources: ["https://www.gov.uk/vat-registration"],
+    industries: ["all"]
   },
   {
     id: "employment-law",
@@ -81,7 +254,8 @@ const defaultComplianceItems: ComplianceItem[] = [
     description: "Comply with UK employment regulations if hiring locally",
     priority: "medium",
     completed: false,
-    resources: ["https://www.gov.uk/employment-law"]
+    resources: ["https://www.gov.uk/employment-law"],
+    industries: ["all"]
   },
   {
     id: "advertising-standards",
@@ -90,22 +264,20 @@ const defaultComplianceItems: ComplianceItem[] = [
     description: "Follow ASA guidelines for advertising and marketing",
     priority: "medium",
     completed: false,
-    resources: ["https://www.asa.org.uk/"]
-  },
-  {
-    id: "financial-services",
-    category: "Financial Services",
-    requirement: "FCA Authorization (if applicable)",
-    description: "Obtain FCA authorization if providing financial services",
-    priority: "high",
-    completed: false,
-    resources: ["https://www.fca.org.uk/"]
+    resources: ["https://www.asa.org.uk/"],
+    industries: ["all"]
   }
 ];
 
-export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading }: ComplianceAssessmentProps) {
+const getComplianceItemsForIndustry = (industry: string): ComplianceItem[] => {
+  const industryItems = industrySpecificCompliance[industry] || [];
+  return [...commonComplianceItems, ...industryItems];
+};
+
+export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, selectedIndustry }: ComplianceAssessmentProps) {
+  const industryItems = getComplianceItemsForIndustry(selectedIndustry);
   const [items, setItems] = useState<ComplianceItem[]>(
-    complianceStatus?.items || defaultComplianceItems
+    complianceStatus?.items || industryItems
   );
 
   const calculateScore = (itemList: ComplianceItem[]) => {
@@ -167,7 +339,7 @@ export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading }: 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          UK Compliance Assessment
+          UK Compliance Assessment - {selectedIndustry}
         </CardTitle>
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-primary">

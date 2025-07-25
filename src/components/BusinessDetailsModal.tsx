@@ -375,6 +375,7 @@ export function BusinessDetailsModal({ business, isOpen, onOpenChange, onUpdate 
               complianceStatus={business.compliance_status}
               onUpdate={handleComplianceUpdate}
               isLoading={isUpdating}
+              selectedIndustry={business.industry || "Other"}
             />
           </TabsContent>
 

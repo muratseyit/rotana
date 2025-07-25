@@ -446,6 +446,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
               complianceStatus={complianceStatus || undefined}
               onUpdate={handleComplianceUpdate}
               isLoading={isSubmitting || isAnalyzing}
+              selectedIndustry={formData.industry}
             />
             
             <Button 
