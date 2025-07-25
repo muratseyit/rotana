@@ -41,6 +41,7 @@ interface BusinessFormData {
   industry: string;
   companySize: string;
   websiteUrl: string;
+  initialInvestmentBudget: string;
 }
 
 interface CombinedFormData extends BusinessFormData {
@@ -59,7 +60,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     businessDescription: "",
     industry: "",
     companySize: "",
-    websiteUrl: ""
+    websiteUrl: "",
+    initialInvestmentBudget: ""
   });
   const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics>({
     annualRevenue: 0,
@@ -209,7 +211,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         industry: formData.industry,
         company_size: formData.companySize,
         website_url: formData.websiteUrl || null,
-        financial_metrics: financialMetrics as any,
+        financial_metrics: { ...financialMetrics, initialInvestmentBudget: formData.initialInvestmentBudget } as any,
         compliance_status: complianceStatus as any
       }).select().single();
 
@@ -235,7 +237,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
         businessDescription: "",
         industry: "",
         companySize: "",
-        websiteUrl: ""
+        websiteUrl: "",
+        initialInvestmentBudget: ""
       });
       setFinancialMetrics({
         annualRevenue: 0,
@@ -382,6 +385,20 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
                   placeholder="https://yourcompany.com"
                   value={formData.websiteUrl}
                   onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="initialInvestmentBudget" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Initial Investment Budget
+                </Label>
+                <Input
+                  id="initialInvestmentBudget"
+                  type="text"
+                  placeholder="e.g., £50,000 - £100,000"
+                  value={formData.initialInvestmentBudget}
+                  onChange={(e) => setFormData(prev => ({ ...prev, initialInvestmentBudget: e.target.value }))}
                 />
               </div>
 
