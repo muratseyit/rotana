@@ -25,6 +25,7 @@ interface BusinessData {
     avgOrderValue: number;
     customerAcquisitionCost: number;
     customerLifetimeValue: number;
+    initialInvestmentBudget?: string;
   };
   complianceStatus?: {
     overallScore: number;
@@ -45,6 +46,7 @@ interface ScoreBreakdown {
   logisticsPotential: number;
   scalabilityAutomation: number;
   founderTeamStrength: number;
+  investmentReadiness: number;
 }
 
 interface DetailedInsight {
@@ -90,6 +92,34 @@ serve(async (req) => {
     const businessData: BusinessData = await req.json();
     console.log('Business data received:', businessData);
 
+    // Calculate budget score
+    const calculateBudgetScore = (budgetString?: string): number => {
+      if (!budgetString) return 0;
+      
+      // Extract numbers from budget string (e.g., "£50,000 - £100,000" or "£50,000")
+      const numbers = budgetString.match(/[\d,]+/g);
+      if (!numbers) return 0;
+      
+      // Take the first number as the minimum budget
+      const budget = parseInt(numbers[0].replace(/,/g, ''));
+      
+      // If budget is under 500, score is 0
+      if (budget < 500) return 0;
+      
+      // Scoring tiers:
+      // £500-£5,000: 20-40
+      // £5,000-£25,000: 40-60  
+      // £25,000-£100,000: 60-80
+      // £100,000+: 80-100
+      
+      if (budget >= 100000) return Math.min(100, 80 + ((budget - 100000) / 100000) * 20);
+      if (budget >= 25000) return 60 + ((budget - 25000) / 75000) * 20;
+      if (budget >= 5000) return 40 + ((budget - 5000) / 20000) * 20;
+      return 20 + ((budget - 500) / 4500) * 20;
+    };
+
+    const budgetScore = calculateBudgetScore(businessData.financialMetrics?.initialInvestmentBudget);
+
     const financialInfo = businessData.financialMetrics ? `
 FINANCIAL METRICS:
 Annual Revenue: $${businessData.financialMetrics.annualRevenue?.toLocaleString() || 'Not provided'}
@@ -101,7 +131,9 @@ Funding Stage: ${businessData.financialMetrics.fundingStage}
 Export Percentage: ${businessData.financialMetrics.exportPercentage}%
 Avg Order Value: $${businessData.financialMetrics.avgOrderValue}
 Customer Acquisition Cost: $${businessData.financialMetrics.customerAcquisitionCost}
-Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}` : '';
+Customer Lifetime Value: $${businessData.financialMetrics.customerLifetimeValue}
+Initial Investment Budget: ${businessData.financialMetrics.initialInvestmentBudget || 'Not provided'}
+CALCULATED INVESTMENT READINESS SCORE: ${budgetScore}/100` : '';
 
     const complianceInfo = businessData.complianceStatus ? `
 COMPLIANCE STATUS:
@@ -183,7 +215,8 @@ RESPONSE FORMAT (JSON):
     "digitalReadiness": [score 0-100],
     "logisticsPotential": [score 0-100],
     "scalabilityAutomation": [score 0-100],
-    "founderTeamStrength": [score 0-100]
+    "founderTeamStrength": [score 0-100],
+    "investmentReadiness": [USE THE CALCULATED SCORE: ${budgetScore}]
   },
   "summary": "[3-4 sentence comprehensive assessment]",
   "roadmap": [
@@ -285,7 +318,8 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
           digitalReadiness: 65,
           logisticsPotential: 65,
           scalabilityAutomation: 70,
-          founderTeamStrength: 60
+          founderTeamStrength: 60,
+          investmentReadiness: budgetScore
         },
         summary: "Analysis completed with limited data. Consider providing more detailed business information for a more accurate assessment.",
         roadmap: [
