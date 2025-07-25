@@ -307,6 +307,22 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
         throw new Error('No valid JSON found in response');
       }
       analysisResult = JSON.parse(jsonMatch[0]);
+      
+      // Round scores to integers to match database schema
+      analysisResult.overallScore = Math.round(analysisResult.overallScore);
+      if (analysisResult.scoreBreakdown) {
+        Object.keys(analysisResult.scoreBreakdown).forEach(key => {
+          analysisResult.scoreBreakdown[key] = Math.round(analysisResult.scoreBreakdown[key]);
+        });
+      }
+      if (analysisResult.detailedInsights) {
+        analysisResult.detailedInsights.forEach(insight => {
+          insight.score = Math.round(insight.score);
+        });
+      }
+      if (analysisResult.complianceAssessment) {
+        analysisResult.complianceAssessment.complianceScore = Math.round(analysisResult.complianceAssessment.complianceScore);
+      }
     } catch (parseError) {
       console.error('Error parsing OpenAI response:', parseError);
       // Fallback response if parsing fails
