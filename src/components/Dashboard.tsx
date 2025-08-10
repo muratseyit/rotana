@@ -279,14 +279,48 @@ export function Dashboard() {
                     {/* Analysis Status */}
                     <div className="space-y-3">
                       {business.analysis_status === 'pending' && (
-                        <Badge variant="outline" className="w-full justify-center">
-                          Analysis Pending
-                        </Badge>
+                        <div className="space-y-2">
+                          <Badge variant="outline" className="w-full justify-center">
+                            Analysis Pending
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => reAnalyzeBusiness(business)}
+                            disabled={isAnalyzing === business.id}
+                            aria-label="Analyze now"
+                          >
+                            {isAnalyzing === business.id ? (
+                              <Brain className="h-3 w-3 mr-2 animate-pulse" />
+                            ) : (
+                              <RotateCcw className="h-3 w-3 mr-2" />
+                            )}
+                            {isAnalyzing === business.id ? 'Analyzing…' : 'Analyze Now'}
+                          </Button>
+                        </div>
                       )}
                       {business.analysis_status === 'failed' && (
-                        <Badge variant="destructive" className="w-full justify-center">
-                          Analysis Failed
-                        </Badge>
+                        <div className="space-y-2">
+                          <Badge variant="destructive" className="w-full justify-center">
+                            Analysis Failed
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => reAnalyzeBusiness(business)}
+                            disabled={isAnalyzing === business.id}
+                            aria-label="Retry analysis"
+                          >
+                            {isAnalyzing === business.id ? (
+                              <Brain className="h-3 w-3 mr-2 animate-pulse" />
+                            ) : (
+                              <RotateCcw className="h-3 w-3 mr-2" />
+                            )}
+                            {isAnalyzing === business.id ? 'Retrying…' : 'Retry Analysis'}
+                          </Button>
+                        </div>
                       )}
                       {business.analysis_status === 'completed' && business.analysis_result && (
                         <div className="space-y-2">
