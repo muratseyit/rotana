@@ -4,7 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Users, Lock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Users, Lock, Link as LinkIcon, Calendar } from "lucide-react";
 
 export interface ComplianceItem {
   id: string;
@@ -15,6 +19,9 @@ export interface ComplianceItem {
   completed: boolean;
   resources?: string[];
   industries: string[]; // Industries this item applies to
+  law?: string; // e.g., GDPR, UKCA, MHRA
+  deadline?: string; // ISO date string
+  partner?: { name: string; url: string };
 }
 
 export interface ComplianceStatus {
@@ -28,6 +35,9 @@ interface ComplianceAssessmentProps {
   onUpdate: (status: ComplianceStatus) => void;
   isLoading?: boolean;
   selectedIndustry: string; // The industry selected in the business form
+  companyName?: string;
+  businessDescription?: string;
+  websiteUrl?: string | null;
 }
 
 const industrySpecificCompliance: Record<string, ComplianceItem[]> = {
@@ -274,11 +284,86 @@ const getComplianceItemsForIndustry = (industry: string): ComplianceItem[] => {
   return [...commonComplianceItems, ...industryItems];
 };
 
-export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, selectedIndustry }: ComplianceAssessmentProps) {
+export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, selectedIndustry, companyName, businessDescription, websiteUrl }: ComplianceAssessmentProps) {
   const industryItems = getComplianceItemsForIndustry(selectedIndustry);
   const [items, setItems] = useState<ComplianceItem[]>(
     complianceStatus?.items || industryItems
   );
+
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [catalogText, setCatalogText] = useState("");
+  const [companyNameInput, setCompanyNameInput] = useState(companyName || "");
+  const [businessDescriptionInput, setBusinessDescriptionInput] = useState(businessDescription || "");
+  const [websiteUrlInput, setWebsiteUrlInput] = useState(websiteUrl || "");
+
+  const toInputDate = (iso?: string) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const addDays = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString();
+  };
+
+  const handleDeadlineChange = (itemId: string, dateStr: string) => {
+    const iso = dateStr ? new Date(dateStr + 'T00:00:00Z').toISOString() : undefined;
+    setItems(prev => prev.map(i => i.id === itemId ? { ...i, deadline: iso } : i));
+  };
+
+  const generateChecklist = async () => {
+    if (!companyNameInput && !businessDescriptionInput && !catalogText) {
+      toast({ title: "Missing context", description: "Provide company info or catalog to generate.", variant: "destructive" });
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-compliance-checklist', {
+        body: {
+          business: {
+            companyName: companyNameInput || companyName || "",
+            businessDescription: businessDescriptionInput || businessDescription || "",
+            industry: selectedIndustry,
+            websiteUrl: websiteUrlInput || websiteUrl || null,
+          },
+          catalogText,
+        }
+      });
+      if (error) throw error;
+
+      const generatedItems = (data.items || []).map((it: any) => {
+        const deadline = it.deadlineDays ? addDays(it.deadlineDays) : undefined;
+        const mapped: ComplianceItem = {
+          id: it.id || `${it.category}-${it.law}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          category: it.category,
+          requirement: it.requirement,
+          description: it.description,
+          priority: it.priority,
+          completed: false,
+          resources: it.resources,
+          industries: [selectedIndustry],
+          law: it.law,
+          partner: it.partner,
+          deadline,
+        };
+        return mapped;
+      });
+
+      setItems(generatedItems);
+      toast({ title: "Checklist generated", description: `Created ${generatedItems.length} items tailored to your profile.` });
+    } catch (e: any) {
+      console.error('generate checklist error', e);
+      toast({ title: "Generation failed", description: e?.message || "Could not generate checklist.", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const calculateScore = (itemList: ComplianceItem[]) => {
     const totalWeight = itemList.reduce((sum, item) => {
@@ -352,6 +437,45 @@ export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, se
         <Progress value={overallScore} className="h-2" />
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Generator controls (optional overrides) */}
+        <div className="space-y-3 p-4 border rounded-lg">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">AI-generated UK checklist</h3>
+            <Button size="sm" onClick={generateChecklist} disabled={isGenerating}>
+              {isGenerating ? "Generating..." : "Generate from Profile & Catalog"}
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Input
+              placeholder="Company name (auto)"
+              value={companyNameInput}
+              onChange={(e) => setCompanyNameInput(e.target.value)}
+            />
+            <Input
+              placeholder="Website URL (optional)"
+              value={websiteUrlInput || ""}
+              onChange={(e) => setWebsiteUrlInput(e.target.value)}
+            />
+            <Input
+              placeholder="Industry (auto)"
+              value={selectedIndustry}
+              readOnly
+            />
+          </div>
+          <Textarea
+            placeholder="Paste catalog items or product summary (optional)"
+            value={catalogText}
+            onChange={(e) => setCatalogText(e.target.value)}
+            rows={3}
+          />
+          <Textarea
+            placeholder="Business description (auto)"
+            value={businessDescriptionInput}
+            onChange={(e) => setBusinessDescriptionInput(e.target.value)}
+            rows={3}
+          />
+        </div>
+
         <div className="space-y-4">
           {Object.entries(
             items.reduce((acc, item) => {
@@ -384,9 +508,14 @@ export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, se
                           >
                             {item.requirement}
                           </label>
-                          <Badge variant={getPriorityColor(item.priority) as any}>
-                            {item.priority}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            {item.law && (
+                              <Badge variant="outline">{item.law}</Badge>
+                            )}
+                            <Badge variant={getPriorityColor(item.priority) as any}>
+                              {item.priority}
+                            </Badge>
+                          </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {item.description}
@@ -406,6 +535,29 @@ export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, se
                             ))}
                           </div>
                         )}
+
+                        <div className="flex flex-col md:flex-row md:items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span className="text-sm">Due date</span>
+                            <Input
+                              type="date"
+                              className="h-8 w-[160px]"
+                              value={toInputDate(item.deadline)}
+                              onChange={(e) => handleDeadlineChange(item.id, e.target.value)}
+                            />
+                          </div>
+                          {item.partner?.url && (
+                            <a
+                              href={item.partner.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                            >
+                              <LinkIcon className="h-3 w-3" /> Get partner help{item.partner?.name ? `: ${item.partner.name}` : ''}
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
