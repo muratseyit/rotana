@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
@@ -101,15 +101,103 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          category: Database["public"]["Enums"]["partner_category"]
+          contact_email: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          location: string | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          specialties: string[] | null
+          updated_at: string
+          verification_status: string
+          verified_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["partner_category"]
+          contact_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          specialties?: string[] | null
+          updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["partner_category"]
+          contact_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          specialties?: string[] | null
+          updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      partner_category:
+        | "accounting"
+        | "marketing"
+        | "business_development"
+        | "compliance"
+        | "legal"
+        | "logistics"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -236,6 +324,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      partner_category: [
+        "accounting",
+        "marketing",
+        "business_development",
+        "compliance",
+        "legal",
+        "logistics",
+      ],
+    },
   },
 } as const
