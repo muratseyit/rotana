@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain } from "lucide-react";
+import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain, Building2, Shield } from "lucide-react";
 
 interface Business {
   id: string;
@@ -29,6 +29,7 @@ export function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,6 +40,18 @@ export function Dashboard() {
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
+    
+    if (user) {
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      setUserRole(roleData?.role || null);
+    }
   };
 
   const fetchBusinesses = async () => {
@@ -161,9 +174,29 @@ export function Dashboard() {
                 </p>
               </div>
             </div>
-            <Button onClick={() => supabase.auth.signOut()}>
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => window.open('/partners', '_blank')}
+                className="gap-2"
+              >
+                <Building2 className="h-4 w-4" />
+                Partner Directory
+              </Button>
+              {userRole === 'admin' && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open('/admin/partners', '_blank')}
+                  className="gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin Partners
+                </Button>
+              )}
+              <Button onClick={() => supabase.auth.signOut()}>
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>

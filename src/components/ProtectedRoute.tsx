@@ -1,45 +1,62 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Session } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
+  requiredRole?: Database['public']['Enums']['app_role'];
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUser = session?.user || null;
+      setUser(currentUser);
+      
+      if (currentUser && requiredRole) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', currentUser.id)
+          .eq('role', requiredRole)
+          .single();
         
-        if (!session?.user && event !== 'INITIAL_SESSION') {
-          navigate('/auth');
+        setUserRole(roleData?.role || null);
+      }
+      
+      setLoading(false);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        const currentUser = session?.user || null;
+        setUser(currentUser);
+        
+        if (currentUser && requiredRole) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', currentUser.id)
+            .eq('role', requiredRole)
+            .single();
+          
+          setUserRole(roleData?.role || null);
+        } else {
+          setUserRole(null);
         }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      
-      if (!session?.user) {
-        navigate('/auth');
-      }
-    });
-
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [requiredRole]);
 
   if (loading) {
     return (
@@ -52,8 +69,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user || !session) {
-    return null; // Auth will handle redirection
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
