@@ -1,9 +1,39 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Circle, Target, TrendingUp, Zap, Shield, Truck, Users, Brain, Lightbulb, AlertCircle, ExternalLink } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { 
+  CheckCircle, 
+  Circle, 
+  Target, 
+  TrendingUp, 
+  Zap, 
+  Shield, 
+  Truck, 
+  Users, 
+  Brain, 
+  Lightbulb, 
+  AlertCircle, 
+  ExternalLink,
+  Mail,
+  Globe,
+  Building
+} from "lucide-react";
+
+interface PartnerRecommendation {
+  category: string;
+  partners: Array<{
+    id: string;
+    name: string;
+    description: string;
+    specialties: string[];
+    contact_email: string;
+    website_url: string;
+  }>;
+  reason: string;
+}
 
 interface ScoreBreakdown {
   productMarketFit: number;
@@ -12,6 +42,7 @@ interface ScoreBreakdown {
   logisticsPotential: number;
   scalabilityAutomation: number;
   founderTeamStrength: number;
+  investmentReadiness?: number;
 }
 
 interface DetailedInsight {
@@ -38,6 +69,13 @@ interface AnalysisResult {
     shortTerm: string[];
     longTerm: string[];
   };
+  complianceAssessment?: {
+    criticalRequirements: string[];
+    riskAreas: string[];
+    complianceScore: number;
+  };
+  partnerRecommendations?: PartnerRecommendation[];
+  timestamp?: string;
 }
 
 interface EnhancedAnalysisResultsProps {
@@ -82,6 +120,12 @@ const scoreCategories = [
     label: 'Founder/Team Strength',
     icon: Users,
     description: 'Experience and UK market knowledge'
+  },
+  {
+    key: 'investmentReadiness' as keyof ScoreBreakdown,
+    label: 'Investment Readiness',
+    icon: Building,
+    description: 'Financial preparedness for UK expansion'
   }
 ];
 
@@ -148,10 +192,11 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
 
       {/* Detailed Analysis Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="insights">Detailed Insights</TabsTrigger>
-          <TabsTrigger value="roadmap">Action Roadmap</TabsTrigger>
+          <TabsTrigger value="partners">Partners</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
+          <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -167,6 +212,8 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {scoreCategories.map((category) => {
                   const score = analysis.scoreBreakdown[category.key];
+                  if (score === undefined) return null; // Skip if score not available
+                  
                   const Icon = category.icon;
                   
                   return (
@@ -190,6 +237,106 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="partners" className="space-y-6">
+          {/* Partner Recommendations */}
+          {analysis.partnerRecommendations && analysis.partnerRecommendations.length > 0 ? (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Recommended UK Partners
+                  </CardTitle>
+                  <CardDescription>
+                    Verified partners to help address your specific needs based on the analysis
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {analysis.partnerRecommendations.map((recommendation, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{recommendation.category}</CardTitle>
+                    <CardDescription>{recommendation.reason}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {recommendation.partners.map((partner) => (
+                        <Card key={partner.id} className="border-l-4 border-l-primary">
+                          <CardContent className="p-4 space-y-3">
+                            <div>
+                              <h5 className="font-medium">{partner.name}</h5>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {partner.description}
+                              </p>
+                            </div>
+                            
+                            {partner.specialties && partner.specialties.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {partner.specialties.slice(0, 3).map((specialty, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-xs">
+                                    {specialty}
+                                  </Badge>
+                                ))}
+                                {partner.specialties.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{partner.specialties.length - 3} more
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="flex gap-2">
+                              {partner.contact_email && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="flex-1"
+                                  onClick={() => window.open(`mailto:${partner.contact_email}`, '_blank')}
+                                >
+                                  <Mail className="h-3 w-3 mr-1" />
+                                  Contact
+                                </Button>
+                              )}
+                              {partner.website_url && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => window.open(partner.website_url, '_blank')}
+                                >
+                                  <Globe className="h-3 w-3 mr-1" />
+                                  Website
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Partner Recommendations</h3>
+                <p className="text-muted-foreground">
+                  Your business shows good readiness across all areas. You can still explore our partner directory for additional support.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => window.open('/partners', '_blank')}
+                >
+                  View Partner Directory
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="insights" className="space-y-6">
@@ -382,8 +529,57 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               </Card>
             </div>
           )}
+
+          {/* Compliance Assessment */}
+          {analysis.complianceAssessment && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Compliance Assessment
+                  <Badge variant={getScoreBadgeVariant(analysis.complianceAssessment.complianceScore)} className="ml-auto">
+                    {analysis.complianceAssessment.complianceScore}%
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {analysis.complianceAssessment.criticalRequirements.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">Critical UK Requirements</h4>
+                    <ul className="space-y-1">
+                      {analysis.complianceAssessment.criticalRequirements.map((req, index) => (
+                        <li key={index} className="text-sm text-muted-foreground pl-4">
+                          • {req}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {analysis.complianceAssessment.riskAreas.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2 text-yellow-700">Risk Areas</h4>
+                    <ul className="space-y-1">
+                      {analysis.complianceAssessment.riskAreas.map((risk, index) => (
+                        <li key={index} className="text-sm text-muted-foreground pl-4">
+                          • {risk}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
+
+      {/* Analysis Metadata */}
+      {analysis.timestamp && (
+        <div className="text-xs text-muted-foreground text-center">
+          Analysis completed on {new Date(analysis.timestamp).toLocaleString()}
+        </div>
+      )}
     </div>
   );
 }

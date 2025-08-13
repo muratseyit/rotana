@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -359,7 +360,113 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
       };
     }
 
-    return new Response(JSON.stringify(analysisResult), {
+    // Fetch verified partners for recommendations
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    const { data: partners, error: partnersError } = await supabaseClient
+      .from('partners')
+      .select('id, name, description, category, specialties, contact_email, website_url')
+      .eq('verification_status', 'verified')
+
+    if (partnersError) {
+      console.error('Error fetching partners:', partnersError)
+    }
+
+    // Generate partner recommendations based on analysis results
+    const partnerRecommendations = [];
+
+    if (partners && partners.length > 0) {
+      // Legal services for low regulatory compliance
+      if (analysisResult.scoreBreakdown.regulatoryCompatibility < 70) {
+        const legalPartners = partners.filter(p => p.category === 'legal').slice(0, 2);
+        if (legalPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Legal Services',
+            partners: legalPartners,
+            reason: 'Your business needs assistance with UK regulatory compliance and company formation'
+          });
+        }
+      }
+
+      // Accounting services for low investment readiness
+      if (analysisResult.scoreBreakdown.investmentReadiness < 70) {
+        const accountingPartners = partners.filter(p => p.category === 'accounting').slice(0, 2);
+        if (accountingPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Accounting Services',
+            partners: accountingPartners,
+            reason: 'Professional accounting support needed for VAT registration and UK tax compliance'
+          });
+        }
+      }
+
+      // Business development for low product-market fit or founder team strength
+      if (analysisResult.scoreBreakdown.productMarketFit < 70 || analysisResult.scoreBreakdown.founderTeamStrength < 70) {
+        const businessPartners = partners.filter(p => p.category === 'business_development').slice(0, 2);
+        if (businessPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Business Development',
+            partners: businessPartners,
+            reason: 'Strategic guidance needed for UK market entry and business development'
+          });
+        }
+      }
+
+      // Marketing for low digital readiness
+      if (analysisResult.scoreBreakdown.digitalReadiness < 70) {
+        const marketingPartners = partners.filter(p => p.category === 'marketing').slice(0, 2);
+        if (marketingPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Marketing Services',
+            partners: marketingPartners,
+            reason: 'Digital marketing expertise required to establish UK market presence'
+          });
+        }
+      }
+
+      // Compliance for specific industries or low compliance scores
+      if (analysisResult.complianceAssessment.complianceScore < 70 || 
+          businessData.industry.toLowerCase().includes('food') || 
+          businessData.industry.toLowerCase().includes('health') || 
+          businessData.industry.toLowerCase().includes('finance')) {
+        const compliancePartners = partners.filter(p => p.category === 'compliance').slice(0, 1);
+        if (compliancePartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Compliance Services',
+            partners: compliancePartners,
+            reason: 'Industry-specific compliance requirements need specialist attention'
+          });
+        }
+      }
+
+      // Logistics for product-based businesses with low logistics potential
+      if (analysisResult.scoreBreakdown.logisticsPotential < 70 && 
+          (businessData.businessDescription.toLowerCase().includes('product') || 
+           businessData.businessDescription.toLowerCase().includes('goods') || 
+           businessData.businessDescription.toLowerCase().includes('manufacturing'))) {
+        const logisticsPartners = partners.filter(p => p.category === 'logistics').slice(0, 1);
+        if (logisticsPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Logistics Services',
+            partners: logisticsPartners,
+            reason: 'Supply chain and logistics support needed for product distribution in the UK'
+          });
+        }
+      }
+    }
+
+    // Add partner recommendations to the analysis result
+    const enhancedResult = {
+      ...analysisResult,
+      partnerRecommendations,
+      timestamp: new Date().toISOString(),
+      analysisVersion: 'v2.0'
+    };
+
+    return new Response(JSON.stringify(enhancedResult), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
