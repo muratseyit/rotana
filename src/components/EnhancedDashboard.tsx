@@ -447,14 +447,26 @@ export function Dashboard() {
       {/* Modals */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <BusinessForm onSubmit={handleBusinessFormSubmit} />
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <BusinessForm onSuccess={handleBusinessFormSubmit} />
+            <Button 
+              variant="outline" 
+              onClick={() => setShowForm(false)}
+              className="mt-4"
+            >
+              Close
+            </Button>
+          </div>
         </div>
       )}
 
       {selectedBusiness && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <BusinessDetailsModal business={selectedBusiness} />
-        </div>
+        <BusinessDetailsModal 
+          business={selectedBusiness}
+          isOpen={!!selectedBusiness}
+          onOpenChange={(open) => !open && setSelectedBusiness(null)}
+          onUpdate={fetchBusinesses}
+        />
       )}
     </div>
   );
