@@ -4,12 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, TrendingUp } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { User } from "@supabase/supabase-js";
 
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Check current auth state
@@ -58,6 +61,7 @@ const Index = () => {
               <span className="text-2xl font-bold text-slate-900">Business Bridge</span>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
               {user ? (
                 <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700 text-white">
                   Dashboard
@@ -83,23 +87,23 @@ const Index = () => {
           <div className="mb-8">
             <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-6">
               <Zap className="h-4 w-4 mr-2" />
-              AI-Powered Business Intelligence
+              {t('hero.badge')}
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            Transform Your Business with{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">Smart Analytics</span>
+            {t('hero.title').split(' ').slice(0, -3).join(' ')}{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">{t('hero.title').split(' ').slice(-3).join(' ')}</span>
           </h1>
           <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Get comprehensive analysis of your business with AI-powered insights. Understand your market position, identify opportunities, and make data-driven decisions.
+            {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
-              {user ? 'Go to Dashboard' : 'Start Your Analysis'}
+              {user ? 'Go to Dashboard' : t('hero.startJourney')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-slate-300">
-              Watch Demo
+              {t('hero.watchDemo')}
             </Button>
           </div>
         </div>
@@ -110,10 +114,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Powerful Features for Business Growth
+              {t('features.title')}
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Everything you need to analyze, understand, and grow your business
+              {t('features.subtitle')}
             </p>
           </div>
 
