@@ -9,7 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { calculateMarketabilityScore, MarketabilityResult } from "@/utils/marketabilityEngine";
 import MarketabilityScoreCard from "./MarketabilityScoreCard";
-import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain, Building2, Shield, LogOut, UserCircle } from "lucide-react";
+import { SubscriptionStatus } from "./SubscriptionStatus";
+import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain, Building2, Shield, LogOut, UserCircle, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Business {
@@ -166,6 +167,10 @@ export function Dashboard() {
     fetchBusinesses();
   };
 
+  const handleUpgradeClick = () => {
+    navigate('/pricing');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -304,8 +309,11 @@ export function Dashboard() {
               </Card>
             </div>
 
-            {/* Recent Businesses */}
-            <Card>
+            {/* Subscription Status */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                {/* Recent Businesses */}
+                <Card>
               <CardHeader>
                 <CardTitle>Recent Business Analyses</CardTitle>
                 <CardDescription>Your latest business analysis results</CardDescription>
@@ -351,6 +359,13 @@ export function Dashboard() {
                 )}
               </CardContent>
             </Card>
+              </div>
+              
+              {/* Subscription Status Sidebar */}
+              <div className="md:col-span-1">
+                <SubscriptionStatus onUpgrade={handleUpgradeClick} />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="businesses" className="space-y-6">

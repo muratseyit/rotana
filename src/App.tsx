@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Partners from "./pages/Partners";
 import AdminPartners from "./pages/AdminPartners";
+import Pricing from "./pages/Pricing";
 import { Dashboard } from "./components/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/features" element={<Features />} />
           <Route path="/partners" element={<Partners />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
