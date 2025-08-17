@@ -28,17 +28,26 @@ export function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProps) {
   const checkSubscription = async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement subscription check
-      // const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-subscription');
       
-      // Mock data for now
-      setSubscription({
-        subscribed: false,
-        subscription_tier: undefined,
-        subscription_end: undefined
-      });
+      if (error) {
+        console.error('Error checking subscription:', error);
+        toast({
+          title: "Error",
+          description: "Failed to check subscription status.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setSubscription(data || { subscribed: false });
     } catch (error) {
       console.error('Error checking subscription:', error);
+      toast({
+        title: "Error",
+        description: "Failed to check subscription status.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -46,13 +55,20 @@ export function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProps) {
 
   const handleManageSubscription = async () => {
     try {
-      // TODO: Implement customer portal
-      // const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data, error } = await supabase.functions.invoke('customer-portal');
       
-      toast({
-        title: "Coming Soon",
-        description: "Subscription management will be available soon!",
-      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to open subscription management.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
     } catch (error) {
       toast({
         title: "Error",

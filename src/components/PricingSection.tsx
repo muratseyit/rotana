@@ -23,20 +23,20 @@ const pricingTiers: PricingTier[] = [
     features: [
       "1 business analysis per month",
       "Basic market readiness score",
-      "Access to partner directory",
+      "Access to partner directory", 
       "Standard compliance checklist",
       "Email support"
     ],
     stripePriceId: ""
   },
   {
-    name: "Professional",
+    name: "Professional", 
     price: "£29",
     period: "/month",
     description: "For serious entrepreneurs entering the UK market",
     features: [
       "10 business analyses per month",
-      "Advanced marketability insights",
+      "Advanced marketability insights", 
       "Priority partner matching",
       "Detailed compliance roadmap",
       "Financial metrics tracking",
@@ -44,18 +44,18 @@ const pricingTiers: PricingTier[] = [
       "Industry benchmarking"
     ],
     isPopular: true,
-    stripePriceId: "price_professional_monthly"
+    stripePriceId: "price_1QTtPhHNxTzBa8ws8BuvQPJx" // Example Stripe price ID - replace with actual
   },
   {
     name: "Enterprise",
-    price: "£99",
+    price: "£99", 
     period: "/month",
     description: "For agencies and consultants with multiple clients",
     features: [
       "Unlimited business analyses",
       "White-label reports",
       "API access",
-      "Custom compliance templates",
+      "Custom compliance templates", 
       "Dedicated account manager",
       "24/7 priority support",
       "Advanced analytics dashboard",
@@ -63,7 +63,7 @@ const pricingTiers: PricingTier[] = [
       "Custom integrations"
     ],
     isPremium: true,
-    stripePriceId: "price_enterprise_monthly"
+    stripePriceId: "price_1QTtPhHNxTzBa8ws9BuvQPJy" // Example Stripe price ID - replace with actual
   }
 ];
 

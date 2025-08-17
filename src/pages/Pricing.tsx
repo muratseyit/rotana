@@ -40,15 +40,22 @@ export default function Pricing() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement Stripe checkout
-      // const { data, error } = await supabase.functions.invoke('create-checkout', {
-      //   body: { priceId }
-      // });
-      
-      toast({
-        title: "Coming Soon",
-        description: "Subscription functionality will be available soon!",
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId }
       });
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to process subscription. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -65,13 +72,20 @@ export default function Pricing() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement customer portal
-      // const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data, error } = await supabase.functions.invoke('customer-portal');
       
-      toast({
-        title: "Coming Soon",
-        description: "Subscription management will be available soon!",
-      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to open subscription management. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
     } catch (error) {
       toast({
         title: "Error",
