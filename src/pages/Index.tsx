@@ -98,10 +98,23 @@ const Index = () => {
             {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
-              {user ? 'Go to Dashboard' : t('hero.startJourney')}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            {user ? (
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
+                Go to Dashboard
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            ) : (
+              <>
+                <Button size="lg" className="bg-premium hover:bg-premium/90 text-premium-foreground px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+                  Get £8 AI Analysis
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
+                  {t('hero.startJourney')}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </>
+            )}
             <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-slate-300">
               {t('hero.watchDemo')}
             </Button>
@@ -237,10 +250,17 @@ const Index = () => {
             Join thousands of businesses that have already discovered their growth potential with our AI-powered platform
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg" onClick={handleGetStarted}>
-              {user ? 'Go to Dashboard' : 'Start Free Analysis'}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            {user ? (
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg" onClick={handleGetStarted}>
+                Go to Dashboard
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            ) : (
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+                Get £8 AI Analysis
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            )}
             <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg">
               Schedule Consultation
             </Button>

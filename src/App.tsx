@@ -12,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import Partners from "./pages/Partners";
 import AdminPartners from "./pages/AdminPartners";
 import Pricing from "./pages/Pricing";
+import GuestAnalysis from "./pages/GuestAnalysis";
+import GuestResults from "./pages/GuestResults";
 import { Dashboard } from "./components/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/features" element={<Features />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/guest-analysis" element={<GuestAnalysis />} />
+          <Route path="/guest-results" element={<GuestResults />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
