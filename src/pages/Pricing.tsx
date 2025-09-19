@@ -14,18 +14,8 @@ export default function Pricing() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    checkUser();
+    // No user check needed anymore
   }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    
-    if (user) {
-      // TODO: Check user's current subscription plan
-      // This would typically involve calling a check-subscription edge function
-    }
-  };
 
   const handleSubscribe = async (priceId: string) => {
     if (!user) {

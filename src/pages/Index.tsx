@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, TrendingUp } from "lucide-react";
@@ -8,49 +7,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { SEOHead } from "@/components/SEOHead";
-import { User } from "@supabase/supabase-js";
 
 const Index = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  useEffect(() => {
-    // Check current auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleGetStarted = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      navigate('/auth');
-    }
+    navigate('/guest-analysis');
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -82,24 +46,13 @@ const Index = () => {
                   Pricing
                 </Button>
                 <LanguageSwitcher />
-                {user ? (
-                  <Button onClick={() => navigate('/dashboard')} variant="default">
-                    Dashboard
-                  </Button>
-                ) : (
-                  <>
-                    <Button variant="ghost" onClick={() => navigate('/auth')}>
-                      Sign In
-                    </Button>
-                    <Button variant="default" onClick={handleGetStarted}>
-                      Get Started
-                    </Button>
-                  </>
-                )}
+                <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
+                  Get Started
+                </Button>
               </div>
 
               {/* Mobile Navigation */}
-              <MobileNavigation user={user} />
+              <MobileNavigation />
             </div>
           </div>
         </header>
@@ -121,23 +74,14 @@ const Index = () => {
             Get comprehensive business analysis, UK market insights, and partner connections - completely free
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {user ? (
-              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={handleGetStarted}>
-                Go to Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            ) : (
-              <>
-                <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-                  Get Free AI Analysis
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg" onClick={handleGetStarted}>
-                  Create Account
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </>
-            )}
+            <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+              Get Free AI Analysis
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
+              Go to Dashboard
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
@@ -270,17 +214,10 @@ const Index = () => {
             Get instant AI analysis of your business potential and connect with verified UK partners - completely free
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {user ? (
-              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={handleGetStarted}>
-                Go to Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            ) : (
-              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-                Get Free Analysis Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            )}
+            <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+              Get Free Analysis Now
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
             <Button variant="outline" size="lg" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg">
               Learn More
             </Button>

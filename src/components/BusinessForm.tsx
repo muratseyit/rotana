@@ -194,19 +194,8 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     setIsSubmitting(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to submit your business information.",
-          variant: "destructive"
-        });
-        return;
-      }
-
       const { data: businessData, error } = await supabase.from("businesses").insert({
-        user_id: user.id,
+        user_id: null, // No authentication required
         company_name: formData.companyName,
         business_description: formData.businessDescription,
         industry: formData.industry,

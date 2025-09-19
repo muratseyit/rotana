@@ -4,11 +4,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, BarChart3 } from "lucide-react";
 
-interface MobileNavigationProps {
-  user?: any;
-}
+interface MobileNavigationProps {}
 
-export function MobileNavigation({ user }: MobileNavigationProps) {
+export function MobileNavigation({}: MobileNavigationProps) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -66,36 +64,11 @@ export function MobileNavigation({ user }: MobileNavigationProps) {
               <div className="border-t pt-4 mt-4">
                 <Button 
                   variant="outline" 
-                  className="w-full mb-3"
+                  className="w-full"
                   onClick={() => handleNavigation('/guest-analysis')}
                 >
                   Free Analysis
                 </Button>
-                
-                {user ? (
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleNavigation('/dashboard')}
-                  >
-                    Dashboard
-                  </Button>
-                ) : (
-                  <div className="space-y-2">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full"
-                      onClick={() => handleNavigation('/auth')}
-                    >
-                      Sign In
-                    </Button>
-                    <Button 
-                      className="w-full"
-                      onClick={() => handleNavigation('/auth?mode=signup')}
-                    >
-                      Get Started
-                    </Button>
-                  </div>
-                )}
               </div>
             </nav>
           </div>

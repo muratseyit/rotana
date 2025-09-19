@@ -64,12 +64,6 @@ export function PartnerApplicationDialog({ isOpen, onOpenChange, onSuccess }: Pa
     setIsSubmitting(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('You must be logged in to apply as a partner');
-      }
-
       if (!formData.category) {
         throw new Error('Please select a category');
       }
@@ -86,7 +80,7 @@ export function PartnerApplicationDialog({ isOpen, onOpenChange, onSuccess }: Pa
           location: formData.location || null,
           logo_url: formData.logo_url || null,
           specialties,
-          created_by: user.id,
+          created_by: null, // No authentication required
           verification_status: 'pending'
         });
 

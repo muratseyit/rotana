@@ -32,14 +32,8 @@ export default function Partners() {
   const { toast } = useToast();
 
   useEffect(() => {
-    checkUser();
     fetchPartners();
   }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-  };
 
   const fetchPartners = async () => {
     try {

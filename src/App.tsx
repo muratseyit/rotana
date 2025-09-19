@@ -8,12 +8,10 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Index from "./pages/Index";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Lazy load pages for better performance
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const Features = lazy(() => import("./pages/Features"));
-const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Partners = lazy(() => import("./pages/Partners"));
 const AdminPartners = lazy(() => import("./pages/AdminPartners"));
@@ -45,23 +43,14 @@ const App = () => (
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/features" element={<Features />} />
               <Route path="/partners" element={<Partners />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/guest-analysis" element={<GuestAnalysis />} />
               <Route path="/guest-results" element={<GuestResults />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/partners" element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminPartners />
-                </ProtectedRoute>
-              } />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin/partners" element={<AdminPartners />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

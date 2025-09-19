@@ -91,7 +91,7 @@ export default function GuestResults() {
   };
 
   const handleCreateAccount = () => {
-    navigate('/auth?mode=signup&from=guest-analysis');
+    navigate('/guest-analysis');
   };
 
   const handleDownloadReport = () => {

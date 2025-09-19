@@ -4,8 +4,10 @@ import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, Trendi
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Features = () => {
+  const navigate = useNavigate();
   const [isSchedulingDemo, setIsSchedulingDemo] = useState(false);
   const { toast } = useToast();
 
@@ -37,16 +39,9 @@ const Features = () => {
               <Link to="/partners" className="text-slate-600 hover:text-slate-900 transition-colors">Partners</Link>
             </nav>
             <div className="flex items-center space-x-4">
-              <Link to="/auth">
-                <Button variant="ghost" className="text-slate-600 hover:text-slate-900">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/onboarding">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Get Started
-                </Button>
-              </Link>
+              <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
+                Get Started
+              </Button>
             </div>
           </div>
         </div>
