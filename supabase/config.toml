@@ -2,3 +2,6 @@ project_id = "qafetzoqccqafbbspjcp"
 
 [functions.generate-compliance-checklist]
 verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
