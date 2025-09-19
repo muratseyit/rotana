@@ -50,7 +50,7 @@ export default function Auth() {
       if (event === 'PASSWORD_RECOVERY') {
         setShowPasswordUpdate(true);
         setShowResetForm(false);
-      } else if (session?.user) {
+      } else if (session?.user && mode !== 'recovery') {
         const redirectTo = from ? `/${from}` : '/';
         navigate(redirectTo);
       }
