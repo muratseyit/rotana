@@ -46,6 +46,9 @@ const Index = () => {
                 <Button variant="ghost" onClick={() => navigate('/pricing')}>
                   Pricing
                 </Button>
+                <Button variant="ghost" onClick={() => navigate('/admin')} className="text-xs">
+                  Admin
+                </Button>
                 <LanguageSwitcher />
                 <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
                   Get Started
@@ -205,7 +208,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Enhance Landing Page with Lead Capture */}
+      {/* Ready to Transform Your Business Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">

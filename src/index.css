@@ -15,6 +15,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Fix dropdown transparency issues */
+[data-radix-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+.dropdown-content,
+[role="listbox"],
+[role="menu"],
+[role="combobox"] > [role="listbox"] {
+  background: hsl(var(--popover)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  z-index: 50 !important;
+}
+
 /* Animations and transitions for better UX */
 @keyframes fadeInUp {
   from {
@@ -213,8 +228,15 @@ html {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
 
-    /* Gradients for hero sections */
+  /* Gradients for hero sections */
+  :root {
+    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 45%));
+    --gradient-brand: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+  }
+
+  .dark {
     --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 45%));
     --gradient-brand: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
   }

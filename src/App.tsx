@@ -15,6 +15,8 @@ const Features = lazy(() => import("./pages/Features"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Partners = lazy(() => import("./pages/Partners"));
 const AdminPartners = lazy(() => import("./pages/AdminPartners"));
+const Admin = lazy(() => import("./pages/Admin"));
+const TestUserJourney = lazy(() => import("./components/TestUserJourney").then(module => ({ default: module.TestUserJourney })));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const GuestAnalysis = lazy(() => import("./pages/GuestAnalysis"));
 const GuestResults = lazy(() => import("./pages/GuestResults"));
@@ -52,7 +54,9 @@ const App = () => (
               <Route path="/guest-results" element={<GuestResults />} />
               <Route path="/comprehensive-analysis" element={<ComprehensiveAnalysis />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/admin/partners" element={<AdminPartners />} />
+              <Route path="/test" element={<TestUserJourney />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
