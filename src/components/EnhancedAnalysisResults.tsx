@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { ExportReportDialog } from "./ExportReportDialog";
 import { 
   CheckCircle, 
   Circle, 
@@ -19,7 +20,11 @@ import {
   ExternalLink,
   Mail,
   Globe,
-  Building
+  Building,
+  Download,
+  Share2,
+  BarChart3,
+  ArrowUpRight
 } from "lucide-react";
 
 interface PartnerRecommendation {
@@ -154,38 +159,67 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
   return (
     <div className="space-y-6">
       {/* Overall Score Header */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-            <Brain className="h-6 w-6 text-primary" />
+      <Card className="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 border-primary/20 shadow-elegant">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="flex items-center justify-center gap-2 text-3xl">
+            <div className="p-2 rounded-full bg-gradient-primary">
+              <Brain className="h-6 w-6 text-white" />
+            </div>
             UK Market Readiness Assessment
           </CardTitle>
-          <p className="text-muted-foreground">{companyName}</p>
+          <p className="text-muted-foreground text-lg">{companyName}</p>
         </CardHeader>
-        <CardContent className="text-center">
-          <div className="space-y-4">
-            <div className="flex items-center justify-center">
-              <div className="text-4xl font-bold text-primary">
+        <CardContent className="text-center space-y-6">
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                 {analysis.overallScore}%
               </div>
+              <div className="absolute -top-2 -right-8">
+                <div className="animate-bounce">
+                  <BarChart3 className="h-8 w-8 text-primary/60" />
+                </div>
+              </div>
             </div>
+          </div>
+          
+          <div className="flex justify-center gap-3">
             <Badge 
               variant={getScoreBadgeVariant(analysis.overallScore)}
-              className="text-sm px-4 py-1"
+              className="text-base px-6 py-2 font-semibold"
             >
-              {analysis.overallScore >= 80 ? 'High Readiness' : 
-               analysis.overallScore >= 60 ? 'Moderate Readiness' : 
-               'Needs Development'}
+              {analysis.overallScore >= 80 ? '🚀 High Readiness' : 
+               analysis.overallScore >= 60 ? '⚡ Moderate Readiness' : 
+               '🔧 Needs Development'}
             </Badge>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {analysis.summary}
-            </p>
+          </div>
+          
+          <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
+            {analysis.summary}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
             {onViewProgress && (
-              <Button variant="outline" onClick={onViewProgress} className="mt-4">
-                <TrendingUp className="h-4 w-4 mr-2" />
+              <Button variant="outline" onClick={onViewProgress} className="gap-2">
+                <TrendingUp className="h-4 w-4" />
                 View Progress History
               </Button>
             )}
+            <ExportReportDialog
+              companyName={companyName}
+              overallScore={analysis.overallScore}
+              analysis={analysis}
+              trigger={
+                <Button className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Export Report
+                </Button>
+              }
+            />
+            <Button variant="outline" className="gap-2">
+              <Share2 className="h-4 w-4" />
+              Share Results
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -201,39 +235,80 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
 
         <TabsContent value="overview" className="space-y-6">
           {/* Score Breakdown */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Score Breakdown
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  Detailed Score Breakdown
+                </CardTitle>
+                <Badge variant="outline" className="text-sm">
+                  {scoreCategories.filter(cat => analysis.scoreBreakdown[cat.key] !== undefined).length} Categories Analyzed
+                </Badge>
+              </div>
+              <CardDescription>
+                Comprehensive analysis across all key business dimensions
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {scoreCategories.map((category) => {
                   const score = analysis.scoreBreakdown[category.key];
-                  if (score === undefined) return null; // Skip if score not available
+                  if (score === undefined) return null;
                   
                   const Icon = category.icon;
                   
                   return (
-                    <div key={category.key} className="space-y-3">
+                    <div key={category.key} className="group space-y-4 p-4 rounded-lg border bg-gradient-to-br from-card to-muted/20 hover:shadow-md transition-all">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Icon className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{category.label}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                            <Icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <span className="font-semibold text-lg">{category.label}</span>
+                            <p className="text-sm text-muted-foreground">{category.description}</p>
+                          </div>
                         </div>
-                        <span className={`font-bold ${getScoreColor(score)}`}>
-                          {score}%
-                        </span>
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                            {score}%
+                          </div>
+                          <Badge variant={getScoreBadgeVariant(score)} className="mt-1">
+                            {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Needs Work'}
+                          </Badge>
+                        </div>
                       </div>
-                      <Progress value={score} className="h-2" />
-                      <p className="text-sm text-muted-foreground">
-                        {category.description}
-                      </p>
+                      <div className="space-y-2">
+                        <Progress value={score} className="h-3" />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>0%</span>
+                          <span className="font-medium">Current: {score}%</span>
+                          <span>100%</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
+              </div>
+              
+              {/* Quick Actions */}
+              <div className="mt-8 p-4 bg-muted/50 rounded-lg">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-amber-500" />
+                  Quick Improvement Tips
+                </h4>
+                <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                  {scoreCategories
+                    .filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] < 70)
+                    .slice(0, 4)
+                    .map((category, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-muted-foreground">
+                        <ArrowUpRight className="h-3 w-3 text-primary" />
+                        Focus on improving {category.label.toLowerCase()}
+                      </div>
+                    ))}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -243,60 +318,80 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
           {/* Partner Recommendations */}
           {analysis.partnerRecommendations && analysis.partnerRecommendations.length > 0 ? (
             <div className="space-y-6">
-              <Card>
+              <Card className="bg-gradient-to-r from-secondary/5 to-accent/5 border-secondary/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
+                    <Users className="h-5 w-5 text-secondary" />
                     Recommended UK Partners
                   </CardTitle>
                   <CardDescription>
-                    Verified partners to help address your specific needs based on the analysis
+                    AI-matched partners based on your specific business needs and analysis results
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Verified Partners
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      Compliance Experts
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-purple-600" />
+                      Industry Specialists
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
 
               {analysis.partnerRecommendations.map((recommendation, index) => (
-                <Card key={index}>
+                <Card key={index} className="shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-lg">{recommendation.category}</CardTitle>
-                    <CardDescription>{recommendation.reason}</CardDescription>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-xl text-primary">{recommendation.category}</CardTitle>
+                      <Badge variant="secondary" className="px-3 py-1">
+                        {recommendation.partners.length} Partner{recommendation.partners.length !== 1 ? 's' : ''} Available
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-base">{recommendation.reason}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-6 md:grid-cols-2">
                       {recommendation.partners.map((partner) => (
-                        <Card key={partner.id} className="border-l-4 border-l-primary">
-                          <CardContent className="p-4 space-y-3">
+                        <Card key={partner.id} className="border-l-4 border-l-primary hover:shadow-md transition-all bg-gradient-to-r from-card to-primary/5">
+                          <CardContent className="p-6 space-y-4">
                             <div>
-                              <h5 className="font-medium">{partner.name}</h5>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
+                              <h5 className="text-lg font-semibold text-primary">{partner.name}</h5>
+                              <p className="text-muted-foreground line-clamp-3 leading-relaxed">
                                 {partner.description}
                               </p>
                             </div>
                             
                             {partner.specialties && partner.specialties.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {partner.specialties.slice(0, 3).map((specialty, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
+                              <div className="flex flex-wrap gap-2">
+                                {partner.specialties.slice(0, 4).map((specialty, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-xs bg-primary/5">
                                     {specialty}
                                   </Badge>
                                 ))}
-                                {partner.specialties.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{partner.specialties.length - 3} more
+                                {partner.specialties.length > 4 && (
+                                  <Badge variant="outline" className="text-xs bg-muted">
+                                    +{partner.specialties.length - 4} more
                                   </Badge>
                                 )}
                               </div>
                             )}
                             
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 pt-2">
                               {partner.contact_email && (
                                 <Button 
                                   size="sm" 
-                                  variant="outline" 
-                                  className="flex-1"
-                                  onClick={() => window.open(`mailto:${partner.contact_email}`, '_blank')}
+                                  className="flex-1 gap-2"
+                                  onClick={() => window.open(`mailto:${partner.contact_email}?subject=Partnership Inquiry - ${companyName}`, '_blank')}
                                 >
-                                  <Mail className="h-3 w-3 mr-1" />
+                                  <Mail className="h-3 w-3" />
                                   Contact
                                 </Button>
                               )}
@@ -304,9 +399,10 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
                                 <Button 
                                   size="sm" 
                                   variant="outline"
+                                  className="gap-2"
                                   onClick={() => window.open(partner.website_url, '_blank')}
                                 >
-                                  <Globe className="h-3 w-3 mr-1" />
+                                  <Globe className="h-3 w-3" />
                                   Website
                                 </Button>
                               )}
@@ -320,20 +416,33 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Partner Recommendations</h3>
-                <p className="text-muted-foreground">
-                  Your business shows good readiness across all areas. You can still explore our partner directory for additional support.
+            <Card className="text-center p-8">
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-full bg-green-100 w-fit mx-auto">
+                  <Users className="h-12 w-12 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-green-700">Excellent Market Readiness!</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Your business shows strong readiness across all key areas. While you may not need immediate assistance, 
+                  our partner directory offers additional opportunities for growth and expansion.
                 </p>
-                <Button 
-                  variant="outline" 
-                  className="mt-4"
-                  onClick={() => window.open('/partners', '_blank')}
-                >
-                  View Partner Directory
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                  <Button 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => window.open('/partners', '_blank')}
+                  >
+                    <Building className="h-4 w-4" />
+                    Explore All Partners
+                  </Button>
+                  <Button 
+                    className="gap-2"
+                    onClick={() => window.open('/partners?category=growth', '_blank')}
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                    Growth Partners
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}

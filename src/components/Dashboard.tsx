@@ -6,7 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Building, TrendingUp, Target, Users, Eye, RotateCcw, Brain, Building2, Shield } from "lucide-react";
+import { 
+  PlusCircle, 
+  Building, 
+  TrendingUp, 
+  Target, 
+  Users, 
+  Eye, 
+  RotateCcw, 
+  Brain, 
+  Building2, 
+  Shield,
+  CheckCircle,
+  AlertCircle,
+  Globe
+} from "lucide-react";
 
 interface Business {
   id: string;
@@ -30,6 +44,7 @@ export function Dashboard() {
   const [isAnalyzing, setIsAnalyzing] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -71,6 +86,12 @@ export function Dashboard() {
 
       if (error) throw error;
       setBusinesses(data || []);
+      
+      // Show welcome message for new users
+      if ((data || []).length === 0 && !localStorage.getItem('welcomeShown')) {
+        setShowWelcome(true);
+        localStorage.setItem('welcomeShown', 'true');
+      }
     } catch (error) {
       console.error("Error fetching businesses:", error);
       toast({
@@ -160,17 +181,19 @@ export function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
       {/* Header */}
-      <header className="border-b bg-card">
+      <header className="border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Target className="h-8 w-8 text-primary" />
+              <div className="p-2 rounded-lg bg-gradient-primary">
+                <Target className="h-6 w-6 text-white" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold">UK Market Entry Platform</h1>
+                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">Business Bridge</h1>
                 <p className="text-sm text-muted-foreground">
-                  Smart soft-landing system for Turkish SMEs
+                  AI-Powered UK Market Entry for Turkish SMEs
                 </p>
               </div>
             </div>
@@ -178,7 +201,7 @@ export function Dashboard() {
               <Button 
                 variant="outline" 
                 onClick={() => window.open('/partners', '_blank')}
-                className="gap-2"
+                className="gap-2 hover:bg-primary/10"
               >
                 <Building2 className="h-4 w-4" />
                 Partner Directory
@@ -193,7 +216,7 @@ export function Dashboard() {
                   Admin Partners
                 </Button>
               )}
-              <Button onClick={() => supabase.auth.signOut()}>
+              <Button onClick={() => supabase.auth.signOut()} variant="ghost">
                 Sign Out
               </Button>
             </div>
@@ -201,53 +224,88 @@ export function Dashboard() {
         </div>
       </header>
 
+      {/* Welcome Message */}
+      {showWelcome && (
+        <div className="bg-gradient-primary/10 border-b border-primary/20">
+          <div className="mx-auto max-w-7xl px-6 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/20">
+                  <Brain className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-primary">Welcome to Business Bridge!</h2>
+                  <p className="text-muted-foreground mt-1">
+                    Start by adding your first business to get a comprehensive UK market readiness assessment powered by AI.
+                  </p>
+                </div>
+              </div>
+              <Button onClick={() => setShowWelcome(false)} variant="ghost" size="sm">
+                ×
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="border-l-4 border-l-primary bg-gradient-to-r from-card to-primary/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Businesses
               </CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
+              <div className="p-2 rounded-full bg-primary/20">
+                <Building className="h-4 w-4 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{businesses.length}</div>
+              <div className="text-3xl font-bold text-primary">{businesses.length}</div>
               <p className="text-xs text-muted-foreground">
                 Registered for assessment
               </p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="border-l-4 border-l-secondary bg-gradient-to-r from-card to-secondary/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Assessments Ready
+                Assessments Complete
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div className="p-2 rounded-full bg-secondary/20">
+                <TrendingUp className="h-4 w-4 text-secondary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-3xl font-bold text-secondary">
                 {businesses.filter(b => b.analysis_status === 'completed').length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Businesses analyzed
+                Ready for review
               </p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="border-l-4 border-l-accent bg-gradient-to-r from-card to-accent/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Market Score
+                Average Score
               </CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
+              <div className="p-2 rounded-full bg-accent/20">
+                <Target className="h-4 w-4 text-accent" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">--</div>
+              <div className="text-3xl font-bold text-accent">
+                {businesses.length > 0 
+                  ? Math.round(businesses.filter(b => b.overall_score).reduce((acc, b) => acc + (b.overall_score || 0), 0) / businesses.filter(b => b.overall_score).length) || '--'
+                  : '--'
+                }%
+              </div>
               <p className="text-xs text-muted-foreground">
-                AI scoring coming soon
+                Market readiness
               </p>
             </CardContent>
           </Card>
@@ -266,108 +324,167 @@ export function Dashboard() {
           {isLoading ? (
             <div className="text-center py-8">Loading...</div>
           ) : businesses.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Building className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No businesses yet</h3>
-                <p className="text-muted-foreground text-center mb-4">
-                  Add your first business to get started with your UK market assessment
+            <Card className="bg-gradient-to-br from-card to-primary/5 border-primary/20">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="p-4 rounded-full bg-gradient-primary/20 mb-6">
+                  <Building className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-2xl font-semibold mb-3 text-primary">Ready to explore the UK market?</h3>
+                <p className="text-muted-foreground text-center mb-6 max-w-md">
+                  Add your first business to get a comprehensive AI-powered assessment of your UK market readiness. 
+                  Our analysis covers market fit, regulatory compliance, digital readiness, and more.
                 </p>
-                <Button onClick={() => setShowForm(true)} className="gap-2">
-                  <PlusCircle className="h-4 w-4" />
-                  Add Your First Business
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button onClick={() => setShowForm(true)} className="gap-2 px-6">
+                    <PlusCircle className="h-4 w-4" />
+                    Add Your First Business
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => window.open('/partners', '_blank')}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Browse Partners
+                  </Button>
+                </div>
+                <div className="flex items-center gap-6 mt-8 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-primary" />
+                    AI-Powered Analysis
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    Compliance Checking
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary" />
+                    Market Insights
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {businesses.map((business) => (
-                <Card key={business.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2">
-                        <Building className="h-5 w-5 text-primary" />
-                        {business.company_name}
-                      </CardTitle>
-                      {business.overall_score && (
-                        <Badge variant={business.overall_score >= 70 ? 'default' : 'secondary'}>
-                          {business.overall_score}%
-                        </Badge>
-                      )}
+                <Card key={business.id} className="group hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card to-card/50 border-l-4 border-l-primary/20 hover:border-l-primary">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="flex items-center gap-2 text-lg group-hover:text-primary transition-colors">
+                          <div className="p-1.5 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                            <Building className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="truncate">{business.company_name}</span>
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          {business.industry} • {business.company_size}
+                        </CardDescription>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        {business.overall_score && (
+                          <Badge 
+                            variant={business.overall_score >= 80 ? 'default' : business.overall_score >= 60 ? 'secondary' : 'destructive'}
+                            className="font-bold"
+                          >
+                            {business.overall_score}%
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <CardDescription>
-                      {business.industry} • {business.company_size}
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                       {business.business_description}
                     </p>
                     {business.website_url && (
-                      <p className="text-sm text-primary underline mb-3">
-                        {business.website_url}
-                      </p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Globe className="h-3 w-3 text-primary" />
+                        <a 
+                          href={business.website_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline truncate"
+                        >
+                          {business.website_url}
+                        </a>
+                      </div>
                     )}
                     
                     {/* Analysis Status */}
-                    <div className="space-y-3">
+                    <div className="space-y-3 pt-2 border-t">
                       {business.analysis_status === 'pending' && (
-                        <div className="space-y-2">
-                          <Badge variant="outline" className="w-full justify-center">
-                            Analysis Pending
-                          </Badge>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center">
+                            <Badge variant="outline" className="animate-pulse bg-yellow-50 border-yellow-200 text-yellow-700">
+                              <Brain className="h-3 w-3 mr-1 animate-pulse" />
+                              Analysis Pending
+                            </Badge>
+                          </div>
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="w-full"
+                            className="w-full gap-2"
                             onClick={() => reAnalyzeBusiness(business)}
                             disabled={isAnalyzing === business.id}
-                            aria-label="Analyze now"
                           >
                             {isAnalyzing === business.id ? (
-                              <Brain className="h-3 w-3 mr-2 animate-pulse" />
+                              <>
+                                <Brain className="h-3 w-3 animate-spin" />
+                                Analyzing…
+                              </>
                             ) : (
-                              <RotateCcw className="h-3 w-3 mr-2" />
+                              <>
+                                <RotateCcw className="h-3 w-3" />
+                                Start Analysis
+                              </>
                             )}
-                            {isAnalyzing === business.id ? 'Analyzing…' : 'Analyze Now'}
                           </Button>
                         </div>
                       )}
                       {business.analysis_status === 'failed' && (
-                        <div className="space-y-2">
-                          <Badge variant="destructive" className="w-full justify-center">
-                            Analysis Failed
-                          </Badge>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center">
+                            <Badge variant="destructive" className="bg-red-50 border-red-200 text-red-700">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              Analysis Failed
+                            </Badge>
+                          </div>
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="w-full"
+                            variant="destructive"
+                            className="w-full gap-2"
                             onClick={() => reAnalyzeBusiness(business)}
                             disabled={isAnalyzing === business.id}
-                            aria-label="Retry analysis"
                           >
                             {isAnalyzing === business.id ? (
-                              <Brain className="h-3 w-3 mr-2 animate-pulse" />
+                              <>
+                                <Brain className="h-3 w-3 animate-spin" />
+                                Retrying…
+                              </>
                             ) : (
-                              <RotateCcw className="h-3 w-3 mr-2" />
+                              <>
+                                <RotateCcw className="h-3 w-3" />
+                                Retry Analysis
+                              </>
                             )}
-                            {isAnalyzing === business.id ? 'Retrying…' : 'Retry Analysis'}
                           </Button>
                         </div>
                       )}
                       {business.analysis_status === 'completed' && business.analysis_result && (
-                        <div className="space-y-2">
-                          <Badge variant="default" className="w-full justify-center">
-                            Analysis Complete
-                          </Badge>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center">
+                            <Badge className="bg-green-50 border-green-200 text-green-700">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Analysis Complete
+                            </Badge>
+                          </div>
                           <div className="flex gap-2">
                             <Button 
                               size="sm" 
-                              variant="outline" 
-                              className="flex-1"
+                              className="flex-1 gap-2"
                               onClick={() => setSelectedBusiness(business)}
                             >
-                              <Eye className="h-3 w-3 mr-1" />
+                              <Eye className="h-3 w-3" />
                               View Report
                             </Button>
                             <Button 
@@ -375,9 +492,10 @@ export function Dashboard() {
                               variant="outline"
                               onClick={() => reAnalyzeBusiness(business)}
                               disabled={isAnalyzing === business.id}
+                              className="px-3"
                             >
                               {isAnalyzing === business.id ? (
-                                <Brain className="h-3 w-3 animate-pulse" />
+                                <Brain className="h-3 w-3 animate-spin" />
                               ) : (
                                 <RotateCcw className="h-3 w-3" />
                               )}
@@ -387,15 +505,15 @@ export function Dashboard() {
                       )}
                     </div>
 
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-xs text-muted-foreground">
-                        Added {new Date(business.created_at).toLocaleDateString()}
+                    <div className="pt-3 border-t">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Added {new Date(business.created_at).toLocaleDateString()}</span>
                         {business.analyzed_at && (
-                          <span className="block">
+                          <span className="text-primary">
                             Analyzed {new Date(business.analyzed_at).toLocaleDateString()}
                           </span>
                         )}
-                      </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
