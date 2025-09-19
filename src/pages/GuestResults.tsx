@@ -265,21 +265,56 @@ export default function GuestResults() {
           </CardContent>
         </Card>
 
-        {/* Partner Preview */}
+        {/* Relevant Partners Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-purple-600" />
-              Partner Directory Preview
+              Recommended Partners for Your Industry
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Access our verified partner directory to connect with UK business service providers.
+              Based on your {analysisResult.customerData.industry} business analysis, these partners can help you enter the UK market:
             </p>
-            <Button onClick={handleCreateAccount} className="w-full">
-              Create Account to View Partners
-            </Button>
+            
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold text-blue-800">Legal & Compliance Partners</h4>
+                    <p className="text-sm text-blue-600">UK incorporation & regulatory compliance</p>
+                  </div>
+                  <Badge className="bg-blue-600">Recommended</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Essential for {analysisResult.customerData.industry} businesses entering the UK market
+                </p>
+              </div>
+              
+              <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold text-green-800">Accounting & Tax Partners</h4>
+                    <p className="text-sm text-green-600">UK tax setup & ongoing compliance</p>
+                  </div>
+                  <Badge className="bg-green-600">High Priority</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Critical for {analysisResult.customerData.companySize} companies
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <Button onClick={handleCreateAccount} className="w-full">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Create Account to Connect with Partners
+              </Button>
+              <Button onClick={() => navigate('/partners')} variant="outline" className="w-full">
+                View All Partners
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

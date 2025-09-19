@@ -31,7 +31,7 @@ export default function GuestAnalysis() {
             Get Your AI Business Analysis
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Receive comprehensive insights about your UK market readiness and access our partner directory for just £8.
+            Get comprehensive insights about your UK market readiness and connect with our verified partner directory - completely free.
           </p>
         </div>
 

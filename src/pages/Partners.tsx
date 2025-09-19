@@ -164,6 +164,54 @@ export default function Partners() {
           </Card>
         </div>
 
+        {/* Partner Success Stories */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Success Stories</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">🎯</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-success mb-2">TechStart Solutions</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      "Legal Partners helped us navigate UK incorporation seamlessly. Within 3 months, 
+                      we had our UK subsidiary operational and compliant."
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">Legal Services</Badge>
+                      <span className="text-xs text-muted-foreground">• 3 months setup</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">📈</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-blue-800 mb-2">Manufacturing Plus</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      "Our accounting partner streamlined our UK tax compliance and saved us 40% 
+                      on operational costs in the first year."
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">Accounting</Badge>
+                      <span className="text-xs text-muted-foreground">• 40% cost savings</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Partners Section */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
