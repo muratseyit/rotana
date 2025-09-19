@@ -56,9 +56,9 @@ export default {
 					DEFAULT: 'hsl(var(--success))',
 					foreground: 'hsl(var(--success-foreground))'
 				},
-				premium: {
-					DEFAULT: 'hsl(var(--premium))',
-					foreground: 'hsl(var(--premium-foreground))'
+				brand: {
+					DEFAULT: 'hsl(var(--brand))',
+					foreground: 'hsl(var(--brand-foreground))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -72,8 +72,8 @@ export default {
 				}
 			},
 			backgroundImage: {
-				'gradient-premium': 'var(--gradient-premium)',
 				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-brand': 'var(--gradient-brand)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

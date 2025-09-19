@@ -51,27 +51,27 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-slate-900">Business Bridge</span>
+              <BarChart3 className="h-8 w-8 text-brand" />
+              <span className="text-2xl font-bold text-foreground">Business Bridge</span>
             </div>
             <div className="flex items-center space-x-4">
               <LanguageSwitcher />
               {user ? (
-                <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button onClick={() => navigate('/dashboard')} variant="default">
                   Dashboard
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" className="text-slate-600 hover:text-slate-900" onClick={() => navigate('/auth')}>
+                  <Button variant="ghost" onClick={() => navigate('/auth')}>
                     Sign In
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleGetStarted}>
+                  <Button variant="default" onClick={handleGetStarted}>
                     Get Started
                   </Button>
                 </>
@@ -82,63 +82,60 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-hero">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-6">
+            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-accent text-accent-foreground mb-6">
               <Zap className="h-4 w-4 mr-2" />
-              {t('hero.badge')}
+              AI-Powered UK Market Entry for Turkish SMEs
             </span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            {t('hero.title').split(' ').slice(0, -3).join(' ')}{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">{t('hero.title').split(' ').slice(-3).join(' ')}</span>
+          <h1 className="text-5xl md:text-6xl font-bold text-background mb-6 leading-tight">
+            Transform Your Business with{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-background to-success">AI-Powered Insights</span>
           </h1>
-          <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            {t('hero.description')}
+          <p className="text-xl text-background/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Get comprehensive business analysis, UK market insights, and partner connections - completely free
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {user ? (
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
+              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={handleGetStarted}>
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             ) : (
               <>
-                <Button size="lg" className="bg-premium hover:bg-premium/90 text-premium-foreground px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-                  Get £8 AI Analysis
+                <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+                  Get Free AI Analysis
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" onClick={handleGetStarted}>
-                  {t('hero.startJourney')}
+                <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg" onClick={handleGetStarted}>
+                  Create Account
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </>
             )}
-            <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-slate-300">
-              {t('hero.watchDemo')}
-            </Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              {t('features.title')}
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Everything You Need for UK Market Success
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              {t('features.subtitle')}
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Comprehensive AI-powered platform designed specifically for Turkish SMEs expanding to the UK
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="border-slate-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="text-center pb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="h-6 w-6 text-brand" />
                 </div>
                 <CardTitle className="text-xl">AI-Powered Analysis</CardTitle>
               </CardHeader>
@@ -149,10 +146,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-slate-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="text-center pb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-6 w-6 text-green-600" />
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-6 w-6 text-success" />
                 </div>
                 <CardTitle className="text-xl">Comprehensive Reports</CardTitle>
               </CardHeader>
@@ -163,10 +160,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-slate-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="text-center pb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-6 w-6 text-purple-600" />
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-6 w-6 text-brand" />
                 </div>
                 <CardTitle className="text-xl">Partner Matching</CardTitle>
               </CardHeader>
@@ -177,10 +174,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-slate-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="text-center pb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="h-6 w-6 text-orange-600" />
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-6 w-6 text-success" />
                 </div>
                 <CardTitle className="text-xl">Smart Roadmap</CardTitle>
               </CardHeader>
@@ -241,44 +238,44 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-green-600">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-brand">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Business?
+          <h2 className="text-4xl font-bold text-background mb-6">
+            Ready to Enter the UK Market?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses that have already discovered their growth potential with our AI-powered platform
+          <p className="text-xl text-background/90 mb-8 max-w-2xl mx-auto">
+            Get instant AI analysis of your business potential and connect with verified UK partners - completely free
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {user ? (
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg" onClick={handleGetStarted}>
+              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={handleGetStarted}>
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             ) : (
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-                Get £8 AI Analysis
+              <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+                Get Free Analysis Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             )}
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg">
-              Schedule Consultation
+            <Button variant="outline" size="lg" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg">
+              Learn More
             </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="bg-foreground text-muted-foreground py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <BarChart3 className="h-6 w-6 text-blue-400" />
-                <span className="text-xl font-bold text-white">Business Bridge</span>
+                <BarChart3 className="h-6 w-6 text-brand" />
+                <span className="text-xl font-bold text-background">Business Bridge</span>
               </div>
-              <p className="text-slate-400">
-                Empowering businesses with AI-driven insights and strategic guidance for sustainable growth
+              <p className="text-muted-foreground">
+                AI-Powered UK Market Entry for Turkish SMEs. Comprehensive analysis, partner matching, and business growth insights.
               </p>
             </div>
             <div>
