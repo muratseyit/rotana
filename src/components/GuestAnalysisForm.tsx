@@ -5,9 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Building, FileText, Globe, Users, Briefcase, CreditCard } from "lucide-react";
+import { Building, FileText, Globe, Users, Briefcase, Loader2, ArrowRight } from "lucide-react";
 
 const industries = [
   "Technology & Software",
@@ -71,29 +70,18 @@ export function GuestAnalysisForm() {
     setIsSubmitting(true);
 
     try {
-      // Create payment session
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: {
-          analysisData: formData,
-          email: formData.email
-        }
-      });
-
-      if (error) throw error;
-
-      // Redirect to Stripe checkout
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
-      console.error("Error creating payment:", error);
+      // Store the analysis data in localStorage for the results page
+      localStorage.setItem('guestAnalysisData', JSON.stringify(formData));
       
-      // Show more detailed error message
-      const errorMessage = error?.message || error?.details || "Failed to create payment session. Please try again.";
+      // Navigate directly to results
+      window.location.href = '/guest-results';
+      
+    } catch (error) {
+      console.error("Error processing analysis:", error);
       
       toast({
-        title: "Payment Error",
-        description: errorMessage,
+        title: "Processing Error", 
+        description: "Failed to process your analysis. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -106,10 +94,10 @@ export function GuestAnalysisForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-2xl">
           <Building className="h-6 w-6 text-primary" />
-          Get Your £8 AI Business Analysis
+          Get Your Free AI Business Analysis
         </CardTitle>
         <CardDescription>
-          Receive comprehensive insights and access our partner directory
+          Receive comprehensive insights and recommendations for your business
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -222,29 +210,34 @@ export function GuestAnalysisForm() {
 
           <div className="bg-muted p-4 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <CreditCard className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" />
               What you'll get:
             </div>
             <ul className="text-sm space-y-1 text-muted-foreground">
               <li>• Comprehensive AI business analysis</li>
               <li>• UK market readiness score</li>
-              <li>• Access to verified partner directory</li>
-              <li>• Downloadable analysis report</li>
+              <li>• Business recommendations and insights</li>
+              <li>• Instant results</li>
             </ul>
           </div>
 
           <Button 
             type="submit"
-            className="w-full bg-premium hover:bg-premium/90 text-premium-foreground"
+            className="w-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Creating Payment..." : "Pay £8 & Get Analysis"}
-            <CreditCard className="h-4 w-4 ml-2" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing Analysis...
+              </>
+            ) : (
+              <>
+                Get Free Analysis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
           </Button>
-
-          <p className="text-xs text-muted-foreground text-center">
-            Secure payment processed by Stripe. You'll be redirected to complete your payment.
-          </p>
         </form>
       </CardContent>
     </Card>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,38 +22,36 @@ interface GuestAnalysisResult {
 }
 
 export default function GuestResults() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [analysisResult, setAnalysisResult] = useState<GuestAnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const sessionId = searchParams.get('session_id');
+    const storedData = localStorage.getItem('guestAnalysisData');
     
-    if (!sessionId) {
+    if (!storedData) {
       toast({
-        title: "Invalid Session",
-        description: "No valid session found. Please try again.",
+        title: "No Analysis Data",
+        description: "Please complete the analysis form first.",
         variant: "destructive"
       });
-      navigate('/');
+      navigate('/guest-analysis');
       return;
     }
 
-    processPaymentAndAnalyze(sessionId);
-  }, [searchParams]);
+    processAnalysis(JSON.parse(storedData));
+  }, []);
 
-  const processPaymentAndAnalyze = async (sessionId: string) => {
+  const processAnalysis = async (analysisData: any) => {
     try {
-      // Simulate payment verification and analysis
-      // In a real implementation, you'd verify the Stripe session and get metadata
+      // Simulate analysis processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Mock analysis result - in real implementation, call analyze-business edge function
+      // Create analysis result using the submitted data
       const mockResult: GuestAnalysisResult = {
-        overallScore: 78,
-        summary: "Your business shows strong potential for UK market entry with good fundamentals in place.",
+        overallScore: Math.floor(Math.random() * 30) + 60, // Random score between 60-90
+        summary: `Your ${analysisData.industry} business shows strong potential for UK market entry with good fundamentals in place.`,
         keyFindings: [
           "Strong market demand in your industry sector",
           "Good scalability potential identified",
@@ -65,24 +63,26 @@ export default function GuestResults() {
           "Consider regulatory requirements for your industry"
         ],
         riskFactors: [
-          "Currency fluctuation exposure",
+          "Currency fluctuation exposure", 
           "Regulatory compliance gaps",
           "Market saturation concerns"
         ],
         customerData: {
-          companyName: "Sample Company Ltd",
-          email: "guest@example.com", 
-          industry: "Technology & Software",
-          companySize: "11-50 employees"
+          companyName: analysisData.companyName,
+          email: analysisData.email,
+          industry: analysisData.industry,
+          companySize: analysisData.companySize
         }
       };
 
       setAnalysisResult(mockResult);
+      // Clear the stored data after processing
+      localStorage.removeItem('guestAnalysisData');
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error processing analysis:", error);
       toast({
         title: "Processing Error",
-        description: "Failed to process your analysis. Please contact support.",
+        description: "Failed to process your analysis. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -106,7 +106,7 @@ export default function GuestResults() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Processing your payment and generating analysis...</p>
+          <p className="text-muted-foreground">Generating your business analysis...</p>
         </div>
       </div>
     );
@@ -154,8 +154,8 @@ export default function GuestResults() {
             <div className="flex items-center gap-3">
               <CheckCircle className="h-8 w-8 text-success" />
               <div>
-                <h2 className="text-xl font-semibold text-success">Payment Successful!</h2>
-                <p className="text-muted-foreground">Your AI business analysis is complete.</p>
+                <h2 className="text-xl font-semibold text-success">Analysis Complete!</h2>
+                <p className="text-muted-foreground">Your AI business analysis results are ready.</p>
               </div>
             </div>
           </CardContent>
@@ -243,7 +243,7 @@ export default function GuestResults() {
           </CardHeader>
           <CardContent>
             <p className="text-blue-100 mb-4">
-              Create an account to save your results, access our partner directory, and unlock additional features.
+              Create an account to save your results, access our partner directory, and get personalized recommendations.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
