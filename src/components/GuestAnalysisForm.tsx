@@ -87,9 +87,13 @@ export function GuestAnalysisForm() {
       }
     } catch (error) {
       console.error("Error creating payment:", error);
+      
+      // Show more detailed error message
+      const errorMessage = error?.message || error?.details || "Failed to create payment session. Please try again.";
+      
       toast({
         title: "Payment Error",
-        description: "Failed to create payment session. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
