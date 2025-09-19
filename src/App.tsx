@@ -18,6 +18,7 @@ const AdminPartners = lazy(() => import("./pages/AdminPartners"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const GuestAnalysis = lazy(() => import("./pages/GuestAnalysis"));
 const GuestResults = lazy(() => import("./pages/GuestResults"));
+const ComprehensiveAnalysis = lazy(() => import("./pages/ComprehensiveAnalysis"));
 const Dashboard = lazy(() => import("./components/Dashboard").then(module => ({ default: module.Dashboard })));
 
 // Optimize React Query for better performance
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/guest-analysis" element={<GuestAnalysis />} />
               <Route path="/guest-results" element={<GuestResults />} />
+              <Route path="/comprehensive-analysis" element={<ComprehensiveAnalysis />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin/partners" element={<AdminPartners />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

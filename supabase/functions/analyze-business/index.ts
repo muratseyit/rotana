@@ -89,9 +89,43 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Processing business analysis request');
-    const businessData: BusinessData = await req.json();
-    console.log('Business data received:', businessData);
+    // Check if this is a guest analysis (limited) or full member analysis
+    const isGuestAnalysis = !businessData.financialMetrics && !businessData.complianceStatus;
+    console.log('Analysis type:', isGuestAnalysis ? 'Guest (Limited)' : 'Full Member');
+
+    if (isGuestAnalysis) {
+      // Generate limited guest analysis
+      const guestAnalysis = {
+        overallScore: Math.floor(Math.random() * 25) + 65, // 65-90 for demo
+        summary: `Initial assessment shows your ${businessData.industry} business has promising fundamentals for UK market entry.`,
+        keyFindings: [
+          'Market opportunity identified in your sector',
+          'Basic business structure appears sound',
+          'Initial market research suggests viability'
+        ],
+        recommendations: [
+          'Complete comprehensive business analysis',
+          'Develop detailed UK market entry strategy', 
+          'Assess regulatory requirements for your industry'
+        ],
+        riskFactors: [
+          'Limited financial data provided',
+          'Regulatory compliance needs assessment',
+          'Market competition analysis required'
+        ],
+        limitedAnalysis: true,
+        upgradePrompt: 'Get your complete 7-category analysis, regulatory assessment, and AI-matched partner recommendations with a premium membership.',
+        nextSteps: [
+          'Subscribe for comprehensive analysis',
+          'Access verified partner directory',
+          'Download detailed market entry roadmap'
+        ]
+      };
+
+      return new Response(JSON.stringify(guestAnalysis), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Calculate budget score
     const calculateBudgetScore = (budgetString?: string): number => {
