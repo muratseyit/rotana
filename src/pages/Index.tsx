@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, TrendingUp } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { MobileNavigation } from "@/components/MobileNavigation";
+import { SEOHead } from "@/components/SEOHead";
 import { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -51,35 +53,56 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="h-8 w-8 text-brand" />
-              <span className="text-2xl font-bold text-foreground">Business Bridge</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <LanguageSwitcher />
-              {user ? (
-                <Button onClick={() => navigate('/dashboard')} variant="default">
-                  Dashboard
+    <>
+      <SEOHead 
+        title="Business Bridge - AI-Powered UK Market Entry for Turkish SMEs"
+        description="Transform your Turkish SME's UK market entry with AI-powered business analysis. Get comprehensive insights, connect with verified partners, and accelerate your growth in the UK market."
+        keywords="UK market entry, Turkish SME, AI business analysis, UK incorporation, business partners, market analysis, SME expansion, UK business setup"
+      />
+      
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <BarChart3 className="h-8 w-8 text-brand" />
+                <span className="text-2xl font-bold text-foreground">Business Bridge</span>
+              </div>
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-6">
+                <Button variant="ghost" onClick={() => navigate('/features')}>
+                  Features
                 </Button>
-              ) : (
-                <>
-                  <Button variant="ghost" onClick={() => navigate('/auth')}>
-                    Sign In
+                <Button variant="ghost" onClick={() => navigate('/partners')}>
+                  Partners
+                </Button>
+                <Button variant="ghost" onClick={() => navigate('/pricing')}>
+                  Pricing
+                </Button>
+                <LanguageSwitcher />
+                {user ? (
+                  <Button onClick={() => navigate('/dashboard')} variant="default">
+                    Dashboard
                   </Button>
-                  <Button variant="default" onClick={handleGetStarted}>
-                    Get Started
-                  </Button>
-                </>
-              )}
+                ) : (
+                  <>
+                    <Button variant="ghost" onClick={() => navigate('/auth')}>
+                      Sign In
+                    </Button>
+                    <Button variant="default" onClick={handleGetStarted}>
+                      Get Started
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile Navigation */}
+              <MobileNavigation user={user} />
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-hero">
@@ -308,7 +331,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
