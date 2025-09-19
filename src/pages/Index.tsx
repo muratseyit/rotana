@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { SEOHead } from "@/components/SEOHead";
+import { LeadCaptureForm } from "@/components/LeadCaptureForm";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -158,45 +159,45 @@ const Index = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
+      {/* How It Works Section - Enhanced */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Get started with your business analysis in three simple steps
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">1</span>
+            <div className="text-center animate-fade-in-up">
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-primary-foreground">1</span>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Share Your Business Info</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-foreground mb-4">Share Your Business Info</h3>
+              <p className="text-muted-foreground">
                 Tell us about your business, goals, and current challenges through our simple form
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">2</span>
+            <div className="text-center animate-fade-in-up animate-delay-200">
+              <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-success-foreground">2</span>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Get AI Analysis</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-foreground mb-4">Get AI Analysis</h3>
+              <p className="text-muted-foreground">
                 Our AI analyzes your business data and generates comprehensive insights and recommendations
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">3</span>
+            <div className="text-center animate-fade-in-up animate-delay-400">
+              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-accent-foreground">3</span>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Take Action</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-foreground mb-4">Take Action</h3>
+              <p className="text-muted-foreground">
                 Follow your personalized roadmap and connect with recommended partners to grow your business
               </p>
             </div>
@@ -204,24 +205,22 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-brand">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-background mb-6">
-            Ready to Enter the UK Market?
-          </h2>
-          <p className="text-xl text-background/90 mb-8 max-w-2xl mx-auto">
-            Get instant AI analysis of your business potential and connect with verified UK partners - completely free
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-              Get Free Analysis Now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg">
-              Learn More
-            </Button>
+      {/* Enhance Landing Page with Lead Capture */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Ready to Transform Your Business?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Join over 2,000 Turkish businesses that have successfully expanded to the UK market with our platform
+            </p>
           </div>
+          <LeadCaptureForm 
+            variant="hero"
+            title="Get Your Comprehensive Market Analysis"
+            description="Discover your UK market potential with AI-powered insights and verified partner recommendations"
+          />
         </div>
       </section>
 
