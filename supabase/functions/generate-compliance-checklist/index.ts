@@ -32,10 +32,53 @@ const verifiedPartnerPool: Partner[] = [
   { id: "p5", name: "Crown Trade Compliance", url: "https://example.com/crown", specialty: ["Trading Standards","Consumer Contracts","ADR"] },
 ];
 
-function pickPartner(tags: string[]): { name: string; url: string } | undefined {
+// Enhanced partner matching with scoring
+function pickPartner(tags: string[], businessInfo?: any): { name: string; url: string; score: number } | undefined {
   const tagSet = new Set(tags.map(t => t.toUpperCase()));
-  const match = verifiedPartnerPool.find(p => p.specialty.some(s => tagSet.has(s.toUpperCase())));
-  return match ? { name: match.name, url: match.url } : undefined;
+  
+  // Score each partner based on specialty match and relevance
+  const scoredPartners = verifiedPartnerPool.map(partner => {
+    let score = 0;
+    let matches = 0;
+    
+    // Count direct tag matches
+    partner.specialty.forEach(spec => {
+      if (tagSet.has(spec.toUpperCase())) {
+        matches++;
+        score += 10;
+      }
+    });
+    
+    // Bonus for multiple matches
+    if (matches > 1) {
+      score += matches * 5;
+    }
+    
+    // Industry-specific bonuses
+    if (businessInfo?.industry) {
+      const industry = businessInfo.industry.toLowerCase();
+      
+      if (industry.includes('health') && partner.specialty.some(s => s.includes('MHRA'))) {
+        score += 15;
+      }
+      if (industry.includes('data') && partner.specialty.some(s => s.includes('GDPR'))) {
+        score += 15;
+      }
+      if (industry.includes('finance') && partner.specialty.some(s => s.includes('PCI'))) {
+        score += 15;
+      }
+    }
+    
+    return { ...partner, score };
+  }).filter(p => p.score > 0);
+  
+  // Return highest scoring partner
+  const bestMatch = scoredPartners.sort((a, b) => b.score - a.score)[0];
+  return bestMatch ? { 
+    name: bestMatch.name, 
+    url: bestMatch.url, 
+    score: bestMatch.score 
+  } : undefined;
 }
 
 function daysByPriority(priority: string): number {

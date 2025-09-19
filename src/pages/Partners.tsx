@@ -7,6 +7,7 @@ import { PartnerCard } from "@/components/PartnerCard";
 import { PartnerApplicationDialog } from "@/components/PartnerApplicationDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Users, Plus, Building2 } from "lucide-react";
+import { SmartPartnerFilter } from "@/components/SmartPartnerFilter";
 
 interface Partner {
   id: string;
@@ -210,13 +211,6 @@ export default function Partners() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Verified Partners</h2>
-            <div className="flex gap-2">
-              {['legal', 'accounting', 'consulting', 'marketing', 'other'].map((category) => (
-                <Badge key={category} variant="outline" className="capitalize">
-                  {category}
-                </Badge>
-              ))}
-            </div>
           </div>
 
           {isLoading ? (
@@ -238,11 +232,7 @@ export default function Partners() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {partners.map((partner) => (
-                <PartnerCard key={partner.id} partner={partner} />
-              ))}
-            </div>
+            <SmartPartnerFilter partners={partners} />
           )}
         </div>
       </main>
