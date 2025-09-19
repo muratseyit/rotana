@@ -292,22 +292,59 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
                 })}
               </div>
               
-              {/* Quick Actions */}
-              <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-amber-500" />
-                  Quick Improvement Tips
-                </h4>
-                <div className="grid sm:grid-cols-2 gap-3 text-sm">
-                  {scoreCategories
-                    .filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] < 70)
-                    .slice(0, 4)
-                    .map((category, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-muted-foreground">
-                        <ArrowUpRight className="h-3 w-3 text-primary" />
-                        Focus on improving {category.label.toLowerCase()}
-                      </div>
-                    ))}
+              {/* Analysis Summary */}
+              <div className="mt-8 space-y-4">
+                {/* Strong Areas */}
+                <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                  <h4 className="font-medium mb-3 flex items-center gap-2 text-green-700">
+                    <CheckCircle className="h-4 w-4" />
+                    Your Strongest Areas (80%+)
+                  </h4>
+                  <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                    {scoreCategories
+                      .filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] >= 80)
+                      .map((category, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-green-700">
+                          <CheckCircle className="h-3 w-3" />
+                          <span className="font-medium">{category.label}</span>
+                          <Badge variant="outline" className="ml-auto bg-green-100 text-green-700 border-green-300">
+                            {analysis.scoreBreakdown[category.key]}%
+                          </Badge>
+                        </div>
+                      ))}
+                    {scoreCategories.filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] >= 80).length === 0 && (
+                      <p className="text-green-600 italic">Focus on strengthening key areas to reach excellence level (80%+)</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Areas Needing Attention */}
+                <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                  <h4 className="font-medium mb-3 flex items-center gap-2 text-orange-700">
+                    <AlertCircle className="h-4 w-4" />
+                    Priority Improvement Areas (Below 70%)
+                  </h4>
+                  <div className="space-y-3">
+                    {scoreCategories
+                      .filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] < 70)
+                      .map((category, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="h-3 w-3 text-orange-600" />
+                            <span className="font-medium text-orange-800">{category.label}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="destructive" className="bg-orange-100 text-orange-700 border-orange-300">
+                              {analysis.scoreBreakdown[category.key]}%
+                            </Badge>
+                            <span className="text-xs text-orange-600">Partner support recommended</span>
+                          </div>
+                        </div>
+                      ))}
+                    {scoreCategories.filter(cat => analysis.scoreBreakdown[cat.key] && analysis.scoreBreakdown[cat.key] < 70).length === 0 && (
+                      <p className="text-orange-600 italic">Excellent! All areas are performing well (70%+)</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>

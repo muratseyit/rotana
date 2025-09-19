@@ -265,19 +265,66 @@ export default function GuestResults() {
           </CardContent>
         </Card>
 
-        {/* Relevant Partners Section */}
+        {/* AI-Powered Partner Recommendations */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-purple-600" />
-              Recommended Partners for Your Industry
+              AI-Recommended Partners Based on Your Analysis
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Based on your {analysisResult.customerData.industry} business analysis, these partners can help you enter the UK market:
-            </p>
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-lg mb-6">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-full bg-primary/10">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-primary">Analysis-Based Recommendations</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Based on your {analysisResult.overallScore}% market readiness score, our AI identified key areas where partner support will accelerate your UK market entry.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Strong Areas */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Your Strong Areas
+              </h4>
+              <div className="grid gap-2">
+                {analysisResult.keyFindings.map((finding, index) => (
+                  <div key={index} className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm font-medium text-green-800">{finding}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Areas Needing Support */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-orange-700 mb-3 flex items-center gap-2">
+                <span className="text-orange-600">⚠️</span>
+                Areas Where Partners Can Help
+              </h4>
+              <div className="grid gap-3">
+                {analysisResult.recommendations.slice(0, 3).map((rec, index) => (
+                  <div key={index} className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                    <p className="text-sm font-medium text-orange-800 mb-2">{rec}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300">
+                        {index === 0 ? 'Legal Partners' : index === 1 ? 'Business Development' : 'Compliance Experts'}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             
+            {/* Industry-Specific Recommendations */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border">
                 <div className="flex items-start justify-between mb-2">
@@ -285,11 +332,14 @@ export default function GuestResults() {
                     <h4 className="font-semibold text-blue-800">Legal & Compliance Partners</h4>
                     <p className="text-sm text-blue-600">UK incorporation & regulatory compliance</p>
                   </div>
-                  <Badge className="bg-blue-600">Recommended</Badge>
+                  <Badge className="bg-blue-600">Critical</Badge>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground mb-2">
                   Essential for {analysisResult.customerData.industry} businesses entering the UK market
                 </p>
+                <div className="text-xs text-blue-700 font-medium">
+                  Addresses: Regulatory compliance gaps identified in your analysis
+                </div>
               </div>
               
               <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border">
@@ -300,19 +350,54 @@ export default function GuestResults() {
                   </div>
                   <Badge className="bg-green-600">High Priority</Badge>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground mb-2">
                   Critical for {analysisResult.customerData.companySize} companies
                 </p>
+                <div className="text-xs text-green-700 font-medium">
+                  Addresses: Financial preparedness and tax compliance needs
+                </div>
+              </div>
+
+              <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold text-purple-800">Business Development</h4>
+                    <p className="text-sm text-purple-600">Market strategy & partnerships</p>
+                  </div>
+                  <Badge className="bg-purple-600">Strategic</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Accelerate market penetration in {analysisResult.customerData.industry}
+                </p>
+                <div className="text-xs text-purple-700 font-medium">
+                  Addresses: Market positioning and growth opportunities
+                </div>
+              </div>
+
+              <div className="p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold text-amber-800">Digital Marketing</h4>
+                    <p className="text-sm text-amber-600">UK-focused online presence</p>
+                  </div>
+                  <Badge className="bg-amber-600">Growth</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Build brand awareness and customer acquisition
+                </p>
+                <div className="text-xs text-amber-700 font-medium">
+                  Addresses: Digital readiness and market visibility
+                </div>
               </div>
             </div>
             
             <div className="flex flex-col gap-3">
               <Button onClick={handleCreateAccount} className="w-full">
                 <UserPlus className="h-4 w-4 mr-2" />
-                Create Account to Connect with Partners
+                Create Account to Connect with AI-Matched Partners
               </Button>
               <Button onClick={() => navigate('/partners')} variant="outline" className="w-full">
-                View All Partners
+                View All Verified Partners
               </Button>
             </div>
           </CardContent>

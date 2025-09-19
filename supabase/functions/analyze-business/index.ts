@@ -375,8 +375,19 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
       console.error('Error fetching partners:', partnersError)
     }
 
-    // Generate partner recommendations based on analysis results
+    // Generate partner recommendations based on analysis results with detailed weak area mapping
     const partnerRecommendations = [];
+    const weakAreas = [];
+    const strongAreas = [];
+
+    // Identify weak and strong areas
+    Object.entries(analysisResult.scoreBreakdown).forEach(([key, score]) => {
+      if (score < 70) {
+        weakAreas.push(key as keyof ScoreBreakdown);
+      } else if (score >= 80) {
+        strongAreas.push(key as keyof ScoreBreakdown);
+      }
+    });
 
     if (partners && partners.length > 0) {
       // Legal services for low regulatory compliance
@@ -384,21 +395,21 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
         const legalPartners = partners.filter(p => p.category === 'legal').slice(0, 2);
         if (legalPartners.length > 0) {
           partnerRecommendations.push({
-            category: 'Legal Services',
+            category: 'Legal & Regulatory Compliance',
             partners: legalPartners,
-            reason: 'Your business needs assistance with UK regulatory compliance and company formation'
+            reason: `Your regulatory compatibility score is ${analysisResult.scoreBreakdown.regulatoryCompatibility}%. These legal partners specialize in UK company formation, GDPR compliance, and industry-specific regulations to ensure your business meets all legal requirements for operating in the UK.`
           });
         }
       }
 
-      // Accounting services for low investment readiness
+      // Accounting services for low investment readiness or general financial needs
       if (analysisResult.scoreBreakdown.investmentReadiness < 70) {
         const accountingPartners = partners.filter(p => p.category === 'accounting').slice(0, 2);
         if (accountingPartners.length > 0) {
           partnerRecommendations.push({
-            category: 'Accounting Services',
+            category: 'Financial & Tax Advisory',
             partners: accountingPartners,
-            reason: 'Professional accounting support needed for VAT registration and UK tax compliance'
+            reason: `Your investment readiness score is ${analysisResult.scoreBreakdown.investmentReadiness}%. These accounting partners will help with VAT registration, UK tax planning, financial structuring, and ensuring compliance with HMRC requirements.`
           });
         }
       }
@@ -407,10 +418,14 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
       if (analysisResult.scoreBreakdown.productMarketFit < 70 || analysisResult.scoreBreakdown.founderTeamStrength < 70) {
         const businessPartners = partners.filter(p => p.category === 'business_development').slice(0, 2);
         if (businessPartners.length > 0) {
+          const lowScores = [];
+          if (analysisResult.scoreBreakdown.productMarketFit < 70) lowScores.push(`Product-Market Fit: ${analysisResult.scoreBreakdown.productMarketFit}%`);
+          if (analysisResult.scoreBreakdown.founderTeamStrength < 70) lowScores.push(`Team Strength: ${analysisResult.scoreBreakdown.founderTeamStrength}%`);
+          
           partnerRecommendations.push({
-            category: 'Business Development',
+            category: 'Strategic Business Development',
             partners: businessPartners,
-            reason: 'Strategic guidance needed for UK market entry and business development'
+            reason: `Areas for improvement: ${lowScores.join(', ')}. These partners provide market research, strategic planning, partnership development, and local market expertise to strengthen your UK market positioning.`
           });
         }
       }
@@ -420,24 +435,9 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
         const marketingPartners = partners.filter(p => p.category === 'marketing').slice(0, 2);
         if (marketingPartners.length > 0) {
           partnerRecommendations.push({
-            category: 'Marketing Services',
+            category: 'Digital Marketing & Online Presence',
             partners: marketingPartners,
-            reason: 'Digital marketing expertise required to establish UK market presence'
-          });
-        }
-      }
-
-      // Compliance for specific industries or low compliance scores
-      if (analysisResult.complianceAssessment.complianceScore < 70 || 
-          businessData.industry.toLowerCase().includes('food') || 
-          businessData.industry.toLowerCase().includes('health') || 
-          businessData.industry.toLowerCase().includes('finance')) {
-        const compliancePartners = partners.filter(p => p.category === 'compliance').slice(0, 1);
-        if (compliancePartners.length > 0) {
-          partnerRecommendations.push({
-            category: 'Compliance Services',
-            partners: compliancePartners,
-            reason: 'Industry-specific compliance requirements need specialist attention'
+            reason: `Your digital readiness score is ${analysisResult.scoreBreakdown.digitalReadiness}%. These marketing partners specialize in UK digital marketing, SEO for UK markets, social media strategy, and building strong online presence to reach UK customers effectively.`
           });
         }
       }
@@ -446,12 +446,63 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
       if (analysisResult.scoreBreakdown.logisticsPotential < 70 && 
           (businessData.businessDescription.toLowerCase().includes('product') || 
            businessData.businessDescription.toLowerCase().includes('goods') || 
-           businessData.businessDescription.toLowerCase().includes('manufacturing'))) {
-        const logisticsPartners = partners.filter(p => p.category === 'logistics').slice(0, 1);
+           businessData.businessDescription.toLowerCase().includes('manufacturing') ||
+           businessData.businessDescription.toLowerCase().includes('retail') ||
+           businessData.businessDescription.toLowerCase().includes('e-commerce'))) {
+        const logisticsPartners = partners.filter(p => p.category === 'logistics').slice(0, 2);
         if (logisticsPartners.length > 0) {
           partnerRecommendations.push({
-            category: 'Logistics Services',
+            category: 'Supply Chain & Logistics',
             partners: logisticsPartners,
+            reason: `Your logistics potential score is ${analysisResult.scoreBreakdown.logisticsPotential}%. These logistics partners offer UK warehousing, distribution networks, customs handling, and supply chain optimization to ensure efficient product delivery across the UK.`
+          });
+        }
+      }
+
+      // Compliance for specific industries or low compliance scores
+      if (analysisResult.complianceAssessment.complianceScore < 70 || 
+          businessData.industry.toLowerCase().includes('food') || 
+          businessData.industry.toLowerCase().includes('health') || 
+          businessData.industry.toLowerCase().includes('finance') ||
+          businessData.industry.toLowerCase().includes('pharma') ||
+          businessData.industry.toLowerCase().includes('medical')) {
+        const compliancePartners = partners.filter(p => p.category === 'compliance').slice(0, 2);
+        if (compliancePartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Industry-Specific Compliance',
+            partners: compliancePartners,
+            reason: `Compliance score: ${analysisResult.complianceAssessment.complianceScore}%. Your ${businessData.industry} business requires specialized compliance expertise for UK regulations, industry standards, and certification requirements.`
+          });
+        }
+      }
+
+      // Scalability support for low scalability scores
+      if (analysisResult.scoreBreakdown.scalabilityAutomation < 70) {
+        const consultingPartners = partners.filter(p => p.category === 'consulting' || p.category === 'business_development').slice(0, 1);
+        if (consultingPartners.length > 0) {
+          partnerRecommendations.push({
+            category: 'Operations & Scalability Consulting',
+            partners: consultingPartners,
+            reason: `Your scalability & automation score is ${analysisResult.scoreBreakdown.scalabilityAutomation}%. These partners help optimize operations, implement automation solutions, and build scalable processes for sustainable UK market growth.`
+          });
+        }
+      }
+
+      // Always include a high-level strategic partner if overall score is moderate
+      if (analysisResult.overallScore < 75 && analysisResult.overallScore >= 60) {
+        const strategicPartners = partners.filter(p => 
+          p.category === 'consulting' || 
+          p.category === 'business_development'
+        ).slice(0, 1);
+        
+        if (strategicPartners.length > 0 && !partnerRecommendations.some(r => r.category.includes('Strategic'))) {
+          partnerRecommendations.push({
+            category: 'Strategic Market Entry Consulting',
+            partners: strategicPartners,
+            reason: `With an overall readiness score of ${analysisResult.overallScore}%, you have solid foundations but could benefit from strategic guidance to optimize your UK market entry approach and accelerate growth.`
+          });
+        }
+      }
             reason: 'Supply chain and logistics support needed for product distribution in the UK'
           });
         }
