@@ -264,8 +264,8 @@ export default function Auth() {
             </div>
             <CardDescription>
               {mode === 'signup' 
-                ? 'Create an account to save your analysis results and access advanced features'
-                : 'Sign in to access your dashboard and get your UK market readiness assessment'
+                ? 'Create an account to access advanced features'
+                : 'Sign in to access your dashboard'
               }
             </CardDescription>
           </CardHeader>
@@ -387,11 +387,8 @@ export default function Auth() {
                           <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
-                    </div>
-                    {password.length > 0 && password.length < 6 && (
-                      <p className="text-sm text-destructive">Password must be at least 6 characters</p>
-                    )}
-                  </div>
+                     </div>
+                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading || !email || password.length < 6}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Create Account
@@ -497,11 +494,8 @@ export default function Auth() {
                       disabled={isUpdatingPassword}
                       minLength={6}
                     />
-                  </div>
-                  {newPassword && confirmPassword && newPassword !== confirmPassword && (
-                    <p className="text-sm text-destructive">Passwords don't match</p>
-                  )}
-                  <Button 
+                   </div>
+                   <Button
                     type="submit" 
                     className="w-full" 
                     disabled={isUpdatingPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword || newPassword.length < 6}
