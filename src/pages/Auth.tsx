@@ -17,6 +17,10 @@ export default function Auth() {
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetting, setIsResetting] = useState(false);
+  const [showPasswordUpdate, setShowPasswordUpdate] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -36,9 +40,12 @@ export default function Auth() {
     
     checkUser();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+    // Listen for auth changes including password recovery
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setShowPasswordUpdate(true);
+        setShowResetForm(false);
+      } else if (session?.user) {
         const redirectTo = from ? `/${from}` : '/';
         navigate(redirectTo);
       }
@@ -133,6 +140,56 @@ export default function Auth() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure both passwords are identical.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({ 
+        password: newPassword 
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password updated successfully!",
+        description: "You can now sign in with your new password."
+      });
+      
+      setShowPasswordUpdate(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      navigate(`/auth?mode=signin${from ? `&from=${from}` : ''}`);
+    } catch (error: any) {
+      toast({
+        title: "Password update failed",
+        description: getAuthErrorMessage(error),
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -382,6 +439,71 @@ export default function Auth() {
                       Cancel
                     </Button>
                   </div>
+                </form>
+              </div>
+            )}
+            
+            {/* Password Update Form - shown when user clicks reset link */}
+            {showPasswordUpdate && (
+              <div className="mt-6 p-4 border rounded-lg bg-primary/10">
+                <div className="mb-4">
+                  <h3 className="text-lg font-medium">Set New Password</h3>
+                  <p className="text-sm text-muted-foreground">Enter your new password below.</p>
+                </div>
+                <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="new-password"
+                        type={showPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new password (min. 6 characters)"
+                        required
+                        disabled={isUpdatingPassword}
+                        minLength={6}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={isUpdatingPassword}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      required
+                      disabled={isUpdatingPassword}
+                      minLength={6}
+                    />
+                  </div>
+                  {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                    <p className="text-sm text-destructive">Passwords don't match</p>
+                  )}
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isUpdatingPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword || newPassword.length < 6}
+                  >
+                    {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Update Password
+                  </Button>
                 </form>
               </div>
             )}
