@@ -503,10 +503,6 @@ Focus on UK-specific market conditions, regulations (GDPR, Companies House, VAT,
           });
         }
       }
-            reason: 'Supply chain and logistics support needed for product distribution in the UK'
-          });
-        }
-      }
     }
 
     // Add partner recommendations to the analysis result
