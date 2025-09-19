@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,21 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Target, Loader2, ArrowLeft } from "lucide-react";
+import { Target, Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const mode = searchParams.get('mode') || 'signin';
+  const from = searchParams.get('from');
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        navigate("/");
+        const redirectTo = from ? `/${from}` : '/';
+        navigate(redirectTo);
       }
     };
     
@@ -30,19 +36,45 @@ export default function Auth() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate("/");
+        const redirectTo = from ? `/${from}` : '/';
+        navigate(redirectTo);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, from]);
+
+  const getAuthErrorMessage = (error: any) => {
+    if (error.message?.includes('Email not confirmed')) {
+      return 'Please check your email and click the confirmation link before signing in.';
+    }
+    if (error.message?.includes('Invalid login credentials')) {
+      return 'Invalid email or password. Please check your credentials and try again.';
+    }
+    if (error.message?.includes('User already registered')) {
+      return 'An account with this email already exists. Try signing in instead.';
+    }
+    if (error.message?.includes('Password should be at least 6 characters')) {
+      return 'Password must be at least 6 characters long.';
+    }
+    return error.message || 'An unexpected error occurred. Please try again.';
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -52,14 +84,21 @@ export default function Auth() {
 
       if (error) throw error;
 
-      toast({
-        title: "Sign up successful!",
-        description: "Please check your email to confirm your account.",
-      });
+      if (data?.user?.email_confirmed_at) {
+        toast({
+          title: "Welcome!",
+          description: "Your account has been created successfully."
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "Please check your email and click the confirmation link to complete your registration."
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: getAuthErrorMessage(error),
         variant: "destructive"
       });
     } finally {
@@ -86,11 +125,19 @@ export default function Auth() {
     } catch (error: any) {
       toast({
         title: "Sign in failed",
-        description: error.message,
+        description: getAuthErrorMessage(error),
         variant: "destructive"
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (from) {
+      navigate(`/${from}`);
+    } else {
+      navigate('/');
     }
   };
 
@@ -99,11 +146,11 @@ export default function Auth() {
       <div className="w-full max-w-md space-y-4">
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/')}
+          onClick={handleBackNavigation}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Home
+          Back to {from === 'guest-analysis' ? 'Analysis' : 'Home'}
         </Button>
         
         <Card className="w-full">
@@ -112,80 +159,133 @@ export default function Auth() {
               <Target className="h-6 w-6 text-primary" />
               <CardTitle>Business Analysis Platform</CardTitle>
             </div>
-          <CardDescription>
-            Sign in to access your dashboard and get your UK market readiness assessment
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <CardDescription>
+              {mode === 'signup' 
+                ? 'Create an account to save your analysis results and access advanced features'
+                : 'Sign in to access your dashboard and get your UK market readiness assessment'
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={mode} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger 
+                  value="signin" 
+                  onClick={() => navigate(`/auth?mode=signin${from ? `&from=${from}` : ''}`)}
+                >
                   Sign In
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a password"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup"
+                  onClick={() => navigate(`/auth?mode=signup${from ? `&from=${from}` : ''}`)}
+                >
                   Sign Up
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="signin-password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                        disabled={isLoading}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading || !email || !password}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign In
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Create a password (min. 6 characters)"
+                        required
+                        disabled={isLoading}
+                        minLength={6}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                    {password.length > 0 && password.length < 6 && (
+                      <p className="text-sm text-destructive">Password must be at least 6 characters</p>
+                    )}
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading || !email || password.length < 6}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create Account
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
         </Card>
       </div>
     </div>
