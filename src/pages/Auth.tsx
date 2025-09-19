@@ -40,6 +40,11 @@ export default function Auth() {
     
     checkUser();
 
+    // Check if this is a password recovery redirect
+    if (mode === 'recovery') {
+      setShowPasswordUpdate(true);
+    }
+
     // Listen for auth changes including password recovery
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -52,7 +57,7 @@ export default function Auth() {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, from]);
+  }, [navigate, from, mode]);
 
   const getAuthErrorMessage = (error: any) => {
     if (error.message?.includes('Email not confirmed')) {
@@ -208,7 +213,7 @@ export default function Auth() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth?mode=signin`
+        redirectTo: `${window.location.origin}/auth?mode=recovery`
       });
 
       if (error) throw error;
