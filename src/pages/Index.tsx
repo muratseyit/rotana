@@ -38,20 +38,20 @@ const Index = () => {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-6">
                 <Button variant="ghost" onClick={() => navigate('/features')}>
-                  Features
+                  {t('nav.features')}
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/partners')}>
                   Partners
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/pricing')}>
-                  Pricing
+                  {t('nav.pricing')}
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/admin')} className="text-xs">
                   Admin
                 </Button>
                 <LanguageSwitcher />
                 <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
-                  Get Started
+                  {t('nav.getStarted')}
                 </Button>
               </div>
 
@@ -67,19 +67,18 @@ const Index = () => {
           <div className="mb-8">
             <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-accent text-accent-foreground mb-6">
               <Zap className="h-4 w-4 mr-2" />
-              AI-Powered UK Market Entry for Turkish SMEs
+              {t('hero.badge')}
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-background mb-6 leading-tight">
-            Transform Your Business with{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-background to-success">AI-Powered Insights</span>
+            {t('hero.title')}
           </h1>
           <p className="text-xl text-background/90 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Get comprehensive business analysis, UK market insights, and partner connections - completely free
+            {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
-              Get Free AI Analysis
+              {t('hero.startJourney')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
@@ -95,10 +94,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Everything You Need for UK Market Success
+              {t('features.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive AI-powered platform designed specifically for Turkish SMEs expanding to the UK
+              {t('features.subtitle')}
             </p>
           </div>
 
@@ -108,11 +107,11 @@ const Index = () => {
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="h-6 w-6 text-brand" />
                 </div>
-                <CardTitle className="text-xl">AI-Powered Analysis</CardTitle>
+                <CardTitle className="text-xl">{t('features.aiScore')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Advanced artificial intelligence analyzes your business data to provide actionable insights
+                  {t('features.aiScoreDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -122,11 +121,11 @@ const Index = () => {
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
                   <FileText className="h-6 w-6 text-success" />
                 </div>
-                <CardTitle className="text-xl">Comprehensive Reports</CardTitle>
+                <CardTitle className="text-xl">{t('features.docGenerator')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Get detailed reports covering market analysis, competitive landscape, and growth opportunities
+                  {t('features.docGeneratorDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -136,11 +135,11 @@ const Index = () => {
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Users className="h-6 w-6 text-brand" />
                 </div>
-                <CardTitle className="text-xl">Partner Matching</CardTitle>
+                <CardTitle className="text-xl">{t('features.partnerMatching')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Connect with verified UK business partners and service providers tailored to your needs
+                  {t('features.partnerMatchingDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -150,11 +149,11 @@ const Index = () => {
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-6 w-6 text-success" />
                 </div>
-                <CardTitle className="text-xl">Smart Roadmap</CardTitle>
+                <CardTitle className="text-xl">{t('features.smartRoadmap')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Get a personalized roadmap with actionable steps to achieve your business goals
+                  {t('features.smartRoadmapDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -167,10 +166,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              How It Works
+              {t('howItWorks.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Get started with your business analysis in three simple steps
+              {t('howItWorks.subtitle')}
             </p>
           </div>
 
@@ -179,9 +178,9 @@ const Index = () => {
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-primary-foreground">1</span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-4">Share Your Business Info</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-4">{t('howItWorks.step1')}</h3>
               <p className="text-muted-foreground">
-                Tell us about your business, goals, and current challenges through our simple form
+                {t('howItWorks.step1Desc')}
               </p>
             </div>
 
@@ -189,9 +188,9 @@ const Index = () => {
               <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-success-foreground">2</span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-4">Get AI Analysis</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-4">{t('howItWorks.step2')}</h3>
               <p className="text-muted-foreground">
-                Our AI analyzes your business data and generates comprehensive insights and recommendations
+                {t('howItWorks.step2Desc')}
               </p>
             </div>
 
@@ -199,9 +198,9 @@ const Index = () => {
               <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-accent-foreground">3</span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-4">Take Action</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-4">{t('howItWorks.step3')}</h3>
               <p className="text-muted-foreground">
-                Follow your personalized roadmap and connect with recommended partners to grow your business
+                {t('howItWorks.step3Desc')}
               </p>
             </div>
           </div>
@@ -213,10 +212,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Ready to Transform Your Business?
+              {t('cta.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join over 2,000 Turkish businesses that have successfully expanded to the UK market with our platform
+              {t('cta.description')}
             </p>
           </div>
           <LeadCaptureForm 
@@ -237,11 +236,11 @@ const Index = () => {
                 <span className="text-xl font-bold text-background">Business Bridge</span>
               </div>
               <p className="text-muted-foreground">
-                AI-Powered UK Market Entry for Turkish SMEs. Comprehensive analysis, partner matching, and business growth insights.
+                {t('footer.description')}
               </p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Platform</h4>
+              <h4 className="text-white font-semibold mb-4">{t('footer.platform')}</h4>
               <ul className="space-y-2">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
@@ -249,7 +248,7 @@ const Index = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Support</h4>
+              <h4 className="text-white font-semibold mb-4">{t('footer.support')}</h4>
               <ul className="space-y-2">
                 <li><a href="#help" className="hover:text-white transition-colors">Help Center</a></li>
                 <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
@@ -257,7 +256,7 @@ const Index = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <h4 className="text-white font-semibold mb-4">{t('footer.legal')}</h4>
               <ul className="space-y-2">
                 <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
                 <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
@@ -266,7 +265,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center">
-            <p>&copy; 2024 Business Bridge. All rights reserved.</p>
+            <p>{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>
