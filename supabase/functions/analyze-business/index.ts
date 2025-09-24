@@ -89,6 +89,9 @@ serve(async (req) => {
   }
 
   try {
+    const businessData: BusinessData = await req.json();
+    console.log('Business data received:', businessData);
+    
     // Check if this is a guest analysis (limited) or full member analysis
     const isGuestAnalysis = !businessData.financialMetrics && !businessData.complianceStatus;
     console.log('Analysis type:', isGuestAnalysis ? 'Guest (Limited)' : 'Full Member');
