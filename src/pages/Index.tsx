@@ -71,7 +71,7 @@ const Index = () => {
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-background mb-6 leading-tight">
-            Simplify the market entry for your business with Smart Analytics
+            Accelerate Market Entry with Smart Analytics
           </h1>
           <p className="text-xl text-background/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             {t('hero.description')}
