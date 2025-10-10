@@ -81,7 +81,7 @@ const Index = () => {
               {t('hero.startJourney')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-brand px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
+            <Button size="lg" variant="outline" className="bg-foreground text-background hover:bg-foreground/90 border-foreground px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
               Go to Dashboard
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
