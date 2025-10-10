@@ -37,20 +37,20 @@ const Index = () => {
               
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-6">
-                <Button variant="ghost" onClick={() => navigate('/features')}>
+                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/features')}>
                   {t('nav.features')}
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/partners')}>
+                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/partners')}>
                   Partners
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/pricing')}>
+                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/pricing')}>
                   {t('nav.pricing')}
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/admin')} className="text-xs">
+                <Button className="bg-foreground text-background hover:bg-foreground/90 text-xs" onClick={() => navigate('/admin')}>
                   Admin
                 </Button>
                 <LanguageSwitcher />
-                <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
+                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/guest-analysis')}>
                   {t('nav.getStarted')}
                 </Button>
               </div>
@@ -77,11 +77,11 @@ const Index = () => {
             {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-background text-brand hover:bg-background/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
               {t('hero.startJourney')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" className="bg-foreground text-background hover:bg-foreground/90 border-foreground px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
+            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 border-foreground px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
               Go to Dashboard
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
