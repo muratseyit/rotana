@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { PartnerCard } from "@/components/PartnerCard";
 import { PartnerApplicationDialog } from "@/components/PartnerApplicationDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Users, Plus, Building2 } from "lucide-react";
 import { SmartPartnerFilter } from "@/components/SmartPartnerFilter";
 
@@ -31,6 +32,7 @@ export default function Partners() {
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchPartners();
@@ -49,8 +51,8 @@ export default function Partners() {
     } catch (error) {
       console.error("Error fetching partners:", error);
       toast({
-        title: "Error",
-        description: "Failed to load partners.",
+        title: t('partners.error'),
+        description: t('partners.failedToLoad'),
         variant: "destructive"
       });
     } finally {
@@ -61,8 +63,8 @@ export default function Partners() {
   const handleApplicationSuccess = () => {
     setShowApplicationDialog(false);
     toast({
-      title: "Application Submitted!",
-      description: "Your partner application has been submitted for review.",
+      title: t('partners.applicationSubmitted'),
+      description: t('partners.applicationDesc'),
     });
   };
 
@@ -75,9 +77,9 @@ export default function Partners() {
             <div className="flex items-center gap-3">
               <Building2 className="h-8 w-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold">Partner Directory</h1>
+                <h1 className="text-2xl font-bold">{t('partners.title')}</h1>
                 <p className="text-sm text-muted-foreground">
-                  Connect with verified UK market entry partners
+                  {t('partners.subtitle')}
                 </p>
               </div>
             </div>
@@ -85,11 +87,11 @@ export default function Partners() {
               {user && (
                 <Button onClick={() => setShowApplicationDialog(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Apply as Partner
+                  {t('partners.applyPartner')}
                 </Button>
               )}
               <Button variant="outline" onClick={() => window.history.back()}>
-                Back
+                {t('partners.back')}
               </Button>
             </div>
           </div>

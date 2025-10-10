@@ -5,11 +5,13 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Features = () => {
   const navigate = useNavigate();
   const [isSchedulingDemo, setIsSchedulingDemo] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleScheduleDemo = () => {
     setIsSchedulingDemo(true);
@@ -40,7 +42,7 @@ const Features = () => {
             </nav>
             <div className="flex items-center space-x-4">
               <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
-                Get Started
+                {t('nav.getStarted')}
               </Button>
             </div>
           </div>
@@ -53,20 +55,20 @@ const Features = () => {
           <div className="mb-8">
             <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-6">
               <Zap className="h-4 w-4 mr-2" />
-              Comprehensive Business Intelligence Suite
+              {t('features.badge')}
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            Every Tool You Need to{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">Grow Your Business</span>
+            {t('features.heroTitle')}{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">{t('features.heroTitleHighlight')}</span>
           </h1>
           <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            From AI-powered market analysis to partner matching and compliance tracking, our platform provides everything you need to make informed business decisions and accelerate growth.
+            {t('features.heroDesc')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/onboarding">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
-                Start Free Analysis
+                {t('features.startAnalysis')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -77,7 +79,7 @@ const Features = () => {
               onClick={handleScheduleDemo}
               disabled={isSchedulingDemo}
             >
-              {isSchedulingDemo ? "Scheduling..." : "Schedule Demo"}
+              {isSchedulingDemo ? t('features.scheduling') : t('features.scheduleDemo')}
             </Button>
           </div>
         </div>
@@ -88,10 +90,10 @@ const Features = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Core Features
+              {t('features.coreTitle')}
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Powerful tools designed to give you the insights and connections you need to succeed
+              {t('features.coreSubtitle')}
             </p>
           </div>
 

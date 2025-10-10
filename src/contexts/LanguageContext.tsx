@@ -172,7 +172,57 @@ const translations = {
     'interest.partnerMatching': 'Partner Matching',
     'interest.complianceSupport': 'Compliance Support',
     'interest.financialPlanning': 'Financial Planning',
-    'interest.digitalMarketing': 'Digital Marketing'
+    'interest.digitalMarketing': 'Digital Marketing',
+
+    // Features Page
+    'features.badge': 'Comprehensive Business Intelligence Suite',
+    'features.heroTitle': 'Every Tool You Need to',
+    'features.heroTitleHighlight': 'Grow Your Business',
+    'features.heroDesc': 'From AI-powered market analysis to partner matching and compliance tracking, our platform provides everything you need to make informed business decisions and accelerate growth.',
+    'features.startAnalysis': 'Start Free Analysis',
+    'features.scheduleDemo': 'Schedule Demo',
+    'features.scheduling': 'Scheduling...',
+    'features.coreTitle': 'Core Features',
+    'features.coreSubtitle': 'Powerful tools designed to give you the insights and connections you need to succeed',
+    'features.whyChoose': 'Why Choose Business Bridge?',
+    'features.whyChooseSubtitle': 'Join thousands of businesses that trust our platform for their growth journey',
+    'features.ctaTitle': 'Ready to Transform Your Business?',
+    'features.ctaSubtitle': 'Join thousands of businesses that have already discovered their growth potential with our AI-powered platform.',
+    
+    // Partners Page
+    'partners.title': 'Partner Directory',
+    'partners.subtitle': 'Connect with verified UK market entry partners',
+    'partners.applyPartner': 'Apply as Partner',
+    'partners.back': 'Back',
+    'partners.verifiedPartners': 'Verified Partners',
+    'partners.readyToHelp': 'Ready to help your business',
+    'partners.serviceCategories': 'Service Categories',
+    'partners.differentSpecializations': 'Different specializations',
+    'partners.joinNetwork': 'Join Network',
+    'partners.applyNow': 'Apply Now',
+    'partners.signInToApply': 'Sign in to apply as a partner',
+    'partners.successStories': 'Success Stories',
+    'partners.loading': 'Loading partners...',
+    'partners.noPartners': 'No verified partners yet',
+    'partners.beFirst': 'Be the first to join our partner network and help Turkish SMEs enter the UK market',
+    'partners.applicationSubmitted': 'Application Submitted!',
+    'partners.applicationDesc': 'Your partner application has been submitted for review.',
+    'partners.error': 'Error',
+    'partners.failedToLoad': 'Failed to load partners.',
+
+    // Pricing Page
+    'pricing.title': 'Pricing Plans',
+    'pricing.backToDashboard': 'Back to Dashboard',
+    'pricing.manageSubscription': 'Manage Subscription',
+    'pricing.partnerDirectory': 'Partner Directory',
+    'pricing.customSolution': 'Need a Custom Solution?',
+    'pricing.customDesc': "If you're a large organization or need custom features, we'd love to discuss a tailored solution for your needs.",
+    'pricing.contactSales': 'Contact Sales',
+    'pricing.authRequired': 'Authentication Required',
+    'pricing.authRequiredDesc': 'Please sign in to subscribe to a plan.',
+    'pricing.errorTitle': 'Error',
+    'pricing.subscriptionError': 'Failed to process subscription. Please try again.',
+    'pricing.manageError': 'Failed to open subscription management. Please try again.'
   },
   tr: {
     // Header
@@ -337,7 +387,57 @@ const translations = {
     'interest.partnerMatching': 'Partner Eşleştirme',
     'interest.complianceSupport': 'Uyumluluk Desteği',
     'interest.financialPlanning': 'Finansal Planlama',
-    'interest.digitalMarketing': 'Dijital Pazarlama'
+    'interest.digitalMarketing': 'Dijital Pazarlama',
+
+    // Features Page
+    'features.badge': 'Kapsamlı İş Zekası Paketi',
+    'features.heroTitle': 'İşinizi Büyütmek İçin',
+    'features.heroTitleHighlight': 'İhtiyacınız Olan Her Araç',
+    'features.heroDesc': 'AI destekli pazar analizinden partner eşleştirme ve uyumluluk takibine kadar, bilinçli iş kararları almak ve büyümeyi hızlandırmak için ihtiyacınız olan her şeyi sağlar.',
+    'features.startAnalysis': 'Ücretsiz Analiz Başlat',
+    'features.scheduleDemo': 'Demo Planla',
+    'features.scheduling': 'Planlanıyor...',
+    'features.coreTitle': 'Temel Özellikler',
+    'features.coreSubtitle': 'Başarılı olmanız için ihtiyacınız olan içgörüleri ve bağlantıları sağlayan güçlü araçlar',
+    'features.whyChoose': 'Neden Business Bridge?',
+    'features.whyChooseSubtitle': 'Büyüme yolculuklarında platformumuza güvenen binlerce işletmeye katılın',
+    'features.ctaTitle': 'İşinizi Dönüştürmeye Hazır mısınız?',
+    'features.ctaSubtitle': 'AI destekli platformumuzla büyüme potansiyellerini keşfetmiş binlerce işletmeye katılın.',
+    
+    // Partners Page
+    'partners.title': 'Partner Dizini',
+    'partners.subtitle': 'Doğrulanmış UK pazar giriş partnerleriyle bağlantı kurun',
+    'partners.applyPartner': 'Partner Olarak Başvur',
+    'partners.back': 'Geri',
+    'partners.verifiedPartners': 'Doğrulanmış Partnerler',
+    'partners.readyToHelp': 'İşinize yardımcı olmaya hazır',
+    'partners.serviceCategories': 'Hizmet Kategorileri',
+    'partners.differentSpecializations': 'Farklı uzmanlık alanları',
+    'partners.joinNetwork': 'Ağa Katıl',
+    'partners.applyNow': 'Şimdi Başvur',
+    'partners.signInToApply': 'Partner olarak başvurmak için giriş yapın',
+    'partners.successStories': 'Başarı Hikayeleri',
+    'partners.loading': 'Partnerler yükleniyor...',
+    'partners.noPartners': 'Henüz doğrulanmış partner yok',
+    'partners.beFirst': 'Partner ağımıza katılan ilk kişi olun ve Türk KOBİ\'lerinin UK pazarına girmesine yardımcı olun',
+    'partners.applicationSubmitted': 'Başvuru Gönderildi!',
+    'partners.applicationDesc': 'Partner başvurunuz inceleme için gönderildi.',
+    'partners.error': 'Hata',
+    'partners.failedToLoad': 'Partnerler yüklenemedi.',
+
+    // Pricing Page
+    'pricing.title': 'Fiyatlandırma Planları',
+    'pricing.backToDashboard': 'Kontrol Paneline Dön',
+    'pricing.manageSubscription': 'Aboneliği Yönet',
+    'pricing.partnerDirectory': 'Partner Dizini',
+    'pricing.customSolution': 'Özel Bir Çözüme mi İhtiyacınız Var?',
+    'pricing.customDesc': 'Büyük bir organizasyonunuz varsa veya özel özelliklere ihtiyacınız varsa, ihtiyaçlarınıza özel bir çözüm tartışmak isteriz.',
+    'pricing.contactSales': 'Satış İle İletişime Geçin',
+    'pricing.authRequired': 'Kimlik Doğrulama Gerekli',
+    'pricing.authRequiredDesc': 'Bir plana abone olmak için lütfen giriş yapın.',
+    'pricing.errorTitle': 'Hata',
+    'pricing.subscriptionError': 'Abonelik işlenemedi. Lütfen tekrar deneyin.',
+    'pricing.manageError': 'Abonelik yönetimi açılamadı. Lütfen tekrar deneyin.'
   }
 };
 

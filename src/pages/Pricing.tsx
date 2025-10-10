@@ -5,10 +5,12 @@ import { PricingSection } from "@/components/PricingSection";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CreditCard, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Pricing() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [currentPlan, setCurrentPlan] = useState<string>("starter");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +22,8 @@ export default function Pricing() {
   const handleSubscribe = async (priceId: string) => {
     if (!user) {
       toast({
-        title: "Authentication Required",
-        description: "Please sign in to subscribe to a plan.",
+        title: t('pricing.authRequired'),
+        description: t('pricing.authRequiredDesc'),
         variant: "destructive",
       });
       navigate("/auth");
@@ -36,8 +38,8 @@ export default function Pricing() {
       
       if (error) {
         toast({
-          title: "Error",
-          description: "Failed to process subscription. Please try again.",
+          title: t('pricing.errorTitle'),
+          description: t('pricing.subscriptionError'),
           variant: "destructive",
         });
         return;
@@ -48,8 +50,8 @@ export default function Pricing() {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to process subscription. Please try again.",
+        title: t('pricing.errorTitle'),
+        description: t('pricing.subscriptionError'),
         variant: "destructive",
       });
     } finally {
@@ -66,8 +68,8 @@ export default function Pricing() {
       
       if (error) {
         toast({
-          title: "Error",
-          description: "Failed to open subscription management. Please try again.",
+          title: t('pricing.errorTitle'),
+          description: t('pricing.manageError'),
           variant: "destructive",
         });
         return;
@@ -78,8 +80,8 @@ export default function Pricing() {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to open subscription management. Please try again.",
+        title: t('pricing.errorTitle'),
+        description: t('pricing.manageError'),
         variant: "destructive",
       });
     } finally {
@@ -101,9 +103,9 @@ export default function Pricing() {
                 className="gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
+                {t('pricing.backToDashboard')}
               </Button>
-              <h1 className="text-xl font-semibold">Pricing Plans</h1>
+              <h1 className="text-xl font-semibold">{t('pricing.title')}</h1>
             </div>
             
             <div className="flex items-center gap-2">
@@ -116,7 +118,7 @@ export default function Pricing() {
                   className="gap-2"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Manage Subscription
+                  {t('pricing.manageSubscription')}
                 </Button>
               )}
               
@@ -127,7 +129,7 @@ export default function Pricing() {
                 className="gap-2"
               >
                 <Users className="w-4 h-4" />
-                Partner Directory
+                {t('pricing.partnerDirectory')}
               </Button>
             </div>
           </div>
@@ -145,15 +147,14 @@ export default function Pricing() {
         <section className="py-16 bg-muted/50">
           <div className="container mx-auto max-w-4xl px-4 text-center">
             <h3 className="text-2xl font-bold mb-4">
-              Need a Custom Solution?
+              {t('pricing.customSolution')}
             </h3>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              If you're a large organization or need custom features, 
-              we'd love to discuss a tailored solution for your needs.
+              {t('pricing.customDesc')}
             </p>
             <Button size="lg" className="gap-2">
               <Users className="w-4 h-4" />
-              Contact Sales
+              {t('pricing.contactSales')}
             </Button>
           </div>
         </section>
