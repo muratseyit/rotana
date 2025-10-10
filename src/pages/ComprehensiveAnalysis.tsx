@@ -83,20 +83,31 @@ export default function ComprehensiveAnalysis() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const businessFormData = location.state?.businessData;
+    // Try to get data from location state first, then from localStorage
+    let businessFormData = location.state?.businessData;
+    
+    if (!businessFormData) {
+      const storedData = localStorage.getItem('comprehensiveBusinessData');
+      if (storedData) {
+        businessFormData = JSON.parse(storedData);
+      }
+    }
     
     if (!businessFormData) {
       toast({
         title: "No Business Data",
-        description: "Please complete the business form first.",
+        description: "Please complete the comprehensive analysis form first.",
         variant: "destructive"
       });
-      navigate('/');
+      navigate('/comprehensive-analysis-form');
       return;
     }
 
     setBusinessData(businessFormData);
     processComprehensiveAnalysis(businessFormData);
+    
+    // Clear localStorage after loading
+    localStorage.removeItem('comprehensiveBusinessData');
   }, [location.state, navigate, toast]);
 
   const processComprehensiveAnalysis = async (data: BusinessData) => {

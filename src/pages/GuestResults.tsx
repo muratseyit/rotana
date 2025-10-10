@@ -253,17 +253,49 @@ export default function GuestResults() {
 
         {/* Comprehensive Analysis Upgrade */}
         {analysisResult.limitedAnalysis && (
-          <SubscriptionGate
-            title="Complete Business Analysis"
-            description="Unlock your full 7-category market readiness assessment with detailed scoring, compliance checklist, and step-by-step roadmap."
-            feature="comprehensive-analysis"
-            currentAnalysis={{
-              overallScore: analysisResult.overallScore,
-              industry: analysisResult.customerData.industry,
-              companyName: analysisResult.customerData.companyName
-            }}
-            onUpgrade={() => setShowPricing(true)}
-          />
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-primary" />
+                Complete Business Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Unlock your full 7-category market readiness assessment with detailed scoring, compliance checklist, and step-by-step roadmap.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>Detailed financial metrics analysis</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>7-category scoring breakdown</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>AI-generated compliance checklist</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>Matched partner recommendations</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>Professional downloadable report</span>
+                </li>
+              </ul>
+              <Button 
+                onClick={() => navigate('/comprehensive-analysis-form')}
+                className="w-full"
+                size="lg"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Get Comprehensive Analysis
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* Call to Action */}
@@ -289,18 +321,18 @@ export default function GuestResults() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
-                onClick={() => setShowPricing(true)}
+                onClick={() => navigate('/comprehensive-analysis-form')}
                 className="bg-white text-blue-600 hover:bg-slate-100"
               >
                 {analysisResult.limitedAnalysis ? (
                   <>
                     <Crown className="h-4 w-4 mr-2" />
-                    {t('results.upgradePremium')}
+                    Get Comprehensive Analysis
                   </>
                 ) : (
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />
-                    Create Account & Access Partners
+                    Get Full Analysis & Partners
                   </>
                 )}
               </Button>
@@ -316,18 +348,28 @@ export default function GuestResults() {
           </CardContent>
         </Card>
 
-        {/* AI-Powered Partner Recommendations - Subscription Gate */}
-        <SubscriptionGate
-          title="AI-Matched Partner Recommendations"
-          description="Get personalized partner matches based on your business analysis and identified improvement areas."
-          feature="partner-recommendations"
-          currentAnalysis={{
-            overallScore: analysisResult.overallScore,
-            industry: analysisResult.customerData.industry,
-            companyName: analysisResult.customerData.companyName
-          }}
-          onUpgrade={() => setShowPricing(true)}
-        />
+        {/* AI-Powered Partner Recommendations */}
+        <Card className="border-2 border-blue-200 bg-blue-50/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              AI-Matched Partner Recommendations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              Get personalized partner matches based on your business analysis and identified improvement areas. Available in the comprehensive analysis.
+            </p>
+            <Button 
+              onClick={() => navigate('/comprehensive-analysis-form')}
+              variant="outline"
+              className="w-full"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              View Partner Matching
+            </Button>
+          </CardContent>
+        </Card>
 
         {showPricing && (
           <Card>

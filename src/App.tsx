@@ -10,7 +10,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Index from "./pages/Index";
 
 // Lazy load pages for better performance
-const Onboarding = lazy(() => import("./pages/Onboarding"));
+const ComprehensiveAnalysisForm = lazy(() => import("./pages/ComprehensiveAnalysisForm"));
 const Features = lazy(() => import("./pages/Features"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Partners = lazy(() => import("./pages/Partners"));
@@ -46,7 +46,7 @@ const App = () => (
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/comprehensive-analysis-form" element={<ComprehensiveAnalysisForm />} />
               <Route path="/features" element={<Features />} />
               <Route path="/partners" element={<Partners />} />
               <Route path="/pricing" element={<Pricing />} />

@@ -33,7 +33,7 @@ interface BusinessData {
   budget: string;
 }
 
-const Onboarding = () => {
+const ComprehensiveAnalysisForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [businessData, setBusinessData] = useState<BusinessData>({
     companyName: "",
@@ -78,16 +78,16 @@ const Onboarding = () => {
   };
 
   const handleSubmit = () => {
-    // Save data to localStorage for now
-    localStorage.setItem('businessData', JSON.stringify(businessData));
+    // Save data to localStorage for comprehensive analysis
+    localStorage.setItem('comprehensiveBusinessData', JSON.stringify(businessData));
     
     toast({
-      title: "Business Information Saved!",
-      description: "Redirecting to your dashboard for analysis...",
+      title: "Information Submitted!",
+      description: "Processing your comprehensive analysis...",
     });
 
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/comprehensive-analysis');
     }, 1500);
   };
 
@@ -441,8 +441,13 @@ const Onboarding = () => {
         <Progress value={progress} className="h-2" />
       </div>
 
-      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 mb-3">Comprehensive Business Analysis</h1>
+          <p className="text-lg text-slate-600">Get your complete 7-category assessment with AI-powered insights and partner matching</p>
+        </div>
+
         <Card>
           <CardContent className="p-8">
             {currentStep === 1 && renderStep1()}
@@ -477,4 +482,4 @@ const Onboarding = () => {
   );
 };
 
-export default Onboarding;
+export default ComprehensiveAnalysisForm;
