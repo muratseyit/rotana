@@ -16,10 +16,13 @@ const translations = {
     'nav.support': 'Support',
     'nav.login': 'Sign In',
     'nav.getStarted': 'Get Started',
+    'nav.partners': 'Partners',
+    'nav.admin': 'Admin',
+    'nav.dashboard': 'Go to Dashboard',
 
     // Hero Section
     'hero.badge': 'AI-Powered Business Intelligence',
-    'hero.title': 'Transform Your Business with Smart Analytics',
+    'hero.title': 'Accelerate Market Entry with Smart Analytics',
     'hero.description': 'Get comprehensive analysis of your business with AI-powered insights. Understand your market position, identify opportunities, and make data-driven decisions.',
     'hero.startJourney': 'Start Your Analysis',
     'hero.watchDemo': 'Watch Demo',
@@ -51,12 +54,16 @@ const translations = {
     'cta.description': 'Join thousands of businesses that have already discovered their growth potential with our AI-powered platform',
     'cta.startAnalysis': 'Start Free Analysis',
     'cta.scheduleConsult': 'Schedule Consultation',
+    'cta.leadFormTitle': 'Get Your Comprehensive Market Analysis',
+    'cta.leadFormDesc': 'Discover your UK market potential with AI-powered insights and verified partner recommendations',
 
     // Footer
     'footer.description': 'Empowering businesses with AI-driven insights and strategic guidance for sustainable growth',
     'footer.platform': 'Platform',
     'footer.support': 'Support',
     'footer.legal': 'Legal',
+    'footer.features': 'Features',
+    'footer.pricing': 'Pricing',
     'footer.api': 'API',
     'footer.helpCenter': 'Help Center',
     'footer.contact': 'Contact',
@@ -126,10 +133,13 @@ const translations = {
     'nav.support': 'Destek',
     'nav.login': 'Giriş Yap',
     'nav.getStarted': 'Başlayın',
+    'nav.partners': 'Ortaklar',
+    'nav.admin': 'Yönetici',
+    'nav.dashboard': 'Kontrol Paneline Git',
 
     // Hero Section
     'hero.badge': 'AI Destekli İş Zekası',
-    'hero.title': 'İşinizi Akıllı Analitikle Dönüştürün',
+    'hero.title': 'Akıllı Analitikle Pazar Girişini Hızlandırın',
     'hero.description': 'AI destekli içgörülerle işinizin kapsamlı analizini alın. Pazar konumunuzu anlayın, fırsatları belirleyin ve veriye dayalı kararlar alın.',
     'hero.startJourney': 'Analizinizi Başlatın',
     'hero.watchDemo': 'Demo İzleyin',
@@ -161,12 +171,16 @@ const translations = {
     'cta.description': 'AI destekli platformumuzla büyüme potansiyellerini keşfetmiş binlerce işletmeye katılın',
     'cta.startAnalysis': 'Ücretsiz Analiz Başlatın',
     'cta.scheduleConsult': 'Konsültasyon Planlayın',
+    'cta.leadFormTitle': 'Kapsamlı Pazar Analizinizi Alın',
+    'cta.leadFormDesc': 'AI destekli içgörüler ve doğrulanmış partner önerileriyle UK pazar potansiyelinizi keşfedin',
 
     // Footer
     'footer.description': 'İşletmeleri AI destekli içgörüler ve stratejik rehberlikle sürdürülebilir büyüme için güçlendiriyoruz',
     'footer.platform': 'Platform',
     'footer.support': 'Destek',
     'footer.legal': 'Yasal',
+    'footer.features': 'Özellikler',
+    'footer.pricing': 'Fiyatlandırma',
     'footer.api': 'API',
     'footer.helpCenter': 'Yardım Merkezi',
     'footer.contact': 'İletişim',

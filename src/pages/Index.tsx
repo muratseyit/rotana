@@ -41,13 +41,13 @@ const Index = () => {
                   {t('nav.features')}
                 </Button>
                 <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/partners')}>
-                  Partners
+                  {t('nav.partners')}
                 </Button>
                 <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/pricing')}>
                   {t('nav.pricing')}
                 </Button>
                 <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors text-xs" onClick={() => navigate('/admin')}>
-                  Admin
+                  {t('nav.admin')}
                 </Button>
                 <LanguageSwitcher />
                 <Button className="bg-transparent border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/guest-analysis')}>
@@ -71,7 +71,7 @@ const Index = () => {
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-background mb-6 leading-tight">
-            Accelerate Market Entry with Smart Analytics
+            {t('hero.title')}
           </h1>
           <p className="text-xl text-background/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             {t('hero.description')}
@@ -82,7 +82,7 @@ const Index = () => {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button size="lg" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/dashboard')}>
-              Go to Dashboard
+              {t('nav.dashboard')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -220,8 +220,8 @@ const Index = () => {
           </div>
           <LeadCaptureForm 
             variant="hero"
-            title="Get Your Comprehensive Market Analysis"
-            description="Discover your UK market potential with AI-powered insights and verified partner recommendations"
+            title={t('cta.leadFormTitle')}
+            description={t('cta.leadFormDesc')}
           />
         </div>
       </section>
@@ -242,25 +242,25 @@ const Index = () => {
             <div>
               <h4 className="text-white font-semibold mb-4">{t('footer.platform')}</h4>
               <ul className="space-y-2">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#api" className="hover:text-white transition-colors">API</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">{t('footer.features')}</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">{t('footer.pricing')}</a></li>
+                <li><a href="#api" className="hover:text-white transition-colors">{t('footer.api')}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">{t('footer.support')}</h4>
               <ul className="space-y-2">
-                <li><a href="#help" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#community" className="hover:text-white transition-colors">Community</a></li>
+                <li><a href="#help" className="hover:text-white transition-colors">{t('footer.helpCenter')}</a></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">{t('footer.contact')}</a></li>
+                <li><a href="#community" className="hover:text-white transition-colors">{t('footer.community')}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">{t('footer.legal')}</h4>
               <ul className="space-y-2">
-                <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#cookies" className="hover:text-white transition-colors">Cookies</a></li>
+                <li><a href="#privacy" className="hover:text-white transition-colors">{t('footer.privacy')}</a></li>
+                <li><a href="#terms" className="hover:text-white transition-colors">{t('footer.terms')}</a></li>
+                <li><a href="#cookies" className="hover:text-white transition-colors">{t('footer.cookies')}</a></li>
               </ul>
             </div>
           </div>
