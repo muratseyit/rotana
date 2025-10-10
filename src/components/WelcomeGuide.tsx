@@ -86,7 +86,7 @@ export function WelcomeGuide({ onAddBusiness, onClose }: WelcomeGuideProps) {
               <Brain className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-3xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
-              Welcome to Business Bridge
+              Welcome to Converta
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Your AI-powered gateway to the UK market. Get comprehensive assessments, compliance insights, 

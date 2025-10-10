@@ -20,7 +20,7 @@ const Index = () => {
   return (
     <>
       <SEOHead 
-        title="Business Bridge - AI-Powered UK Market Entry for Turkish SMEs"
+        title="Converta - AI-Powered UK Market Entry for Turkish SMEs"
         description="Transform your Turkish SME's UK market entry with AI-powered business analysis. Get comprehensive insights, connect with verified partners, and accelerate your growth in the UK market."
         keywords="UK market entry, Turkish SME, AI business analysis, UK incorporation, business partners, market analysis, SME expansion, UK business setup"
       />
@@ -32,7 +32,7 @@ const Index = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BarChart3 className="h-8 w-8 text-brand" />
-                <span className="text-2xl font-bold text-foreground">Business Bridge</span>
+                <span className="text-2xl font-bold text-foreground">Converta</span>
               </div>
               
               {/* Desktop Navigation */}
@@ -233,7 +233,7 @@ const Index = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <BarChart3 className="h-6 w-6 text-brand" />
-                <span className="text-xl font-bold text-background">Business Bridge</span>
+                <span className="text-xl font-bold text-background">Converta</span>
               </div>
               <p className="text-muted-foreground">
                 {t('footer.description')}

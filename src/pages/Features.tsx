@@ -33,7 +33,7 @@ const Features = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <BarChart3 className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-slate-900">Business Bridge</span>
+              <span className="text-2xl font-bold text-slate-900">Converta</span>
             </div>
             <nav className="hidden md:flex space-x-8">
               <Link to="/" className="text-slate-600 hover:text-slate-900 transition-colors">Home</Link>

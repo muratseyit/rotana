@@ -59,7 +59,7 @@ export default function Admin() {
                 <div>
                   <h1 className="text-2xl font-bold">Admin Dashboard</h1>
                   <p className="text-sm text-muted-foreground">
-                    Business Bridge Management Console
+                    Converta Management Console
                   </p>
                 </div>
               </div>

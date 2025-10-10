@@ -427,7 +427,7 @@ const ComprehensiveAnalysisForm = () => {
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-2">
               <Building className="h-6 w-6 text-blue-600" />
-              <span className="text-xl font-bold text-slate-900">Business Bridge</span>
+              <span className="text-xl font-bold text-slate-900">Converta</span>
             </Link>
             <div className="text-sm text-slate-600">
               Step {currentStep} of {totalSteps}

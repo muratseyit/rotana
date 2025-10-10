@@ -31,7 +31,7 @@ export function MobileNavigation({}: MobileNavigationProps) {
             <div className="flex items-center justify-between pb-4 border-b">
               <div className="flex items-center space-x-2">
                 <BarChart3 className="h-6 w-6 text-primary" />
-                <span className="text-lg font-bold">Business Bridge</span>
+                <span className="text-lg font-bold">Converta</span>
               </div>
             </div>
 

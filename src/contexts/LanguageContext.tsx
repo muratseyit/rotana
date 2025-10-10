@@ -71,7 +71,7 @@ const translations = {
     'footer.privacy': 'Privacy',
     'footer.terms': 'Terms',
     'footer.cookies': 'Cookies',
-    'footer.copyright': '© 2024 Business Bridge. All rights reserved.',
+    'footer.copyright': '© 2024 Converta. All rights reserved.',
 
     // Guest Analysis Form
     'analysis.form.title': 'Get Your Free AI Business Analysis',
@@ -147,7 +147,7 @@ const translations = {
     'leadForm.companyPlaceholder': 'Your company name',
     'leadForm.submit': 'Get My Free Analysis',
     'leadForm.processing': 'Processing...',
-    'leadForm.privacy': 'By submitting this form, you agree to receive communications from Business Bridge. We respect your privacy and will never spam you.',
+    'leadForm.privacy': 'By submitting this form, you agree to receive communications from Converta. We respect your privacy and will never spam you.',
     'leadForm.successTitle': 'Thank you for your interest!',
     'leadForm.successDesc': 'We\'ll be in touch within 24 hours with your personalized business insights.',
     'leadForm.errorTitle': 'Something went wrong',
@@ -184,7 +184,7 @@ const translations = {
     'features.scheduling': 'Scheduling...',
     'features.coreTitle': 'Core Features',
     'features.coreSubtitle': 'Powerful tools designed to give you the insights and connections you need to succeed',
-    'features.whyChoose': 'Why Choose Business Bridge?',
+    'features.whyChoose': 'Why Choose Converta?',
     'features.whyChooseSubtitle': 'Join thousands of businesses that trust our platform for their growth journey',
     'features.ctaTitle': 'Ready to Transform Your Business?',
     'features.ctaSubtitle': 'Join thousands of businesses that have already discovered their growth potential with our AI-powered platform.',
@@ -330,7 +330,7 @@ const translations = {
     'footer.privacy': 'Gizlilik',
     'footer.terms': 'Şartlar',
     'footer.cookies': 'Çerezler',
-    'footer.copyright': '© 2024 Business Bridge. Tüm hakları saklıdır.',
+    'footer.copyright': '© 2024 Converta. Tüm hakları saklıdır.',
 
     // Guest Analysis Form
     'analysis.form.title': 'Ücretsiz AI İş Analizinizi Alın',
@@ -406,7 +406,7 @@ const translations = {
     'leadForm.companyPlaceholder': 'Şirketinizin adı',
     'leadForm.submit': 'Ücretsiz Analizimi Al',
     'leadForm.processing': 'İşleniyor...',
-    'leadForm.privacy': 'Bu formu göndererek Business Bridge\'den iletişim almayı kabul ediyorsunuz. Gizliliğinize saygı duyuyoruz ve asla spam göndermeyeceğiz.',
+    'leadForm.privacy': 'Bu formu göndererek Converta\'den iletişim almayı kabul ediyorsunuz. Gizliliğinize saygı duyuyoruz ve asla spam göndermeyeceğiz.',
     'leadForm.successTitle': 'İlginiz için teşekkür ederiz!',
     'leadForm.successDesc': '24 saat içinde kişiselleştirilmiş iş içgörülerinizle sizinle iletişime geçeceğiz.',
     'leadForm.errorTitle': 'Bir şeyler yanlış gitti',
@@ -443,7 +443,7 @@ const translations = {
     'features.scheduling': 'Planlanıyor...',
     'features.coreTitle': 'Temel Özellikler',
     'features.coreSubtitle': 'Başarılı olmanız için ihtiyacınız olan içgörüleri ve bağlantıları sağlayan güçlü araçlar',
-    'features.whyChoose': 'Neden Business Bridge?',
+    'features.whyChoose': 'Neden Converta?',
     'features.whyChooseSubtitle': 'Büyüme yolculuklarında platformumuza güvenen binlerce işletmeye katılın',
     'features.ctaTitle': 'İşinizi Dönüştürmeye Hazır mısınız?',
     'features.ctaSubtitle': 'AI destekli platformumuzla büyüme potansiyellerini keşfetmiş binlerce işletmeye katılın.',

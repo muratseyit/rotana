@@ -16,7 +16,7 @@ export default function GuestAnalysis() {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <BarChart3 className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-slate-900">Business Bridge</span>
+              <span className="text-2xl font-bold text-slate-900">Converta</span>
             </div>
             <Button onClick={() => navigate('/')} variant="ghost">
               <ArrowLeft className="h-4 w-4 mr-2" />

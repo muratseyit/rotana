@@ -10,7 +10,7 @@ interface SEOHeadProps {
 }
 
 export function SEOHead({
-  title = "Business Bridge - UK Market Entry for Turkish SMEs",
+  title = "Converta - UK Market Entry for Turkish SMEs",
   description = "AI-powered business analysis and UK market entry support for Turkish SMEs. Connect with verified partners and get comprehensive market readiness insights.",
   keywords = "UK market entry, Turkish SME, business analysis, AI analysis, UK incorporation, business partners, market readiness",
   image = "/placeholder.svg",
@@ -50,7 +50,7 @@ export function SEOHead({
     updateMetaTag('og:image', image);
     updateMetaTag('og:url', url);
     updateMetaTag('og:type', type);
-    updateMetaTag('og:site_name', 'Business Bridge');
+    updateMetaTag('og:site_name', 'Converta');
     
     // Twitter Card tags
     updateMetaTag('twitter:card', 'summary_large_image');

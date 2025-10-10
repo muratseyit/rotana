@@ -35,8 +35,8 @@ export function EmailMarketingIntegration() {
     {
       id: '1',
       name: 'Welcome Series',
-      subject: 'Welcome to Business Bridge!',
-      content: 'Thank you for joining Business Bridge...',
+      subject: 'Welcome to Converta!',
+      content: 'Thank you for joining Converta...',
       status: 'sent',
       recipientCount: 156,
       openRate: 42.3,
@@ -57,9 +57,9 @@ export function EmailMarketingIntegration() {
     {
       id: '1',
       name: 'Welcome Email',
-      subject: 'Welcome to Business Bridge - Your UK Market Journey Begins!',
+      subject: 'Welcome to Converta - Your UK Market Journey Begins!',
       content: `
-        <h2>Welcome to Business Bridge!</h2>
+        <h2>Welcome to Converta!</h2>
         <p>Thank you for joining our community of Turkish businesses expanding to the UK market.</p>
         <p>Here's what you can expect:</p>
         <ul>
