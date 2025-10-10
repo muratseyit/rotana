@@ -104,28 +104,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="h-8 w-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">AI Business Analysis</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.aiAnalysisTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Get comprehensive AI-powered analysis of your business performance, market position, and growth opportunities
+                  {t('features.aiAnalysisDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Market readiness scoring</span>
+                    <span>{t('features.aiAnalysis1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Competitive landscape analysis</span>
+                    <span>{t('features.aiAnalysis2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Risk assessment & mitigation</span>
+                    <span>{t('features.aiAnalysis3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Growth opportunity identification</span>
+                    <span>{t('features.aiAnalysis4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -137,28 +137,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-green-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">Verified Partner Network</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.partnerNetworkTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Connect with pre-vetted service providers, consultants, and business partners tailored to your needs
+                  {t('features.partnerNetworkDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Legal & accounting services</span>
+                    <span>{t('features.partnerNetwork1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Marketing & design agencies</span>
+                    <span>{t('features.partnerNetwork2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Technology providers</span>
+                    <span>{t('features.partnerNetwork3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Logistics & fulfillment</span>
+                    <span>{t('features.partnerNetwork4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -170,28 +170,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <FileText className="h-8 w-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">Compliance Tracking</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.complianceTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Stay compliant with automated tracking, document generation, and regulatory guidance
+                  {t('features.complianceDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Automated compliance checklists</span>
+                    <span>{t('features.compliance1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Document template library</span>
+                    <span>{t('features.compliance2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Regulatory change alerts</span>
+                    <span>{t('features.compliance3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Expert consultation access</span>
+                    <span>{t('features.compliance4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -203,28 +203,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Target className="h-8 w-8 text-orange-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">Smart Roadmapping</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.roadmapTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Get personalized, actionable roadmaps with clear milestones and success metrics
+                  {t('features.roadmapDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Goal-oriented planning</span>
+                    <span>{t('features.roadmap1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Progress tracking dashboard</span>
+                    <span>{t('features.roadmap2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Milestone notifications</span>
+                    <span>{t('features.roadmap3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Success metric monitoring</span>
+                    <span>{t('features.roadmap4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -236,28 +236,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">Real-time Analytics</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.analyticsTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Monitor your business performance with live dashboards and intelligent alerts
+                  {t('features.analyticsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Live performance dashboards</span>
+                    <span>{t('features.analytics1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Custom KPI tracking</span>
+                    <span>{t('features.analytics2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Automated insights & alerts</span>
+                    <span>{t('features.analytics3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Exportable reports</span>
+                    <span>{t('features.analytics4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -269,28 +269,28 @@ const Features = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Shield className="h-8 w-8 text-green-600" />
                 </div>
-                <CardTitle className="text-xl mb-2">Enterprise Security</CardTitle>
+                <CardTitle className="text-xl mb-2">{t('features.securityTitle')}</CardTitle>
                 <CardDescription className="text-center">
-                  Bank-level security with full data privacy and compliance with international standards
+                  {t('features.securityDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>End-to-end encryption</span>
+                    <span>{t('features.security1')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>GDPR compliance</span>
+                    <span>{t('features.security2')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>SOC 2 Type II certified</span>
+                    <span>{t('features.security3')}</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Regular security audits</span>
+                    <span>{t('features.security4')}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -304,10 +304,10 @@ const Features = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Why Choose Business Bridge?
+              {t('features.whyChoose')}
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Join thousands of businesses that trust our platform for their growth journey
+              {t('features.whyChooseSubtitle')}
             </p>
           </div>
 
@@ -316,9 +316,9 @@ const Features = () => {
               <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Clock className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Save Time & Resources</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.saveTime')}</h3>
               <p className="text-slate-600">
-                Automate complex analysis and get instant insights instead of spending weeks on manual research and planning.
+                {t('features.saveTimeDesc')}
               </p>
             </div>
 
@@ -326,9 +326,9 @@ const Features = () => {
               <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Award className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Expert-Level Insights</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.expertLevel')}</h3>
               <p className="text-slate-600">
-                Access the same quality analysis that Fortune 500 companies get, at a fraction of the cost and time.
+                {t('features.expertLevelDesc')}
               </p>
             </div>
 
@@ -336,9 +336,9 @@ const Features = () => {
               <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Globe className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Global Scalability</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.globalScale')}</h3>
               <p className="text-slate-600">
-                Built for businesses of all sizes, from startups to enterprises, with support for international expansion.
+                {t('features.globalScaleDesc')}
               </p>
             </div>
           </div>
@@ -349,15 +349,15 @@ const Features = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-green-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Business?
+            {t('features.ctaTitle')}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses that have already discovered their growth potential with our AI-powered platform.
+            {t('features.ctaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/onboarding">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg">
-                Start Free Analysis
+                {t('features.startAnalysis')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
