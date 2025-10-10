@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Building, FileText, Globe, Users, Briefcase, Loader2, ArrowRight } from "lucide-react";
 
 const industries = [
@@ -52,6 +53,7 @@ export function GuestAnalysisForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,8 +62,8 @@ export function GuestAnalysisForm() {
     if (!formData.companyName || !formData.businessDescription || !formData.industry || 
         !formData.companySize || !formData.email) {
       toast({
-        title: "Required Fields Missing",
-        description: "Please fill in all required fields.",
+        title: t('analysis.form.required'),
+        description: t('analysis.form.requiredDesc'),
         variant: "destructive"
       });
       return;
@@ -94,10 +96,10 @@ export function GuestAnalysisForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-2xl">
           <Building className="h-6 w-6 text-primary" />
-          Get Your Free AI Business Analysis
+          {t('analysis.form.title')}
         </CardTitle>
         <CardDescription>
-          Receive comprehensive insights and recommendations for your business
+          {t('analysis.form.subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -105,7 +107,7 @@ export function GuestAnalysisForm() {
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <span className="text-sm">📧</span>
-              Email Address *
+              {t('analysis.form.email')} *
             </Label>
             <Input
               id="email"
@@ -120,7 +122,7 @@ export function GuestAnalysisForm() {
           <div className="space-y-2">
             <Label htmlFor="companyName" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
-              Company Name *
+              {t('analysis.form.companyName')} *
             </Label>
             <Input
               id="companyName"
@@ -134,11 +136,11 @@ export function GuestAnalysisForm() {
           <div className="space-y-2">
             <Label htmlFor="businessDescription" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Business Description *
+              {t('analysis.form.businessDesc')} *
             </Label>
             <Textarea
               id="businessDescription"
-              placeholder="Describe your business, products/services, and target market..."
+              placeholder={t('analysis.form.businessDescPlaceholder')}
               value={formData.businessDescription}
               onChange={(e) => setFormData(prev => ({ ...prev, businessDescription: e.target.value }))}
               rows={3}
@@ -150,7 +152,7 @@ export function GuestAnalysisForm() {
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
-                Industry *
+                {t('analysis.form.industry')} *
               </Label>
               <Select 
                 value={formData.industry} 
@@ -158,7 +160,7 @@ export function GuestAnalysisForm() {
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select industry" />
+                  <SelectValue placeholder={t('analysis.form.selectIndustry')} />
                 </SelectTrigger>
                 <SelectContent>
                   {industries.map((industry) => (
@@ -173,7 +175,7 @@ export function GuestAnalysisForm() {
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Company Size *
+                {t('analysis.form.companySize')} *
               </Label>
               <Select 
                 value={formData.companySize} 
@@ -181,7 +183,7 @@ export function GuestAnalysisForm() {
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select size" />
+                  <SelectValue placeholder={t('analysis.form.selectSize')} />
                 </SelectTrigger>
                 <SelectContent>
                   {companySizes.map((size) => (
@@ -197,7 +199,7 @@ export function GuestAnalysisForm() {
           <div className="space-y-2">
             <Label htmlFor="websiteUrl" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              Website URL (Optional)
+              {t('analysis.form.websiteUrl')}
             </Label>
             <Input
               id="websiteUrl"
@@ -211,13 +213,13 @@ export function GuestAnalysisForm() {
           <div className="bg-muted p-4 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
               <ArrowRight className="h-4 w-4" />
-              What you'll get:
+              {t('analysis.form.whatYouGet')}
             </div>
             <ul className="text-sm space-y-1 text-muted-foreground">
-              <li>• Comprehensive AI business analysis</li>
-              <li>• UK market readiness score</li>
-              <li>• Business recommendations and insights</li>
-              <li>• Instant results</li>
+              <li>• {t('analysis.form.benefit1')}</li>
+              <li>• {t('analysis.form.benefit2')}</li>
+              <li>• {t('analysis.form.benefit3')}</li>
+              <li>• {t('analysis.form.benefit4')}</li>
             </ul>
           </div>
 
@@ -229,11 +231,11 @@ export function GuestAnalysisForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing Analysis...
+                {t('analysis.form.processing')}
               </>
             ) : (
               <>
-                Get Free Analysis
+                {t('analysis.form.submit')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}

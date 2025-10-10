@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { PricingSection } from "@/components/PricingSection";
 import { SaveReportDialog } from "@/components/SaveReportDialog";
@@ -34,6 +35,7 @@ export default function GuestResults() {
   const [showPricing, setShowPricing] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const storedData = localStorage.getItem('guestAnalysisData');
@@ -107,7 +109,7 @@ export default function GuestResults() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Generating your business analysis...</p>
+          <p className="text-muted-foreground">{t('results.generating')}</p>
         </div>
       </div>
     );
@@ -118,13 +120,13 @@ export default function GuestResults() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-center text-destructive">Analysis Not Found</CardTitle>
+            <CardTitle className="text-center text-destructive">{t('results.notFound')}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-muted-foreground mb-4">
-              We couldn't find your analysis results. Please contact support.
+              {t('results.notFoundDesc')}
             </p>
-            <Button onClick={() => navigate('/')}>Return Home</Button>
+            <Button onClick={() => navigate('/')}>{t('results.returnHome')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -142,7 +144,7 @@ export default function GuestResults() {
               <span className="text-2xl font-bold text-slate-900">Business Bridge</span>
             </div>
             <Button onClick={() => navigate('/')} variant="ghost">
-              Back to Home
+              {t('analysis.page.backHome')}
             </Button>
           </div>
         </div>
@@ -155,8 +157,8 @@ export default function GuestResults() {
             <div className="flex items-center gap-3">
               <CheckCircle className="h-8 w-8 text-success" />
               <div>
-                <h2 className="text-xl font-semibold text-success">Analysis Complete!</h2>
-                <p className="text-muted-foreground">Your AI business analysis results are ready.</p>
+                <h2 className="text-xl font-semibold text-success">{t('results.complete')}</h2>
+                <p className="text-muted-foreground">{t('results.ready')}</p>
               </div>
             </div>
           </CardContent>
@@ -167,11 +169,11 @@ export default function GuestResults() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span>UK Market Readiness Score</span>
+                <span>{t('results.score')}</span>
                 {analysisResult.limitedAnalysis && (
                   <Badge variant="outline" className="text-xs border-orange-400 text-orange-700">
                     <AlertTriangle className="h-3 w-3 mr-1" />
-                    Limited Analysis
+                    {t('results.limited')}
                   </Badge>
                 )}
               </div>
@@ -184,7 +186,7 @@ export default function GuestResults() {
             <p className="text-muted-foreground mb-3">{analysisResult.summary}</p>
             {analysisResult.limitedAnalysis && (
               <div className="p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
-                <p className="text-sm text-primary font-medium mb-1">🚀 Upgrade for Complete Analysis</p>
+                <p className="text-sm text-primary font-medium mb-1">🚀 {t('results.upgrade')}</p>
                 <p className="text-xs text-muted-foreground">{analysisResult.upgradePrompt}</p>
               </div>
             )}
@@ -197,7 +199,7 @@ export default function GuestResults() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-success" />
-                Key Findings
+                {t('results.keyFindings')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -212,12 +214,11 @@ export default function GuestResults() {
             </CardContent>
           </Card>
 
-          {/* Recommendations */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-blue-600" />
-                Recommendations
+                {t('results.recommendations')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -231,12 +232,11 @@ export default function GuestResults() {
             </CardContent>
           </Card>
 
-          {/* Risk Factors */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-orange-600">⚠️</span>
-                Risk Factors
+                {t('results.riskFactors')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -273,10 +273,10 @@ export default function GuestResults() {
               {analysisResult.limitedAnalysis ? (
                 <>
                   <Crown className="h-5 w-5" />
-                  Unlock Your Full Business Potential
+                  {t('results.unlockFull')}
                 </>
               ) : (
-                "Ready to Take the Next Step?"
+                t('results.nextStep')
               )}
             </CardTitle>
           </CardHeader>
@@ -284,7 +284,7 @@ export default function GuestResults() {
             <p className="text-blue-100 mb-4">
               {analysisResult.limitedAnalysis 
                 ? "Get the complete analysis with AI-matched partners, detailed compliance assessment, and professional reports."
-                : "Create an account to save your results, access our partner directory, and get personalized recommendations."
+                : t('results.createAccount')
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -295,7 +295,7 @@ export default function GuestResults() {
                 {analysisResult.limitedAnalysis ? (
                   <>
                     <Crown className="h-4 w-4 mr-2" />
-                    Upgrade to Premium
+                    {t('results.upgradePremium')}
                   </>
                 ) : (
                   <>
@@ -310,7 +310,7 @@ export default function GuestResults() {
                 className="border-white text-white hover:bg-white/10"
               >
                 <Download className="h-4 w-4 mr-2" />
-                {analysisResult.limitedAnalysis ? "Download Summary" : "Download Report"}
+                {analysisResult.limitedAnalysis ? t('results.downloadSummary') : t('results.downloadReport')}
               </Button>
             </div>
           </CardContent>

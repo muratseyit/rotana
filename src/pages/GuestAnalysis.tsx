@@ -1,10 +1,12 @@
 import { GuestAnalysisForm } from "@/components/GuestAnalysisForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { BarChart3, ArrowLeft } from "lucide-react";
 
 export default function GuestAnalysis() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -18,7 +20,7 @@ export default function GuestAnalysis() {
             </div>
             <Button onClick={() => navigate('/')} variant="ghost">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              {t('analysis.page.backHome')}
             </Button>
           </div>
         </div>
@@ -28,10 +30,10 @@ export default function GuestAnalysis() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">
-            Get Your AI Business Analysis
+            {t('analysis.page.title')}
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Get comprehensive insights about your UK market readiness and connect with our verified partner directory - completely free.
+            {t('analysis.page.subtitle')}
           </p>
         </div>
 
@@ -43,9 +45,9 @@ export default function GuestAnalysis() {
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <BarChart3 className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">AI-Powered Analysis</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('analysis.page.aiTitle')}</h3>
             <p className="text-muted-foreground">
-              Advanced algorithms analyze your business for UK market readiness
+              {t('analysis.page.aiDesc')}
             </p>
           </div>
 
@@ -53,9 +55,9 @@ export default function GuestAnalysis() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">📊</span>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Comprehensive Report</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('analysis.page.reportTitle')}</h3>
             <p className="text-muted-foreground">
-              Detailed insights, recommendations, and growth opportunities
+              {t('analysis.page.reportDesc')}
             </p>
           </div>
 
@@ -63,9 +65,9 @@ export default function GuestAnalysis() {
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🤝</span>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Partner Access</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('analysis.page.partnerTitle')}</h3>
             <p className="text-muted-foreground">
-              Connect with verified UK business partners and service providers
+              {t('analysis.page.partnerDesc')}
             </p>
           </div>
         </div>
