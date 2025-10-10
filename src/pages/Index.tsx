@@ -37,20 +37,20 @@ const Index = () => {
               
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-6">
-                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/features')}>
+                <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/features')}>
                   {t('nav.features')}
                 </Button>
-                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/partners')}>
+                <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/partners')}>
                   Partners
                 </Button>
-                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/pricing')}>
+                <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/pricing')}>
                   {t('nav.pricing')}
                 </Button>
-                <Button className="bg-foreground text-background hover:bg-foreground/90 text-xs" onClick={() => navigate('/admin')}>
+                <Button className="bg-transparent border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors text-xs" onClick={() => navigate('/admin')}>
                   Admin
                 </Button>
                 <LanguageSwitcher />
-                <Button className="bg-foreground text-background hover:bg-foreground/90" onClick={() => navigate('/guest-analysis')}>
+                <Button className="bg-transparent border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/guest-analysis')}>
                   {t('nav.getStarted')}
                 </Button>
               </div>
@@ -77,11 +77,11 @@ const Index = () => {
             {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 px-8 py-4 text-lg" onClick={() => navigate('/guest-analysis')}>
+            <Button size="lg" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/guest-analysis')}>
               {t('hero.startJourney')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 border-foreground px-8 py-4 text-lg" onClick={() => navigate('/dashboard')}>
+            <Button size="lg" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/dashboard')}>
               Go to Dashboard
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
