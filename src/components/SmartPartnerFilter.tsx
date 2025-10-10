@@ -40,7 +40,7 @@ interface PartnerWithScore extends Partner {
 
 export function SmartPartnerFilter({ partners, businessContext }: SmartPartnerFilterProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showOnlyRelevant, setShowOnlyRelevant] = useState(false);
 
   // Smart scoring algorithm for partner relevance
@@ -132,7 +132,7 @@ export function SmartPartnerFilter({ partners, businessContext }: SmartPartnerFi
     }
 
     // Category filter
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== "all") {
       filtered = filtered.filter(partner => partner.category === selectedCategory);
     }
 
@@ -192,7 +192,7 @@ export function SmartPartnerFilter({ partners, businessContext }: SmartPartnerFi
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All categories</SelectItem>
+            <SelectItem value="all">All categories</SelectItem>
             {categories.map(category => (
               <SelectItem key={category} value={category}>
                 {category.charAt(0).toUpperCase() + category.slice(1)}
