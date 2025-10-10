@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Phone, Building2, User, MessageSquare, Gift, Zap, ArrowRight } from "lucide-react";
 
@@ -46,6 +47,7 @@ export function LeadCaptureForm({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,8 +81,8 @@ export function LeadCaptureForm({
       });
 
       toast({
-        title: "Thank you for your interest!",
-        description: "We'll be in touch within 24 hours with your personalized business insights.",
+        title: t('leadForm.successTitle'),
+        description: t('leadForm.successDesc'),
       });
 
       // Reset form
@@ -99,8 +101,8 @@ export function LeadCaptureForm({
     } catch (error) {
       console.error('Error submitting lead:', error);
       toast({
-        title: "Something went wrong",
-        description: "Please try again or contact our support team.",
+        title: t('leadForm.errorTitle'),
+        description: t('leadForm.errorDesc'),
         variant: "destructive"
       });
     } finally {
@@ -118,12 +120,12 @@ export function LeadCaptureForm({
   };
 
   const availableInterests = [
-    'UK Market Entry',
-    'Business Analysis',
-    'Partner Matching',
-    'Compliance Support',
-    'Financial Planning',
-    'Digital Marketing'
+    t('interest.ukMarketEntry'),
+    t('interest.businessAnalysis'),
+    t('interest.partnerMatching'),
+    t('interest.complianceSupport'),
+    t('interest.financialPlanning'),
+    t('interest.digitalMarketing')
   ];
 
   const getVariantStyles = () => {
@@ -140,14 +142,14 @@ export function LeadCaptureForm({
   };
 
   const defaultTitle = variant === 'hero' 
-    ? "Get Your Free Business Analysis" 
-    : "Start Your UK Market Journey";
+    ? t('leadForm.defaultTitle')
+    : t('leadForm.defaultTitleAlt');
     
   const defaultDescription = variant === 'hero'
-    ? "Discover your UK market potential with our AI-powered analysis. Get personalized insights and partner recommendations."
-    : "Join hundreds of Turkish businesses successfully expanding to the UK market.";
+    ? t('leadForm.defaultDesc')
+    : t('leadForm.defaultDescAlt');
 
-  const defaultIncentive = "Free AI Analysis + Partner Matching Report (Worth £299)";
+  const defaultIncentive = t('leadForm.incentive');
 
   return (
     <Card className={getVariantStyles()}>
@@ -172,27 +174,27 @@ export function LeadCaptureForm({
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Full Name *
+                {t('leadForm.fullName')} *
               </label>
               <Input
                 required
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
-                placeholder="Your full name"
+                placeholder={t('leadForm.namePlaceholder')}
               />
             </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                Email Address *
+                {t('leadForm.email')} *
               </label>
               <Input
                 type="email"
                 required
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
-                placeholder="your.email@company.com"
+                placeholder={t('leadForm.emailPlaceholder')}
               />
             </div>
           </div>
@@ -201,54 +203,54 @@ export function LeadCaptureForm({
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                Phone Number
+                {t('leadForm.phone')}
               </label>
               <Input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({...prev, phone: e.target.value}))}
-                placeholder="+90 xxx xxx xxxx"
+                placeholder={t('leadForm.phonePlaceholder')}
               />
             </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
-                Company Name *
+                {t('leadForm.company')} *
               </label>
               <Input
                 required
                 value={formData.company}
                 onChange={(e) => setFormData(prev => ({...prev, company: e.target.value}))}
-                placeholder="Your company name"
+                placeholder={t('leadForm.companyPlaceholder')}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Industry</label>
+            <label className="text-sm font-medium">{t('leadForm.industry')}</label>
             <select
               value={formData.industry}
               onChange={(e) => setFormData(prev => ({...prev, industry: e.target.value}))}
               className="w-full px-3 py-2 border rounded-md text-sm"
             >
-              <option value="">Select your industry</option>
-              <option value="technology">Technology</option>
-              <option value="manufacturing">Manufacturing</option>
-              <option value="retail">Retail & E-commerce</option>
-              <option value="food-beverage">Food & Beverage</option>
-              <option value="textiles">Textiles & Fashion</option>
-              <option value="healthcare">Healthcare</option>
-              <option value="construction">Construction</option>
-              <option value="automotive">Automotive</option>
-              <option value="finance">Finance</option>
-              <option value="consulting">Consulting</option>
-              <option value="other">Other</option>
+              <option value="">{t('leadForm.selectIndustry')}</option>
+              <option value="technology">{t('industry.technology')}</option>
+              <option value="manufacturing">{t('industry.manufacturing')}</option>
+              <option value="retail">{t('industry.retail')}</option>
+              <option value="food-beverage">{t('industry.foodBeverage')}</option>
+              <option value="textiles">{t('industry.textiles')}</option>
+              <option value="healthcare">{t('industry.healthcare')}</option>
+              <option value="construction">{t('industry.construction')}</option>
+              <option value="automotive">{t('industry.automotive')}</option>
+              <option value="finance">{t('industry.finance')}</option>
+              <option value="consulting">{t('industry.consulting')}</option>
+              <option value="other">{t('industry.other')}</option>
             </select>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Areas of Interest</label>
+            <label className="text-sm font-medium">{t('leadForm.interests')}</label>
             <div className="flex flex-wrap gap-2">
               {availableInterests.map((interest) => (
                 <button
@@ -270,12 +272,12 @@ export function LeadCaptureForm({
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              Tell us about your goals
+              {t('leadForm.goals')}
             </label>
             <Textarea
               value={formData.message}
               onChange={(e) => setFormData(prev => ({...prev, message: e.target.value}))}
-              placeholder="What are your main objectives for entering the UK market? Any specific challenges you're facing?"
+              placeholder={t('leadForm.goalsPlaceholder')}
               rows={3}
             />
           </div>
@@ -289,19 +291,18 @@ export function LeadCaptureForm({
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                Processing...
+                {t('leadForm.processing')}
               </>
             ) : (
               <>
-                Get My Free Analysis
+                {t('leadForm.submit')}
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
-            By submitting this form, you agree to receive communications from Business Bridge. 
-            We respect your privacy and will never spam you.
+            {t('leadForm.privacy')}
           </p>
         </form>
       </CardContent>

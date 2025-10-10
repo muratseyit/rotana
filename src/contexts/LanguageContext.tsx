@@ -124,7 +124,55 @@ const translations = {
     'results.generating': 'Generating your business analysis...',
     'results.notFound': 'Analysis Not Found',
     'results.notFoundDesc': "We couldn't find your analysis results. Please contact support.",
-    'results.returnHome': 'Return Home'
+    'results.returnHome': 'Return Home',
+
+    // Lead Capture Form
+    'leadForm.defaultTitle': 'Get Your Free Business Analysis',
+    'leadForm.defaultTitleAlt': 'Start Your UK Market Journey',
+    'leadForm.defaultDesc': 'Discover your UK market potential with our AI-powered analysis. Get personalized insights and partner recommendations.',
+    'leadForm.defaultDescAlt': 'Join hundreds of Turkish businesses successfully expanding to the UK market.',
+    'leadForm.incentive': 'Free AI Analysis + Partner Matching Report (Worth £299)',
+    'leadForm.fullName': 'Full Name',
+    'leadForm.email': 'Email Address',
+    'leadForm.phone': 'Phone Number',
+    'leadForm.company': 'Company Name',
+    'leadForm.industry': 'Industry',
+    'leadForm.selectIndustry': 'Select your industry',
+    'leadForm.interests': 'Areas of Interest',
+    'leadForm.goals': 'Tell us about your goals',
+    'leadForm.goalsPlaceholder': 'What are your main objectives for entering the UK market? Any specific challenges you\'re facing?',
+    'leadForm.namePlaceholder': 'Your full name',
+    'leadForm.emailPlaceholder': 'your.email@company.com',
+    'leadForm.phonePlaceholder': '+90 xxx xxx xxxx',
+    'leadForm.companyPlaceholder': 'Your company name',
+    'leadForm.submit': 'Get My Free Analysis',
+    'leadForm.processing': 'Processing...',
+    'leadForm.privacy': 'By submitting this form, you agree to receive communications from Business Bridge. We respect your privacy and will never spam you.',
+    'leadForm.successTitle': 'Thank you for your interest!',
+    'leadForm.successDesc': 'We\'ll be in touch within 24 hours with your personalized business insights.',
+    'leadForm.errorTitle': 'Something went wrong',
+    'leadForm.errorDesc': 'Please try again or contact our support team.',
+    
+    // Industries
+    'industry.technology': 'Technology',
+    'industry.manufacturing': 'Manufacturing',
+    'industry.retail': 'Retail & E-commerce',
+    'industry.foodBeverage': 'Food & Beverage',
+    'industry.textiles': 'Textiles & Fashion',
+    'industry.healthcare': 'Healthcare',
+    'industry.construction': 'Construction',
+    'industry.automotive': 'Automotive',
+    'industry.finance': 'Finance',
+    'industry.consulting': 'Consulting',
+    'industry.other': 'Other',
+    
+    // Interests
+    'interest.ukMarketEntry': 'UK Market Entry',
+    'interest.businessAnalysis': 'Business Analysis',
+    'interest.partnerMatching': 'Partner Matching',
+    'interest.complianceSupport': 'Compliance Support',
+    'interest.financialPlanning': 'Financial Planning',
+    'interest.digitalMarketing': 'Digital Marketing'
   },
   tr: {
     // Header
@@ -241,7 +289,55 @@ const translations = {
     'results.generating': 'İş analiziniz oluşturuluyor...',
     'results.notFound': 'Analiz Bulunamadı',
     'results.notFoundDesc': 'Analiz sonuçlarınızı bulamadık. Lütfen destekle iletişime geçin.',
-    'results.returnHome': 'Ana Sayfaya Dön'
+    'results.returnHome': 'Ana Sayfaya Dön',
+
+    // Lead Capture Form
+    'leadForm.defaultTitle': 'Ücretsiz İş Analizinizi Alın',
+    'leadForm.defaultTitleAlt': 'UK Pazar Yolculuğunuza Başlayın',
+    'leadForm.defaultDesc': 'AI destekli analizimizle UK pazar potansiyelinizi keşfedin. Kişiselleştirilmiş içgörüler ve partner önerileri alın.',
+    'leadForm.defaultDescAlt': 'UK pazarına başarıyla genişleyen yüzlerce Türk işletmesine katılın.',
+    'leadForm.incentive': 'Ücretsiz AI Analizi + Partner Eşleştirme Raporu (299£ Değerinde)',
+    'leadForm.fullName': 'Ad Soyad',
+    'leadForm.email': 'E-posta Adresi',
+    'leadForm.phone': 'Telefon Numarası',
+    'leadForm.company': 'Şirket Adı',
+    'leadForm.industry': 'Sektör',
+    'leadForm.selectIndustry': 'Sektörünüzü seçin',
+    'leadForm.interests': 'İlgi Alanları',
+    'leadForm.goals': 'Hedefleriniz hakkında bize bilgi verin',
+    'leadForm.goalsPlaceholder': 'UK pazarına giriş için ana hedefleriniz nelerdir? Karşılaştığınız özel zorluklar var mı?',
+    'leadForm.namePlaceholder': 'Adınız ve soyadınız',
+    'leadForm.emailPlaceholder': 'e-posta@sirketiniz.com',
+    'leadForm.phonePlaceholder': '+90 xxx xxx xxxx',
+    'leadForm.companyPlaceholder': 'Şirketinizin adı',
+    'leadForm.submit': 'Ücretsiz Analizimi Al',
+    'leadForm.processing': 'İşleniyor...',
+    'leadForm.privacy': 'Bu formu göndererek Business Bridge\'den iletişim almayı kabul ediyorsunuz. Gizliliğinize saygı duyuyoruz ve asla spam göndermeyeceğiz.',
+    'leadForm.successTitle': 'İlginiz için teşekkür ederiz!',
+    'leadForm.successDesc': '24 saat içinde kişiselleştirilmiş iş içgörülerinizle sizinle iletişime geçeceğiz.',
+    'leadForm.errorTitle': 'Bir şeyler yanlış gitti',
+    'leadForm.errorDesc': 'Lütfen tekrar deneyin veya destek ekibimizle iletişime geçin.',
+    
+    // Industries
+    'industry.technology': 'Teknoloji',
+    'industry.manufacturing': 'İmalat',
+    'industry.retail': 'Perakende ve E-ticaret',
+    'industry.foodBeverage': 'Gıda ve İçecek',
+    'industry.textiles': 'Tekstil ve Moda',
+    'industry.healthcare': 'Sağlık',
+    'industry.construction': 'İnşaat',
+    'industry.automotive': 'Otomotiv',
+    'industry.finance': 'Finans',
+    'industry.consulting': 'Danışmanlık',
+    'industry.other': 'Diğer',
+    
+    // Interests
+    'interest.ukMarketEntry': 'UK Pazar Girişi',
+    'interest.businessAnalysis': 'İş Analizi',
+    'interest.partnerMatching': 'Partner Eşleştirme',
+    'interest.complianceSupport': 'Uyumluluk Desteği',
+    'interest.financialPlanning': 'Finansal Planlama',
+    'interest.digitalMarketing': 'Dijital Pazarlama'
   }
 };
 
