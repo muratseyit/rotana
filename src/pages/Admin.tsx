@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +9,7 @@ import { AdminUserManagement } from "@/components/AdminUserManagement";
 import AdminPartners from "@/pages/AdminPartners";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Activity, 
   Users, 
@@ -26,6 +28,63 @@ import { EmailMarketingIntegration } from "@/components/EmailMarketingIntegratio
 export default function Admin() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to access the admin dashboard.",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
+
+        const { data: roles, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin');
+
+        if (roleError || !roles || roles.length === 0) {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access this page.",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
+
+        setIsAuthorized(true);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
+
+  if (isLoading || !isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{!isAuthorized ? "Verifying access..." : "Loading..."}</p>
+        </div>
+      </div>
+    );
+  }
 
   // Mock admin statistics
   const stats = {

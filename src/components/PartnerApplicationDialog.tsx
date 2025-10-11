@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -44,6 +45,17 @@ export function PartnerApplicationDialog({ isOpen, onOpenChange, onSuccess }: Pa
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const partnerSchema = z.object({
+    name: z.string().trim().min(1, "Company name is required").max(200, "Name must be less than 200 characters"),
+    description: z.string().trim().min(10, "Description must be at least 10 characters").max(2000, "Description must be less than 2000 characters"),
+    category: z.string().min(1, "Category is required"),
+    website_url: z.string().url("Invalid URL format").max(500, "URL must be less than 500 characters").optional().or(z.literal("")),
+    contact_email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+    phone: z.string().regex(/^[+]?[0-9\s\-()]*$/, "Invalid phone number format").max(20, "Phone must be less than 20 characters").optional().or(z.literal("")),
+    location: z.string().trim().max(200, "Location must be less than 200 characters").optional().or(z.literal("")),
+    logo_url: z.string().url("Invalid logo URL format").max(500, "URL must be less than 500 characters").optional().or(z.literal(""))
+  });
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -64,21 +76,33 @@ export function PartnerApplicationDialog({ isOpen, onOpenChange, onSuccess }: Pa
     setIsSubmitting(true);
 
     try {
-      if (!formData.category) {
+      // Validate form data
+      const validated = partnerSchema.parse({
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        website_url: formData.website_url,
+        contact_email: formData.contact_email,
+        phone: formData.phone,
+        location: formData.location,
+        logo_url: formData.logo_url
+      });
+
+      if (!validated.category) {
         throw new Error('Please select a category');
       }
 
       const { error } = await supabase
         .from('partners')
         .insert({
-          name: formData.name,
-          description: formData.description,
-          category: formData.category as PartnerCategory,
-          website_url: formData.website_url || null,
-          contact_email: formData.contact_email || null,
-          phone: formData.phone || null,
-          location: formData.location || null,
-          logo_url: formData.logo_url || null,
+          name: validated.name,
+          description: validated.description,
+          category: validated.category as PartnerCategory,
+          website_url: validated.website_url || null,
+          contact_email: validated.contact_email || null,
+          phone: validated.phone || null,
+          location: validated.location || null,
+          logo_url: validated.logo_url || null,
           specialties,
           created_by: null, // No authentication required
           verification_status: 'pending'
@@ -102,12 +126,21 @@ export function PartnerApplicationDialog({ isOpen, onOpenChange, onSuccess }: Pa
 
       onSuccess();
     } catch (error) {
-      console.error('Error submitting application:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit application. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive"
+        });
+      } else {
+        console.error('Error submitting application:', error);
+        toast({
+          title: "Error",
+          description: "Failed to submit application. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

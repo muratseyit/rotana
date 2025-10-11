@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +27,56 @@ export default function AdminPartners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPartners();
-  }, []);
+    const checkAuth = async () => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to access partner management.",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
+
+        const { data: roles, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin');
+
+        if (roleError || !roles || roles.length === 0) {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access this page.",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
+
+        setIsAuthorized(true);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        navigate('/');
+      }
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
+
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchPartners();
+    }
+  }, [isAuthorized]);
 
   const fetchPartners = async () => {
     try {
@@ -109,12 +155,12 @@ export default function AdminPartners() {
   const verifiedPartners = partners.filter(p => p.verification_status === 'verified');
   const rejectedPartners = partners.filter(p => p.verification_status === 'rejected');
 
-  if (isLoading) {
+  if (isLoading || !isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading partners...</p>
+          <p className="text-muted-foreground">{!isAuthorized ? "Verifying access..." : "Loading partners..."}</p>
         </div>
       </div>
     );

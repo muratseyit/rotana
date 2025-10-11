@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,23 +50,37 @@ export function LeadCaptureForm({
   const { toast } = useToast();
   const { t } = useLanguage();
 
+  const leadSchema = z.object({
+    name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+    email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+    phone: z.string().regex(/^[+]?[0-9\s\-()]*$/, "Invalid phone number format").max(20, "Phone must be less than 20 characters").optional().or(z.literal("")),
+    company: z.string().trim().min(1, "Company name is required").max(200, "Company name must be less than 200 characters"),
+    industry: z.string().max(100, "Industry must be less than 100 characters").optional().or(z.literal("")),
+    message: z.string().max(1000, "Message must be less than 1000 characters").optional().or(z.literal("")),
+    leadSource: z.string(),
+    interests: z.array(z.string())
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // Validate input data
+      const validated = leadSchema.parse(formData);
+
       // Save lead to database - using businesses table with correct schema
       const { error } = await supabase
         .from('businesses')
         .insert([{
-          company_name: formData.company,
-          business_description: formData.message || 'Lead from website',
-          industry: formData.industry || 'Technology',
+          company_name: validated.company,
+          business_description: validated.message || 'Lead from website',
+          industry: validated.industry || 'Technology',
           company_size: 'small',
           user_id: '', // Will be empty for leads
           website_url: '',
-          contact_email: formData.email,
-          contact_phone: formData.phone,
+          contact_email: validated.email,
+          contact_phone: validated.phone,
           created_at: new Date().toISOString()
         }]);
 
@@ -74,9 +89,9 @@ export function LeadCaptureForm({
       // Send welcome email (you can implement this as an edge function)
       await supabase.functions.invoke('send-welcome-email', {
         body: {
-          name: formData.name,
-          email: formData.email,
-          company: formData.company
+          name: validated.name,
+          email: validated.email,
+          company: validated.company
         }
       });
 
@@ -99,12 +114,21 @@ export function LeadCaptureForm({
 
       onSuccess?.(formData);
     } catch (error) {
-      console.error('Error submitting lead:', error);
-      toast({
-        title: t('leadForm.errorTitle'),
-        description: t('leadForm.errorDesc'),
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive"
+        });
+      } else {
+        console.error('Error submitting lead:', error);
+        toast({
+          title: t('leadForm.errorTitle'),
+          description: t('leadForm.errorDesc'),
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
