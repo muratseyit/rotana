@@ -22,7 +22,7 @@ const translations = {
 
     // Hero Section
     'hero.badge': 'AI-Powered Business Intelligence',
-    'hero.title': 'Accelerate UK Market Entry with Smart Analytics',
+    'hero.title': 'Accelerate the UK Market Entry with Smart Analytics',
     'hero.description': 'Get comprehensive analysis of your business with AI-powered insights. Understand your market position, identify opportunities, and make data-driven decisions.',
     'hero.startJourney': 'Start Your Analysis',
     'hero.watchDemo': 'Watch Demo',
