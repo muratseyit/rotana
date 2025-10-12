@@ -73,7 +73,13 @@ export default function GuestResults() {
       }
 
       setAnalysisResult({
-        ...data,
+        overallScore: data.overallScore || 0,
+        summary: data.riskAssessment || "Analysis completed",
+        keyFindings: data.strengths || [],
+        recommendations: data.priorityActions || [],
+        riskFactors: data.challenges || [],
+        limitedAnalysis: true,
+        upgradePrompt: "Get detailed financial analysis and partner matching",
         customerData: {
           companyName: analysisData.companyName,
           email: analysisData.email,
