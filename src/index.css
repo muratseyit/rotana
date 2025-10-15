@@ -140,12 +140,15 @@ html {
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Business Bridge Brand Colors */
-    --primary: 217 91% 60%;  /* Blue brand color */
+    /* Converta Brand Colors */
+    --primary: 217 100% 33%;  /* UK Blue #0047AB */
     --primary-foreground: 0 0% 100%;
     
-    --brand: 217 91% 60%;  /* Main brand blue */
+    --brand: 217 100% 33%;  /* UK Blue #0047AB */
     --brand-foreground: 0 0% 100%;
+    
+    --accent-red: 354 95% 45%;  /* Turkish Red #E30A17 */
+    --accent-red-foreground: 0 0% 100%;
     
     --success: 142 76% 36%;  /* Green for success states */
     --success-foreground: 0 0% 100%;
@@ -195,11 +198,14 @@ html {
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 217 100% 33%;
     --primary-foreground: 0 0% 100%;
     
-    --brand: 217 91% 60%;
+    --brand: 217 100% 33%;
     --brand-foreground: 0 0% 100%;
+    
+    --accent-red: 354 95% 45%;
+    --accent-red-foreground: 0 0% 100%;
     
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -232,13 +238,13 @@ html {
 
   /* Gradients for hero sections */
   :root {
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 45%));
-    --gradient-brand: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(217 100% 33%), hsl(354 95% 45%));
+    --gradient-brand: linear-gradient(135deg, hsl(217 100% 33%), hsl(217 100% 50%));
   }
 
   .dark {
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 45%));
-    --gradient-brand: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(217 100% 33%), hsl(354 95% 45%));
+    --gradient-brand: linear-gradient(135deg, hsl(217 100% 33%), hsl(217 100% 50%));
   }
 }
 
@@ -249,5 +255,6 @@ html {
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }

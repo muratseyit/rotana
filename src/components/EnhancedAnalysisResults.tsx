@@ -210,6 +210,15 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
 
   return (
     <div className="space-y-6">
+      {/* AI Disclaimer Alert */}
+      <Alert className="border-primary/20 bg-primary/5">
+        <AlertCircle className="h-4 w-4 text-primary" />
+        <AlertTitle>Important Disclaimer</AlertTitle>
+        <AlertDescription>
+          This analysis is AI-generated and provided for informational purposes only. It does not constitute legal, financial, or professional advice. Please consult with qualified professionals before making any business decisions.
+        </AlertDescription>
+      </Alert>
+
       {/* Analysis Methodology & Data Quality Section */}
       <Card>
         <CardHeader>
