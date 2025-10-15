@@ -50,9 +50,6 @@ const Index = () => {
                   {t('nav.admin')}
                 </Button>
                 <LanguageSwitcher />
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-semibold" onClick={() => navigate('/comprehensive-analysis-form')}>
-                  Get Analysis
-                </Button>
               </div>
 
               {/* Mobile Navigation */}
