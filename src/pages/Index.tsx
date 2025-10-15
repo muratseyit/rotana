@@ -50,8 +50,8 @@ const Index = () => {
                   {t('nav.admin')}
                 </Button>
                 <LanguageSwitcher />
-                <Button className="bg-transparent border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors" onClick={() => navigate('/guest-analysis')}>
-                  {t('nav.getStarted')}
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-semibold" onClick={() => navigate('/comprehensive-analysis-form')}>
+                  Get Analysis
                 </Button>
               </div>
 
@@ -77,15 +77,123 @@ const Index = () => {
             {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/guest-analysis')}>
-              {t('hero.startJourney')}
+            <Button size="lg" className="bg-background text-brand hover:bg-background/90 transition-colors px-8 py-4 text-lg shadow-lg font-semibold" onClick={() => navigate('/comprehensive-analysis-form')}>
+              Get Comprehensive Analysis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/dashboard')}>
-              {t('nav.dashboard')}
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" variant="outline" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/guest-analysis')}>
+              Try Quick Analysis (Free)
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Comprehensive Analysis Highlight Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-primary/5 to-background border-y border-primary/10">
+        <div className="max-w-6xl mx-auto">
+          <Card className="border-2 border-primary/20 shadow-xl bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Most Popular Choice
+                  </div>
+                  <h2 className="text-3xl font-bold text-foreground mb-4">
+                    Comprehensive UK Market Analysis
+                  </h2>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                    Get a full evidence-based assessment of your UK market readiness with actionable insights, verified partner matches, and expert review options.
+                  </p>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">Real Metrics & Validation</p>
+                        <p className="text-sm text-muted-foreground">Research-backed scoring algorithms with Companies House verification</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">Advanced Partner Matching</p>
+                        <p className="text-sm text-muted-foreground">85%+ match accuracy with detailed explanations and case studies</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">Expert Review Available</p>
+                        <p className="text-sm text-muted-foreground">Request human expert validation and consultation calls</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">UK-Specific Requirements</p>
+                        <p className="text-sm text-muted-foreground">Industry benchmarks and regulatory compliance roadmap</p>
+                      </div>
+                    </div>
+                  </div>
+                  <Button 
+                    size="lg" 
+                    className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                    onClick={() => navigate('/comprehensive-analysis-form')}
+                  >
+                    Start Comprehensive Analysis
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </div>
+                
+                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg p-6 border border-primary/20">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">What You'll Get:</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <BarChart3 className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>7 evidence-based category scores with detailed breakdown</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Score influence reports showing which factors affect your score</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <Users className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Smart partner matches with 5-factor compatibility analysis</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <Globe className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>UK market benchmarks and industry-specific regulations</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Actionable roadmap with cost estimates and timelines</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Data quality indicators and methodology transparency</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6 p-4 bg-background/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground text-center">
+                      ⚡ Analysis completed in minutes • 📊 Used by 100+ businesses • ⭐ 95% satisfaction rate
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 

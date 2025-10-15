@@ -61,13 +61,20 @@ export function MobileNavigation({}: MobileNavigationProps) {
                 Pricing
               </Button>
 
-              <div className="border-t pt-4 mt-4">
+              <div className="border-t pt-4 mt-4 space-y-2">
+                <Button 
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => handleNavigation('/comprehensive-analysis-form')}
+                >
+                  Get Comprehensive Analysis
+                </Button>
+                
                 <Button 
                   variant="outline" 
                   className="w-full"
                   onClick={() => handleNavigation('/guest-analysis')}
                 >
-                  Free Analysis
+                  Try Quick Analysis (Free)
                 </Button>
               </div>
             </nav>
