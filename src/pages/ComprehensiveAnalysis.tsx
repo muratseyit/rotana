@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { IntelligentPartnerDashboard } from "@/components/IntelligentPartnerDashboard";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   BarChart3, 
   CheckCircle2, 
@@ -20,7 +27,11 @@ import {
   DollarSign,
   ArrowLeft,
   Download,
-  FileText
+  FileText,
+  Mail,
+  Phone,
+  Globe,
+  MapPin
 } from "lucide-react";
 
 interface ComprehensiveAnalysisResult {
@@ -98,6 +109,8 @@ export default function ComprehensiveAnalysis() {
   const [analysisResult, setAnalysisResult] = useState<ComprehensiveAnalysisResult | null>(null);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPartner, setSelectedPartner] = useState<any | null>(null);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -183,11 +196,8 @@ export default function ComprehensiveAnalysis() {
   };
 
   const handleContactPartner = (partner: any) => {
-    // Handle partner contact logic
-    toast({
-      title: "Contact Initiated",
-      description: `Connecting you with ${partner.name}...`
-    });
+    setSelectedPartner(partner);
+    setContactDialogOpen(true);
   };
 
   const handleDownloadReport = () => {
@@ -231,6 +241,139 @@ export default function ComprehensiveAnalysis() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Partner Contact Dialog */}
+      <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedPartner?.verification_status === 'verified' && (
+                <CheckCircle2 className="h-5 w-5 text-success" />
+              )}
+              {selectedPartner?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPartner?.category && (
+                <Badge variant="secondary" className="mt-2">
+                  {selectedPartner.category}
+                </Badge>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {selectedPartner?.description && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">About</h4>
+                <p className="text-sm text-muted-foreground">{selectedPartner.description}</p>
+              </div>
+            )}
+            
+            {selectedPartner?.specialties && selectedPartner.specialties.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Specialties</h4>
+                <div className="flex flex-wrap gap-1">
+                  {selectedPartner.specialties.map((specialty: string, i: number) => (
+                    <Badge key={i} variant="outline" className="text-xs">
+                      {specialty}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-3 pt-2 border-t">
+              <h4 className="text-sm font-semibold">Contact Information</h4>
+              
+              {selectedPartner?.contact_email && (
+                <a 
+                  href={`mailto:${selectedPartner.contact_email}`}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors group"
+                >
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20">
+                    <Mail className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="text-sm font-medium">{selectedPartner.contact_email}</p>
+                  </div>
+                </a>
+              )}
+              
+              {selectedPartner?.phone && (
+                <a 
+                  href={`tel:${selectedPartner.phone}`}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors group"
+                >
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20">
+                    <Phone className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Phone</p>
+                    <p className="text-sm font-medium">{selectedPartner.phone}</p>
+                  </div>
+                </a>
+              )}
+              
+              {selectedPartner?.website_url && (
+                <a 
+                  href={selectedPartner.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors group"
+                >
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20">
+                    <Globe className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Website</p>
+                    <p className="text-sm font-medium">{selectedPartner.website_url}</p>
+                  </div>
+                </a>
+              )}
+              
+              {selectedPartner?.location && (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <MapPin className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Location</p>
+                    <p className="text-sm font-medium">{selectedPartner.location}</p>
+                  </div>
+                </div>
+              )}
+              
+              {!selectedPartner?.contact_email && !selectedPartner?.phone && !selectedPartner?.website_url && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No contact information available
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            {selectedPartner?.contact_email && (
+              <Button 
+                className="flex-1"
+                onClick={() => {
+                  window.location.href = `mailto:${selectedPartner.contact_email}`;
+                  setContactDialogOpen(false);
+                }}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
+            )}
+            <Button 
+              variant="outline"
+              onClick={() => setContactDialogOpen(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <header className="border-b bg-card">
         <div className="mx-auto max-w-7xl px-6 py-4">
