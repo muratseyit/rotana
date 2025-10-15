@@ -235,6 +235,9 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
       throw new Error('Invalid AI response format');
     }
 
+    // Calculate data completeness score for transparency
+    const dataCompleteness = calculateDataCompleteness(businessData);
+
     // Fetch verified partners from database
     console.log('Fetching verified partners...');
     const { data: partners, error: partnersError } = await supabase
@@ -246,55 +249,265 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
       console.error('Error fetching partners:', partnersError);
     }
 
-    // Match partners to business needs
-    const partnerRecommendations = [];
-    const categories = ['legal', 'accounting', 'marketing', 'logistics'];
-    
-    for (const category of categories) {
-      const categoryPartners = partners?.filter(p => p.category === category) || [];
-      
-      if (categoryPartners.length > 0) {
-        let reason = '';
-        let urgency: 'high' | 'medium' | 'low' = 'medium';
-        let matchScore = 70;
+    // Advanced partner matching algorithm
+    const partnerRecommendations = generateSmartPartnerMatches(
+      partners || [],
+      businessData,
+      analysis
+    );
 
-        // Customize recommendations based on category and business data
-        if (category === 'legal') {
-          reason = 'Legal compliance and company registration support needed for UK market entry';
-          urgency = businessData.ukRegistered === 'no' ? 'high' : 'medium';
-          matchScore = businessData.ukRegistered === 'no' ? 95 : 75;
-        } else if (category === 'accounting') {
-          reason = 'Tax registration and financial compliance required for UK operations';
-          urgency = 'high';
-          matchScore = 90;
-        } else if (category === 'marketing') {
-          reason = 'Digital marketing expertise to establish UK market presence';
-          urgency = businessData.onlineSalesPlatform === 'yes' ? 'medium' : 'high';
-          matchScore = 85;
-        } else if (category === 'logistics') {
-          reason = 'Supply chain and distribution support for UK market';
-          urgency = businessData.industry?.toLowerCase().includes('retail') || 
-                   businessData.industry?.toLowerCase().includes('manufacturing') ? 'high' : 'medium';
-          matchScore = 80;
-        }
-
-        partnerRecommendations.push({
-          category,
-          partners: categoryPartners.slice(0, 3), // Top 3 partners per category
-          reason,
-          urgency,
-          matchScore
-        });
-      }
-    }
-
-    // Add partner recommendations to analysis
+    // Add transparency metadata
     const comprehensiveResult = {
       ...analysis,
       partnerRecommendations,
+      metadata: {
+        dataCompleteness,
+        analysisVersion: '2.0',
+        modelUsed: 'gpt-5-2025-08-07',
+        analysisDate: new Date().toISOString(),
+        confidenceLevel: calculateConfidenceLevel(dataCompleteness, analysis),
+      }
     };
 
     console.log('Comprehensive analysis completed successfully');
+
+    return new Response(
+      JSON.stringify(comprehensiveResult),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      }
+    );
+
+  } catch (error) {
+    console.error('Error in analyze-business-comprehensive:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        details: error instanceof Error ? error.stack : undefined
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
+    );
+  }
+});
+
+// Calculate data completeness score
+function calculateDataCompleteness(data: any): {
+  score: number;
+  missingFields: string[];
+  completedSections: string[];
+} {
+  const criticalFields = {
+    'Company Information': ['companyName', 'businessDescription', 'industry', 'companySize'],
+    'Digital Presence': ['onlineSalesPlatform', 'socialMediaPlatforms', 'websiteFeatures'],
+    'Compliance': ['ukRegistered', 'businessType', 'complianceCompleted'],
+    'Strategy': ['primaryObjective', 'targetMarket', 'marketEntryTimeline']
+  };
+
+  let totalFields = 0;
+  let completedFields = 0;
+  const missingFields: string[] = [];
+  const completedSections: string[] = [];
+
+  for (const [section, fields] of Object.entries(criticalFields)) {
+    let sectionComplete = true;
+    
+    for (const field of fields) {
+      totalFields++;
+      const value = data[field];
+      
+      if (value && value !== 'Not specified' && value !== 'Not provided' && 
+          !(Array.isArray(value) && value.length === 0)) {
+        completedFields++;
+      } else {
+        missingFields.push(field);
+        sectionComplete = false;
+      }
+    }
+    
+    if (sectionComplete) {
+      completedSections.push(section);
+    }
+  }
+
+  return {
+    score: Math.round((completedFields / totalFields) * 100),
+    missingFields,
+    completedSections
+  };
+}
+
+// Calculate overall confidence level
+function calculateConfidenceLevel(
+  dataCompleteness: { score: number },
+  analysis: any
+): 'high' | 'medium' | 'low' {
+  const dataScore = dataCompleteness.score;
+  const overallScore = analysis.overallScore || 0;
+
+  if (dataScore >= 80 && overallScore > 0) return 'high';
+  if (dataScore >= 60) return 'medium';
+  return 'low';
+}
+
+// Advanced partner matching with scoring
+function generateSmartPartnerMatches(
+  partners: any[],
+  businessData: any,
+  analysis: any
+): any[] {
+  const categories = ['legal', 'accounting', 'marketing', 'logistics'];
+  const partnerRecommendations = [];
+
+  for (const category of categories) {
+    const categoryPartners = partners.filter(p => p.category === category);
+    
+    if (categoryPartners.length === 0) continue;
+
+    // Score each partner based on business needs
+    const scoredPartners = categoryPartners.map(partner => {
+      const score = calculatePartnerMatchScore(partner, businessData, analysis, category);
+      return { ...partner, matchScore: score };
+    });
+
+    // Sort by match score and take top 3
+    const topPartners = scoredPartners
+      .sort((a, b) => b.matchScore - a.matchScore)
+      .slice(0, 3);
+
+    const recommendation = generateCategoryRecommendation(
+      category,
+      businessData,
+      analysis,
+      topPartners
+    );
+
+    if (recommendation) {
+      partnerRecommendations.push({
+        category,
+        partners: topPartners,
+        ...recommendation
+      });
+    }
+  }
+
+  return partnerRecommendations;
+}
+
+// Calculate partner match score
+function calculatePartnerMatchScore(
+  partner: any,
+  businessData: any,
+  analysis: any,
+  category: string
+): number {
+  let score = 50; // Base score
+
+  // Industry expertise match
+  if (partner.specialties && Array.isArray(partner.specialties)) {
+    const industryMatch = partner.specialties.some((specialty: string) =>
+      specialty.toLowerCase().includes(businessData.industry?.toLowerCase() || '')
+    );
+    if (industryMatch) score += 20;
+  }
+
+  // Category-specific scoring
+  switch (category) {
+    case 'legal':
+      if (businessData.ukRegistered === 'no') score += 25;
+      if (!businessData.complianceCompleted || businessData.complianceCompleted.length === 0) score += 15;
+      break;
+      
+    case 'accounting':
+      if (businessData.ukRegistered === 'no') score += 20;
+      if (analysis.scoreBreakdown?.investmentReadiness < 60) score += 15;
+      break;
+      
+    case 'marketing':
+      if (businessData.onlineSalesPlatform === 'no') score += 25;
+      if (analysis.scoreBreakdown?.digitalReadiness < 60) score += 20;
+      break;
+      
+    case 'logistics':
+      const isProductBusiness = ['retail', 'manufacturing', 'ecommerce', 'wholesale'].some(
+        term => businessData.industry?.toLowerCase().includes(term)
+      );
+      if (isProductBusiness) score += 30;
+      break;
+  }
+
+  // Location relevance (if partner location matches target market)
+  if (partner.location && businessData.targetMarket) {
+    if (partner.location.toLowerCase().includes(businessData.targetMarket.toLowerCase())) {
+      score += 10;
+    }
+  }
+
+  return Math.min(score, 100);
+}
+
+// Generate category-specific recommendation
+function generateCategoryRecommendation(
+  category: string,
+  businessData: any,
+  analysis: any,
+  partners: any[]
+): { reason: string; urgency: 'high' | 'medium' | 'low'; insights: string[] } | null {
+  if (partners.length === 0) return null;
+
+  const recommendations: Record<string, any> = {
+    legal: {
+      reason: businessData.ukRegistered === 'no' 
+        ? 'Immediate legal support required for UK company registration and compliance setup'
+        : 'Legal guidance needed for ongoing compliance and regulatory requirements',
+      urgency: businessData.ukRegistered === 'no' ? 'high' : 'medium',
+      insights: [
+        `${partners.length} verified legal partners available`,
+        businessData.ukRegistered === 'no' ? 'Priority: Company registration' : 'Focus: Compliance maintenance',
+        `Average match score: ${Math.round(partners.reduce((sum, p) => sum + p.matchScore, 0) / partners.length)}%`
+      ]
+    },
+    accounting: {
+      reason: 'Financial compliance and tax registration essential for UK market operations',
+      urgency: businessData.ukRegistered === 'no' ? 'high' : 'medium',
+      insights: [
+        `${partners.length} qualified accounting partners identified`,
+        'Services: VAT registration, tax compliance, financial reporting',
+        `Match confidence: ${Math.round(partners.reduce((sum, p) => sum + p.matchScore, 0) / partners.length)}%`
+      ]
+    },
+    marketing: {
+      reason: analysis.scoreBreakdown?.digitalReadiness < 60
+        ? 'Digital marketing expertise critical to improve online presence and reach UK customers'
+        : 'Marketing support to optimize UK market penetration and brand positioning',
+      urgency: analysis.scoreBreakdown?.digitalReadiness < 60 ? 'high' : 'medium',
+      insights: [
+        `${partners.length} specialized marketing partners available`,
+        businessData.onlineSalesPlatform === 'no' ? 'Priority: E-commerce setup' : 'Focus: Growth optimization',
+        `Relevance score: ${Math.round(partners.reduce((sum, p) => sum + p.matchScore, 0) / partners.length)}%`
+      ]
+    },
+    logistics: {
+      reason: ['retail', 'manufacturing', 'ecommerce'].some(term => 
+        businessData.industry?.toLowerCase().includes(term)
+      ) 
+        ? 'Supply chain and distribution infrastructure critical for product-based business'
+        : 'Logistics optimization to ensure efficient UK market operations',
+      urgency: ['retail', 'manufacturing', 'ecommerce'].some(term => 
+        businessData.industry?.toLowerCase().includes(term)
+      ) ? 'high' : 'medium',
+      insights: [
+        `${partners.length} logistics partners with UK expertise`,
+        'Capabilities: Warehousing, distribution, customs support',
+        `Industry alignment: ${Math.round(partners.reduce((sum, p) => sum + p.matchScore, 0) / partners.length)}%`
+      ]
+    }
+  };
+
+  return recommendations[category] || null;
 
     return new Response(
       JSON.stringify(comprehensiveResult),

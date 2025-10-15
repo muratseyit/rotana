@@ -61,8 +61,20 @@ interface ComprehensiveAnalysisResult {
     partners: any[];
     reason: string;
     urgency: 'high' | 'medium' | 'low';
-    matchScore: number;
+    matchScore?: number;
+    insights?: string[];
   }>;
+  metadata?: {
+    dataCompleteness: {
+      score: number;
+      missingFields: string[];
+      completedSections: string[];
+    };
+    analysisVersion: string;
+    modelUsed: string;
+    analysisDate: string;
+    confidenceLevel: 'high' | 'medium' | 'low';
+  };
 }
 
 interface BusinessData {
@@ -241,6 +253,54 @@ export default function ComprehensiveAnalysis() {
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-8 space-y-8">
+        {/* Transparency & Confidence Badge */}
+        {analysisResult.metadata && (
+          <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <Shield className={`h-5 w-5 ${
+                    analysisResult.metadata.confidenceLevel === 'high' ? 'text-green-600' :
+                    analysisResult.metadata.confidenceLevel === 'medium' ? 'text-yellow-600' :
+                    'text-orange-600'
+                  }`} />
+                  <div>
+                    <p className="font-semibold text-sm">
+                      Analysis Confidence: {analysisResult.metadata.confidenceLevel.toUpperCase()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Data Completeness: {analysisResult.metadata.dataCompleteness.score}% • 
+                      Model: {analysisResult.metadata.modelUsed} • 
+                      Version: {analysisResult.metadata.analysisVersion}
+                    </p>
+                  </div>
+                </div>
+                
+                {analysisResult.metadata.dataCompleteness.missingFields.length > 0 && (
+                  <Badge variant="outline" className="gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    {analysisResult.metadata.dataCompleteness.missingFields.length} fields incomplete
+                  </Badge>
+                )}
+              </div>
+              
+              {analysisResult.metadata.dataCompleteness.completedSections.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800">
+                  <p className="text-xs text-muted-foreground mb-1">Completed sections:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {analysisResult.metadata.dataCompleteness.completedSections.map((section) => (
+                      <Badge key={section} variant="secondary" className="text-xs">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        {section}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Overall Score Header */}
         <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
           <CardContent className="p-6">
