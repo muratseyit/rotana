@@ -74,6 +74,12 @@ interface ComprehensiveAnalysisResult {
     modelUsed: string;
     analysisDate: string;
     confidenceLevel: 'high' | 'medium' | 'low';
+    companyVerification?: {
+      verified: boolean;
+      data?: any;
+      insights?: any;
+    };
+    dataSourcesUsed?: string[];
   };
 }
 
@@ -277,16 +283,31 @@ export default function ComprehensiveAnalysis() {
                 </div>
                 
                 {analysisResult.metadata.dataCompleteness.missingFields.length > 0 && (
-                  <Badge variant="outline" className="gap-1">
-                    <AlertTriangle className="h-3 w-3" />
-                    {analysisResult.metadata.dataCompleteness.missingFields.length} fields incomplete
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      {analysisResult.metadata.dataCompleteness.missingFields.length} fields incomplete
+                    </Badge>
+                    {analysisResult.metadata.companyVerification?.verified && (
+                      <Badge variant="default" className="gap-1 bg-green-600">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Companies House Verified
+                      </Badge>
+                    )}
+                  </div>
                 )}
               </div>
               
               {analysisResult.metadata.dataCompleteness.completedSections.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800">
-                  <p className="text-xs text-muted-foreground mb-1">Completed sections:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-muted-foreground">Completed sections:</p>
+                    {analysisResult.metadata.dataSourcesUsed && (
+                      <p className="text-xs text-muted-foreground">
+                        Data sources: {analysisResult.metadata.dataSourcesUsed.length}
+                      </p>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-1">
                     {analysisResult.metadata.dataCompleteness.completedSections.map((section) => (
                       <Badge key={section} variant="secondary" className="text-xs">

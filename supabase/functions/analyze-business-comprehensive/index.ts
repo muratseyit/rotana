@@ -27,6 +27,31 @@ serve(async (req) => {
 
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
+    // Verify UK company registration if company number provided
+    let companyVerification = null;
+    if (businessData.companyNumber || businessData.ukRegistered === 'yes') {
+      try {
+        const verifyResponse = await fetch(`${supabaseUrl}/functions/v1/verify-uk-company`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            companyName: businessData.companyName,
+            companyNumber: businessData.companyNumber
+          })
+        });
+        
+        if (verifyResponse.ok) {
+          companyVerification = await verifyResponse.json();
+          console.log('Company verification result:', companyVerification.verified);
+        }
+      } catch (verifyError) {
+        console.log('Company verification failed, continuing without it:', verifyError);
+      }
+    }
+
     // Create detailed prompt for comprehensive analysis with evidence-based scoring
     const prompt = `You are a senior UK market entry analyst with expertise in business assessment, regulatory compliance, and market strategy. 
 
@@ -69,10 +94,18 @@ For each category, apply these evidence-based criteria:
    - Customer validation: +15-25 points
    
 2. Regulatory Compatibility (0-100):
-   - UK registration status: +25 points if complete
+   - UK registration status: +25 points if complete${companyVerification?.verified ? ' (VERIFIED via Companies House)' : ''}
    - Industry compliance progress: +25 points
    - IP protection status: +20 points
    - Legal structure suitability: +15-30 points
+   ${companyVerification?.data ? `
+   VERIFIED COMPANY DATA:
+   - Company Number: ${companyVerification.data.companyNumber}
+   - Status: ${companyVerification.data.companyStatus}
+   - Type: ${companyVerification.data.companyType}
+   - Incorporated: ${companyVerification.data.dateOfCreation}
+   - Age: ${companyVerification.insights?.ageInYears || 'N/A'} years
+   ` : ''}
 
 3. Digital Readiness (0-100):
    - E-commerce capability: +25 points
@@ -266,6 +299,12 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         modelUsed: 'gpt-5-2025-08-07',
         analysisDate: new Date().toISOString(),
         confidenceLevel: calculateConfidenceLevel(dataCompleteness, analysis),
+        companyVerification: companyVerification || { verified: false },
+        dataSourcesUsed: [
+          'OpenAI GPT-5',
+          'Supabase Partner Database',
+          companyVerification?.verified ? 'UK Companies House API' : null
+        ].filter(Boolean)
       }
     };
 
