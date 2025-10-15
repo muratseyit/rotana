@@ -189,6 +189,77 @@ export type Database = {
         }
         Relationships: []
       }
+      expert_review_requests: {
+        Row: {
+          admin_notes: string | null
+          analysis_id: string | null
+          business_id: string | null
+          consultation_topic: string | null
+          created_at: string
+          expert_response: string | null
+          id: string
+          insight_category: string | null
+          insight_question: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+          priority: string
+          request_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          analysis_id?: string | null
+          business_id?: string | null
+          consultation_topic?: string | null
+          created_at?: string
+          expert_response?: string | null
+          id?: string
+          insight_category?: string | null
+          insight_question?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          priority?: string
+          request_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          analysis_id?: string | null
+          business_id?: string | null
+          consultation_topic?: string | null
+          created_at?: string
+          expert_response?: string | null
+          id?: string
+          insight_category?: string | null
+          insight_question?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          priority?: string
+          request_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_review_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestones: {
         Row: {
           amount: number

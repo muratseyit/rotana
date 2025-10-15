@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ExpertReviewDialog } from "./ExpertReviewDialog";
 import { ExportReportDialog } from "./ExportReportDialog";
 import { 
   CheckCircle, 
@@ -31,7 +32,9 @@ import {
   Info,
   Database,
   Activity,
-  Clock
+  Clock,
+  UserCheck,
+  MessageSquare
 } from "lucide-react";
 
 import { ScoreInfluenceCard } from "./ScoreInfluenceCard";
@@ -327,6 +330,30 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
         </CardContent>
       </Card>
 
+      {/* High-Value Analysis Alert - Flag for Expert Review */}
+      {(analysis.overallScore < 60 || companyVerified || dataCompleteness >= 85) && (
+        <Alert className="border-primary">
+          <UserCheck className="h-4 w-4" />
+          <AlertTitle>Expert Review Recommended</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <div>
+              {analysis.overallScore < 60 
+                ? "Your analysis shows areas that could benefit from expert guidance. Our UK market specialists can provide targeted recommendations."
+                : companyVerified
+                ? "Your company is verified with Companies House. An expert review can help you maximize your UK market entry strategy."
+                : "Your analysis is comprehensive. Consider an expert review to validate findings and uncover additional opportunities."}
+            </div>
+            <ExpertReviewDialog
+              trigger={
+                <Button variant="default" size="sm" className="ml-4">
+                  Get Expert Review
+                </Button>
+              }
+            />
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Rest of the existing content */}
       {/* Overall Score Header */}
       <Card className="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 border-primary/20 shadow-elegant">
@@ -383,6 +410,15 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
                 <Button className="gap-2">
                   <Download className="h-4 w-4" />
                   Export Report
+                </Button>
+              }
+            />
+            <ExpertReviewDialog
+              analysisId={analysis.metadata?.analysisDate}
+              trigger={
+                <Button variant="outline" className="gap-2">
+                  <UserCheck className="h-4 w-4" />
+                  Request Expert Review
                 </Button>
               }
             />
@@ -687,13 +723,24 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               return (
                 <Card key={insight.category}>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Icon className="h-5 w-5" />
-                      {category?.label}
-                      <Badge variant={getScoreBadgeVariant(insight.score)} className="ml-auto">
-                        {insight.score}%
-                      </Badge>
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Icon className="h-5 w-5" />
+                        {category?.label}
+                        <Badge variant={getScoreBadgeVariant(insight.score)} className="ml-2">
+                          {insight.score}%
+                        </Badge>
+                      </CardTitle>
+                      <ExpertReviewDialog
+                        insightCategory={category?.label}
+                        trigger={
+                          <Button variant="ghost" size="sm" className="gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            Ask Expert
+                          </Button>
+                        }
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Strengths */}
