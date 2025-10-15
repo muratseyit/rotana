@@ -193,6 +193,19 @@ const ComprehensiveAnalysisForm = () => {
         </div>
 
         <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="companyNumber">UK Company Number (Optional)</Label>
+          <Input
+            id="companyNumber"
+            value={(businessData as any).companyNumber || ''}
+            onChange={(e) => updateBusinessData('companyNumber' as any, e.target.value)}
+            placeholder="e.g., 12345678"
+          />
+          <p className="text-xs text-muted-foreground">
+            Enter your Companies House registration number for enhanced company verification
+          </p>
+        </div>
+
+        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="description">Business Description *</Label>
           <Textarea
             id="description"

@@ -379,6 +379,23 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="companyNumber" className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  UK Company Number
+                </Label>
+                <Input
+                  id="companyNumber"
+                  type="text"
+                  placeholder="e.g., 12345678"
+                  value={(formData as any).companyNumber || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, companyNumber: e.target.value }))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Optional: Enter your Companies House registration number for enhanced verification
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="initialInvestmentBudget" className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
                   Initial Investment Budget
