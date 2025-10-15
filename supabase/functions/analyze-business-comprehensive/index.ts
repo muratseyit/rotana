@@ -27,37 +27,91 @@ serve(async (req) => {
 
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
-    // Create detailed prompt for comprehensive analysis
-    const prompt = `You are an expert UK market entry consultant. Analyze the following business comprehensively across 7 critical categories.
+    // Create detailed prompt for comprehensive analysis with evidence-based scoring
+    const prompt = `You are a senior UK market entry analyst with expertise in business assessment, regulatory compliance, and market strategy. 
 
-Business Information:
-- Company: ${businessData.companyName}
-- Description: ${businessData.businessDescription}
-- Industry: ${businessData.industry}
-- Company Size: ${businessData.companySize}
-- Website: ${businessData.websiteUrl || 'Not provided'}
-- Target Market: ${businessData.targetMarket || 'Not specified'}
-- Market Entry Timeline: ${businessData.marketEntryTimeline || 'Not specified'}
+Conduct a rigorous, evidence-based analysis of the following business for UK market entry readiness.
 
-Digital Presence:
-- Online Sales Platform: ${businessData.onlineSalesPlatform || 'No'}
-- Social Media Platforms: ${businessData.socialMediaPlatforms?.join(', ') || 'None'}
-- Website Features: ${businessData.websiteFeatures?.join(', ') || 'None'}
-- Digital Marketing Budget: ${businessData.digitalMarketingBudget || 'Not specified'}
+BUSINESS PROFILE:
+Company: ${businessData.companyName}
+Description: ${businessData.businessDescription}
+Industry: ${businessData.industry}
+Company Size: ${businessData.companySize}
+Website: ${businessData.websiteUrl || 'Not provided'}
+Target Market: ${businessData.targetMarket || 'Not specified'}
+Market Entry Timeline: ${businessData.marketEntryTimeline || 'Not specified'}
 
-Compliance & Operations:
-- Registered in UK: ${businessData.ukRegistered || 'No'}
-- Business Type: ${businessData.businessType || 'Not specified'}
-- Compliance Completed: ${businessData.complianceCompleted?.join(', ') || 'None'}
-- IP Protection: ${businessData.ipProtection?.join(', ') || 'None'}
+DIGITAL INFRASTRUCTURE:
+Online Sales Platform: ${businessData.onlineSalesPlatform || 'No'}
+Social Media: ${businessData.socialMediaPlatforms?.join(', ') || 'None'}
+Website Features: ${businessData.websiteFeatures?.join(', ') || 'None'}
+Digital Marketing Budget: ${businessData.digitalMarketingBudget || 'Not specified'}
 
-Goals & Objectives:
-- Primary Objective: ${businessData.primaryObjective || 'Not specified'}
-- Planned Investments: ${businessData.plannedInvestments?.join(', ') || 'None'}
-- Required Support: ${businessData.requiredSupport?.join(', ') || 'None'}
-- Key Success Metrics: ${businessData.keySuccessMetrics?.join(', ') || 'None'}
+COMPLIANCE STATUS:
+UK Registered: ${businessData.ukRegistered || 'No'}
+Business Type: ${businessData.businessType || 'Not specified'}
+Completed Compliance: ${businessData.complianceCompleted?.join(', ') || 'None'}
+IP Protection: ${businessData.ipProtection?.join(', ') || 'None'}
 
-Please provide a comprehensive analysis in the following JSON structure:
+STRATEGIC OBJECTIVES:
+Primary Goal: ${businessData.primaryObjective || 'Not specified'}
+Planned Investments: ${businessData.plannedInvestments?.join(', ') || 'None'}
+Support Needed: ${businessData.requiredSupport?.join(', ') || 'None'}
+Success Metrics: ${businessData.keySuccessMetrics?.join(', ') || 'None'}
+
+SCORING METHODOLOGY:
+For each category, apply these evidence-based criteria:
+
+1. Product-Market Fit (0-100):
+   - Market demand evidence: +20-30 points
+   - Competitive positioning: +15-25 points
+   - Value proposition clarity: +15-20 points
+   - Customer validation: +15-25 points
+   
+2. Regulatory Compatibility (0-100):
+   - UK registration status: +25 points if complete
+   - Industry compliance progress: +25 points
+   - IP protection status: +20 points
+   - Legal structure suitability: +15-30 points
+
+3. Digital Readiness (0-100):
+   - E-commerce capability: +25 points
+   - Website functionality: +20-25 points
+   - Social media presence: +15-20 points
+   - Digital marketing strategy: +15-30 points
+
+4. Logistics Potential (0-100):
+   - Supply chain clarity: +25-30 points
+   - Distribution strategy: +20-25 points
+   - Inventory management: +15-25 points
+   - Fulfilment readiness: +15-25 points
+
+5. Scalability & Automation (0-100):
+   - Process documentation: +20-25 points
+   - Technology infrastructure: +25-30 points
+   - Automation level: +20-25 points
+   - Growth capacity: +15-25 points
+
+6. Founder & Team Strength (0-100):
+   - Market expertise: +25-30 points
+   - Team completeness: +20-25 points
+   - Advisory support: +15-20 points
+   - Execution track record: +20-30 points
+
+7. Investment Readiness (0-100):
+   - Financial planning: +25-30 points
+   - Funding strategy: +20-25 points
+   - ROI projection quality: +20-25 points
+   - Resource allocation: +15-25 points
+
+CRITICAL REQUIREMENTS:
+- Base scores on ACTUAL data provided, not assumptions
+- Cite specific evidence from the business data for each score
+- Flag missing information that impacts scoring accuracy
+- Provide concrete, actionable next steps tied to score gaps
+- Include UK-specific regulatory and market context
+
+Provide comprehensive analysis in this JSON structure:
 {
   "overallScore": <0-100>,
   "scoreBreakdown": {
@@ -149,13 +203,15 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-2025-08-07',
         messages: [
-          { role: 'system', content: 'You are an expert UK market entry consultant providing comprehensive business analysis. Always respond with valid JSON only.' },
+          { 
+            role: 'system', 
+            content: 'You are a senior UK market entry analyst specializing in evidence-based business assessments. You provide rigorous, data-driven analysis with specific scoring methodologies. Always respond with valid JSON only, citing specific evidence for each score and recommendation.' 
+          },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 3000,
+        max_completion_tokens: 4000,
       }),
     });
 
