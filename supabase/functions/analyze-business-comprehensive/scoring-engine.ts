@@ -769,7 +769,7 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
       points,
       evidence: 'Revenue model and financial projections developed'
     });
-  } else if (data.plannedInvestments.length > 0) {
+  } else if (data.plannedInvestments && data.plannedInvestments.length > 0) {
     const points = 15;
     score += points;
     factors.push({
