@@ -65,9 +65,9 @@ serve(async (req) => {
     });
 
     // Create detailed prompt for AI to generate insights based on calculated scores
-    const prompt = `You are a senior UK market entry analyst with expertise in business assessment, regulatory compliance, and market strategy.
+    const prompt = `You are a senior UK market entry analyst with 15+ years of expertise in business assessment, regulatory compliance, and market strategy across multiple industries.
 
-A comprehensive scoring analysis has been completed for this business. Your task is to provide detailed insights, actionable recommendations, and strategic guidance based on the calculated scores and evidence.
+A comprehensive scoring analysis has been completed for this business. Your task is to provide detailed, industry-specific insights, actionable recommendations with concrete timelines and costs, and strategic guidance based on the calculated scores and evidence.
 
 Conduct a rigorous, evidence-based analysis of the following business for UK market entry readiness.
 
@@ -118,21 +118,76 @@ ${evidence.category} (${evidence.score}/100):
 ${evidence.factors.map(f => `  • ${f.factor} (${f.points > 0 ? '+' : ''}${f.points} points): ${f.evidence}`).join('\n')}
 `).join('\n')}
 
+UK MARKET-SPECIFIC REQUIREMENTS TO EVALUATE:
+
+REGULATORY COMPLIANCE:
+- Companies House registration and annual filing requirements
+- HMRC tax registration (Corporation Tax, VAT if turnover >£90k, PAYE if employing)
+- Industry-specific licenses (FSA for food, FCA for financial services, CQC for healthcare, etc.)
+- GDPR compliance and ICO registration (if processing personal data)
+- Product safety and CE/UKCA marking requirements
+- Trading Standards compliance
+- Anti-money laundering (AML) requirements for relevant sectors
+
+INDUSTRY-SPECIFIC CRITERIA FOR ${businessData.industry}:
+- Analyze this industry's competitive landscape in the UK
+- Identify UK-specific regulations, certifications, or standards required
+- Assess market saturation and growth trends in the UK for this sector
+- Evaluate typical customer acquisition costs and sales cycles in UK market
+- Consider seasonal variations and UK consumer behavior patterns
+- Identify key UK competitors and market positioning opportunities
+
+MARKET ENTRY BARRIERS:
+- Legal entity setup costs and timeline (£12-£500 + professional fees)
+- UK business bank account requirements and processing times (2-6 weeks)
+- Physical presence requirements (registered office address, trade premises)
+- Professional indemnity insurance requirements for the sector
+- Employee rights and employment law compliance (if hiring UK staff)
+- Import duties, customs procedures, and Brexit implications (if importing goods)
+
 YOUR TASK:
 
 Based on the calculated scores and evidence above, provide:
-1. Strategic insights explaining WHY each score is at its current level
-2. Specific strengths to leverage in each category
-3. Critical weaknesses that need immediate attention
-4. Prioritized action items with timelines and expected impact
-5. UK market-specific recommendations and regulatory guidance
 
-IMPORTANT:
+1. STRATEGIC INSIGHTS (for each category):
+   - WHY the score is at its current level based on UK market context
+   - Specific UK market benchmarks and how this business compares
+   - Industry-specific considerations and competitive positioning in UK
+
+2. STRENGTHS TO LEVERAGE:
+   - Concrete competitive advantages for UK market entry
+   - How to maximize these strengths in UK context
+   - Potential UK partnerships or channels to leverage
+
+3. CRITICAL WEAKNESSES:
+   - Specific gaps that will prevent or delay UK market success
+   - UK regulatory non-compliance risks with potential penalties
+   - Competitive disadvantages versus established UK players
+
+4. PRIORITIZED ACTION ITEMS (for each category):
+   - SPECIFIC action with detailed steps (not generic advice)
+   - ESTIMATED cost range in GBP (e.g., "£2,000-£5,000")
+   - TIMELINE with milestones (e.g., "Week 1-2: X, Week 3-4: Y")
+   - RESOURCES needed (people, tools, partners)
+   - EXPECTED IMPACT on score and business outcomes
+   - PRIORITY level based on urgency and UK legal requirements
+
+5. UK MARKET-SPECIFIC RECOMMENDATIONS:
+   - Immediate actions required for UK legal compliance
+   - Industry-specific UK certifications or memberships to pursue
+   - Recommended UK service providers (accountants, solicitors, etc.)
+   - UK government grants, schemes, or support programs available
+   - Networking opportunities and industry associations in UK
+   - Geographic considerations (London vs. regions for this industry)
+
+CRITICAL REQUIREMENTS:
 - DO NOT recalculate scores - use the provided scores as-is
-- Focus on actionable insights and strategic recommendations
-- Explain the business implications of each score
-- Provide specific next steps tied to improving low scores
-- Reference UK market conditions and requirements
+- Every action item MUST include: specific steps, cost estimate, timeline, resources, and expected impact
+- Reference SPECIFIC UK regulations, not generic compliance advice
+- Provide INDUSTRY-SPECIFIC insights, not generic business advice
+- Include concrete examples and case studies where relevant
+- Prioritize based on LEGAL REQUIREMENTS first, then strategic importance
+- Consider the stated market entry timeline and budget constraints
 
 Provide your analysis in this JSON structure (using the pre-calculated scores):
 {
