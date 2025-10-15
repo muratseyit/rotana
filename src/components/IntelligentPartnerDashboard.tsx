@@ -102,6 +102,17 @@ export function IntelligentPartnerDashboard({
     return <AlertCircle className="h-4 w-4 text-destructive" />;
   };
 
+  const handleContactPriorityPartners = () => {
+    const criticalRecommendations = prioritizedRecommendations.filter(r => r.urgency === 'high');
+    if (criticalRecommendations.length > 0 && criticalRecommendations[0].partners.length > 0) {
+      // Contact the first partner from the highest priority category
+      onContactPartner(criticalRecommendations[0].partners[0]);
+    } else if (prioritizedRecommendations.length > 0 && prioritizedRecommendations[0].partners.length > 0) {
+      // Fallback to first available partner
+      onContactPartner(prioritizedRecommendations[0].partners[0]);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Section */}
@@ -229,7 +240,13 @@ export function IntelligentPartnerDashboard({
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
-            <Button variant="default" className="justify-start gap-2">
+            <Button 
+              variant="default" 
+              className="justify-start gap-2"
+              onClick={handleContactPriorityPartners}
+              disabled={prioritizedRecommendations.length === 0 || 
+                prioritizedRecommendations.every(r => r.partners.length === 0)}
+            >
               <Users className="h-4 w-4" />
               Contact Priority Partners
             </Button>
