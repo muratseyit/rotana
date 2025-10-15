@@ -82,6 +82,42 @@ serve(async (req) => {
     // Extract relevant information
     const companyData = Array.isArray(searchResults) ? searchResults[0] : searchResults;
     
+    // Fetch additional company data (officers, filing history, etc.)
+    let officers = null;
+    let filingHistory = null;
+    
+    if (companyData.company_number) {
+      try {
+        // Get company officers
+        const officersResponse = await fetch(
+          `https://api.company-information.service.gov.uk/company/${companyData.company_number}/officers`,
+          {
+            headers: {
+              'Authorization': `Basic ${btoa(companiesHouseApiKey + ':')}`,
+            },
+          }
+        );
+        if (officersResponse.ok) {
+          officers = await officersResponse.json();
+        }
+
+        // Get filing history
+        const filingResponse = await fetch(
+          `https://api.company-information.service.gov.uk/company/${companyData.company_number}/filing-history?items_per_page=10`,
+          {
+            headers: {
+              'Authorization': `Basic ${btoa(companiesHouseApiKey + ':')}`,
+            },
+          }
+        );
+        if (filingResponse.ok) {
+          filingHistory = await filingResponse.json();
+        }
+      } catch (err) {
+        console.log('Error fetching additional company data:', err);
+      }
+    }
+    
     const verificationResult = {
       verified: true,
       data: {
@@ -93,6 +129,14 @@ serve(async (req) => {
         address: companyData.registered_office_address || companyData.address,
         sicCodes: companyData.sic_codes,
         registeredOfficeIsMail: companyData.registered_office_is_in_dispute,
+        jurisdiction: companyData.jurisdiction,
+        accounts: companyData.accounts,
+        confirmationStatement: companyData.confirmation_statement,
+        hasBeenLiquidated: companyData.has_been_liquidated,
+        hasCharges: companyData.has_charges,
+        hasInsolvencyHistory: companyData.has_insolvency_history,
+        officers: officers?.items || [],
+        recentFilings: filingHistory?.items || [],
       },
       insights: {
         isActive: companyData.company_status === 'active',
@@ -101,6 +145,16 @@ serve(async (req) => {
           : null,
         hasUKAddress: companyData.registered_office_address?.country === 'United Kingdom' || 
                       companyData.address?.country === 'United Kingdom',
+        filingCompliance: companyData.accounts?.overdue === false && 
+                         companyData.confirmation_statement?.overdue === false,
+        accountsOverdue: companyData.accounts?.overdue || false,
+        confirmationStatementOverdue: companyData.confirmation_statement?.overdue || false,
+        numberOfOfficers: officers?.active_count || 0,
+        hasCharges: companyData.has_charges || false,
+        hasInsolvencyHistory: companyData.has_insolvency_history || false,
+        lastAccountsDate: companyData.accounts?.last_accounts?.made_up_to,
+        nextAccountsDue: companyData.accounts?.next_due,
+        industryClassification: companyData.sic_codes?.map((code: string) => getSICDescription(code)) || [],
       }
     };
 
@@ -127,3 +181,28 @@ serve(async (req) => {
     );
   }
 });
+
+// Helper function to get SIC code descriptions
+function getSICDescription(code: string): { code: string; description: string } {
+  const sicCodes: Record<string, string> = {
+    '01110': 'Growing of cereals',
+    '46510': 'Wholesale of computers, computer peripheral equipment and software',
+    '62011': 'Ready-made interactive leisure and entertainment software development',
+    '62012': 'Business and domestic software development',
+    '62020': 'Information technology consultancy activities',
+    '62090': 'Other information technology service activities',
+    '63110': 'Data processing, hosting and related activities',
+    '70221': 'Financial management',
+    '74909': 'Other professional, scientific and technical activities',
+    '82990': 'Other business support service activities',
+    '47910': 'Retail sale via mail order houses or via Internet',
+    '96090': 'Other service activities',
+    '73110': 'Advertising agencies',
+    '73120': 'Media representation',
+  };
+  
+  return {
+    code,
+    description: sicCodes[code] || `SIC Code ${code}`
+  };
+}

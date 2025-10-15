@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.4';
 import { calculateComprehensiveScore } from './scoring-engine.ts';
+import { getIndustryBenchmark, getRegulatoryRequirements } from './market-data.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,6 +64,13 @@ serve(async (req) => {
       confidence: scoringResult.confidenceLevel,
       dataCompleteness: scoringResult.dataCompleteness
     });
+
+    // Get industry benchmarks and regulatory requirements
+    const industryBenchmark = getIndustryBenchmark(businessData.industry || '');
+    const regulatoryRequirements = getRegulatoryRequirements(businessData.industry || '');
+    
+    console.log('Industry benchmark data:', industryBenchmark);
+    console.log('Regulatory requirements:', regulatoryRequirements.length);
 
     // Create detailed prompt for AI to generate insights based on calculated scores
     const prompt = `You are a senior UK market entry analyst with 15+ years of expertise in business assessment, regulatory compliance, and market strategy across multiple industries.
@@ -180,14 +188,53 @@ Based on the calculated scores and evidence above, provide:
    - Networking opportunities and industry associations in UK
    - Geographic considerations (London vs. regions for this industry)
 
+INDUSTRY BENCHMARKS (UK Market Data):
+Average Industry Growth Rate: ${industryBenchmark.averageGrowthRate}% per year
+UK Market Size: £${industryBenchmark.marketSize} billion
+Competition Level: ${industryBenchmark.competitionLevel.toUpperCase()}
+Entry Barriers: ${industryBenchmark.entryBarriers.toUpperCase()}
+Digital Adoption Rate: ${industryBenchmark.digitalAdoptionRate}%
+Average Profit Margins: ${industryBenchmark.averageMargins}%
+Typical Customer Acquisition Cost: ${industryBenchmark.typicalCustomerAcquisitionCost}
+Average Time to Market: ${industryBenchmark.averageTimeToMarket}
+Regulatory Complexity: ${industryBenchmark.regulatoryComplexity.toUpperCase()}
+Seasonality Impact: ${industryBenchmark.seasonality.toUpperCase()}
+Key Success Factors: ${industryBenchmark.keySuccessFactors.join(', ')}
+
+REGULATORY REQUIREMENTS (Real-time UK Compliance):
+${regulatoryRequirements.map(req => `
+- ${req.name} (${req.authority})
+  Required: ${req.required ? 'YES' : 'NO'} | Urgency: ${req.urgency.toUpperCase()}
+  Cost: ${req.estimatedCost} | Timeline: ${req.timeToComplete}
+  Description: ${req.description}
+  More info: ${req.link}
+`).join('\n')}
+
+COMPANY VERIFICATION DATA:
+${companyVerification?.verified ? `
+Verified UK Company: YES
+Company Number: ${companyVerification.data?.companyNumber || 'N/A'}
+Company Status: ${companyVerification.data?.companyStatus || 'N/A'}
+Company Age: ${companyVerification.insights?.ageInYears || 'N/A'} years
+Filing Compliance: ${companyVerification.insights?.filingCompliance ? 'UP TO DATE' : 'OVERDUE'}
+Accounts Overdue: ${companyVerification.insights?.accountsOverdue ? 'YES' : 'NO'}
+Number of Officers: ${companyVerification.insights?.numberOfOfficers || 0}
+Has Charges: ${companyVerification.insights?.hasCharges ? 'YES' : 'NO'}
+Insolvency History: ${companyVerification.insights?.hasInsolvencyHistory ? 'YES' : 'NO'}
+Industry Classification (SIC): ${companyVerification.insights?.industryClassification?.map((sic: any) => sic.description).join(', ') || 'N/A'}
+` : 'Company not verified with Companies House - UK registration required'}
+
 CRITICAL REQUIREMENTS:
 - DO NOT recalculate scores - use the provided scores as-is
 - Every action item MUST include: specific steps, cost estimate, timeline, resources, and expected impact
 - Reference SPECIFIC UK regulations, not generic compliance advice
-- Provide INDUSTRY-SPECIFIC insights, not generic business advice
+- Provide INDUSTRY-SPECIFIC insights based on the benchmark data above
+- Compare business performance against industry benchmarks
 - Include concrete examples and case studies where relevant
 - Prioritize based on LEGAL REQUIREMENTS first, then strategic importance
 - Consider the stated market entry timeline and budget constraints
+- Use the real regulatory requirements data to provide accurate compliance guidance
+- Reference Companies House verification data in your assessment
 
 Provide your analysis in this JSON structure (using the pre-calculated scores):
 {
@@ -356,10 +403,14 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           data: companyVerification.data,
           insights: companyVerification.insights
         } : { verified: false },
+        industryBenchmark,
+        regulatoryRequirements,
         dataSourcesUsed: [
           'Evidence-Based Scoring Algorithms',
           'Business Form Data',
           companyVerification?.verified ? 'Companies House API (Verified)' : null,
+          'UK Industry Benchmarks (2024-2025)',
+          'UK Government Regulatory Database',
           'Supabase Partner Database',
           'GPT-5 Strategic Analysis'
         ].filter(Boolean)
