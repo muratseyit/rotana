@@ -329,7 +329,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
@@ -338,17 +338,29 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           { role: 'user', content: prompt }
         ],
         max_completion_tokens: 4000,
+        response_format: { type: "json_object" }
       }),
     });
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
       console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${openAIResponse.status}`);
+      throw new Error(`OpenAI API error: ${openAIResponse.status} - ${errorText}`);
     }
 
     const openAIData = await openAIResponse.json();
+    
+    if (!openAIData.choices || !openAIData.choices[0] || !openAIData.choices[0].message) {
+      console.error('Invalid OpenAI response structure:', JSON.stringify(openAIData));
+      throw new Error('Invalid OpenAI response structure');
+    }
+    
     const analysisText = openAIData.choices[0].message.content;
+    
+    if (!analysisText || analysisText.trim() === '') {
+      console.error('Empty AI response received');
+      throw new Error('Empty AI response');
+    }
     
     console.log('AI Analysis received, parsing...');
     
@@ -358,7 +370,8 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
       aiAnalysis = JSON.parse(analysisText);
     } catch (parseError) {
       console.error('Failed to parse AI response:', analysisText);
-      throw new Error('Invalid AI response format');
+      console.error('Parse error details:', parseError);
+      throw new Error(`Invalid AI response format: ${parseError.message}`);
     }
 
     console.log('Merging AI insights with calculated scores...');
