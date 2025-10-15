@@ -114,16 +114,8 @@ export default function ComprehensiveAnalysis() {
     try {
       setLoading(true);
 
-      const { data: result, error } = await supabase.functions.invoke('analyze-business', {
-        body: {
-          companyName: data.companyName,
-          businessDescription: data.businessDescription,
-          industry: data.industry,
-          companySize: data.companySize,
-          websiteUrl: data.websiteUrl,
-          financialMetrics: data.financialMetrics,
-          complianceStatus: { overallScore: 60, items: [] } // Mark as comprehensive analysis
-        }
+      const { data: result, error } = await supabase.functions.invoke('analyze-business-comprehensive', {
+        body: data
       });
 
       if (error) {
