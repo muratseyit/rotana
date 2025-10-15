@@ -329,7 +329,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
@@ -337,28 +337,33 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           },
           { role: 'user', content: prompt }
         ],
-        max_completion_tokens: 4000,
+        max_tokens: 4000,
+        temperature: 0.7,
         response_format: { type: "json_object" }
       }),
     });
 
+    console.log('OpenAI API call initiated...');
+
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
-      console.error('OpenAI API error:', errorText);
+      console.error('OpenAI API error:', openAIResponse.status, errorText);
       throw new Error(`OpenAI API error: ${openAIResponse.status} - ${errorText}`);
     }
 
     const openAIData = await openAIResponse.json();
+    console.log('OpenAI response received, structure check...');
     
     if (!openAIData.choices || !openAIData.choices[0] || !openAIData.choices[0].message) {
-      console.error('Invalid OpenAI response structure:', JSON.stringify(openAIData));
+      console.error('Invalid OpenAI response structure:', JSON.stringify(openAIData, null, 2));
       throw new Error('Invalid OpenAI response structure');
     }
     
     const analysisText = openAIData.choices[0].message.content;
+    console.log('Analysis text length:', analysisText?.length || 0);
     
     if (!analysisText || analysisText.trim() === '') {
-      console.error('Empty AI response received');
+      console.error('Empty AI response received. Full response:', JSON.stringify(openAIData, null, 2));
       throw new Error('Empty AI response');
     }
     
