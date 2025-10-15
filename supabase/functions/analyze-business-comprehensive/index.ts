@@ -508,26 +508,4 @@ function generateCategoryRecommendation(
   };
 
   return recommendations[category] || null;
-
-    return new Response(
-      JSON.stringify(comprehensiveResult),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
-    );
-
-  } catch (error) {
-    console.error('Error in analyze-business-comprehensive:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
-        details: error instanceof Error ? error.stack : undefined
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
-    );
-  }
-});
+}
