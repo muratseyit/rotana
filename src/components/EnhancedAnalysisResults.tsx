@@ -4,6 +4,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ExportReportDialog } from "./ExportReportDialog";
 import { 
   CheckCircle, 
@@ -24,7 +27,11 @@ import {
   Download,
   Share2,
   BarChart3,
-  ArrowUpRight
+  ArrowUpRight,
+  Info,
+  Database,
+  Activity,
+  Clock
 } from "lucide-react";
 
 import { ScoreInfluenceCard } from "./ScoreInfluenceCard";
@@ -97,6 +104,26 @@ interface AnalysisResult {
   };
   partnerRecommendations?: PartnerRecommendation[];
   timestamp?: string;
+  metadata?: {
+    dataCompleteness: {
+      score: number;
+      missingFields?: string[];
+      completedSections?: string[];
+    };
+    analysisVersion: string;
+    modelUsed: string;
+    analysisDate: string;
+    confidenceLevel: string;
+    scoringMethod?: string;
+    companyVerification?: {
+      verified: boolean;
+      data?: any;
+      insights?: any;
+    };
+    industryBenchmark?: any;
+    regulatoryRequirements?: any[];
+    dataSourcesUsed?: string[];
+  };
 }
 
 interface EnhancedAnalysisResultsProps {
@@ -172,8 +199,135 @@ const getPriorityColor = (priority: string) => {
 };
 
 export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress }: EnhancedAnalysisResultsProps) {
+  const confidenceLevel = analysis.metadata?.confidenceLevel || 'medium';
+  const dataCompleteness = analysis.metadata?.dataCompleteness?.score || 0;
+  const scoringMethod = analysis.metadata?.scoringMethod || 'AI-based analysis';
+  const dataSourcesUsed = analysis.metadata?.dataSourcesUsed || [];
+  const companyVerified = analysis.metadata?.companyVerification?.verified || false;
+
   return (
     <div className="space-y-6">
+      {/* Analysis Methodology & Data Quality Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Analysis Methodology & Data Quality
+          </CardTitle>
+          <CardDescription>
+            Understanding how your score was calculated and data sources used
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Data Completeness */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  Data Completeness
+                </span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant={dataCompleteness >= 80 ? "default" : dataCompleteness >= 60 ? "secondary" : "destructive"}>
+                        {dataCompleteness}%
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Percentage of critical data fields provided</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Progress value={dataCompleteness} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                {dataCompleteness >= 80 ? 'Excellent - All critical fields completed' :
+                 dataCompleteness >= 60 ? 'Good - Most fields completed' :
+                 'Incomplete - More data needed for accurate analysis'}
+              </p>
+            </div>
+
+            {/* Confidence Level */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  Confidence Level
+                </span>
+                <Badge variant={confidenceLevel === 'high' ? "default" : confidenceLevel === 'medium' ? "secondary" : "outline"}>
+                  {confidenceLevel.toUpperCase()}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {confidenceLevel === 'high' ? 'High confidence based on complete data' :
+                 confidenceLevel === 'medium' ? 'Medium confidence - some data gaps' :
+                 'Low confidence - limited data available'}
+              </p>
+            </div>
+
+            {/* Company Verification */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Verification Status
+                </span>
+                <Badge variant={companyVerified ? "default" : "outline"}>
+                  {companyVerified ? 'VERIFIED' : 'UNVERIFIED'}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {companyVerified 
+                  ? 'Company verified via Companies House API' 
+                  : 'Company not verified - UK registration recommended'}
+              </p>
+            </div>
+          </div>
+
+          {/* Scoring Methodology */}
+          <div className="border-t pt-4">
+            <h4 className="text-sm font-semibold mb-2">Scoring Methodology</h4>
+            <p className="text-sm text-muted-foreground mb-3">
+              {scoringMethod === 'evidence-based-algorithms' 
+                ? 'Your scores are calculated using research-backed algorithms that analyze specific business attributes against UK market benchmarks. Each category uses weighted formulas based on industry best practices.'
+                : 'Scores generated using AI analysis of business data and market conditions.'}
+            </p>
+            
+            {dataSourcesUsed.length > 0 && (
+              <div>
+                <h5 className="text-xs font-semibold mb-2">Data Sources Used:</h5>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  {dataSourcesUsed.map((source, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                      <span>{source}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Missing Data Alert */}
+          {dataCompleteness < 80 && analysis.metadata?.dataCompleteness?.missingFields && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Improve Analysis Accuracy</AlertTitle>
+              <AlertDescription>
+                Provide additional information to increase data completeness and confidence:
+                <ul className="list-disc ml-5 mt-2 text-sm">
+                  {analysis.metadata.dataCompleteness.missingFields.slice(0, 5).map((field, idx) => (
+                    <li key={idx}>{field.replace(/([A-Z])/g, ' $1').trim()}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Rest of the existing content */}
       {/* Overall Score Header */}
       <Card className="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 border-primary/20 shadow-elegant">
         <CardHeader className="text-center pb-4">
