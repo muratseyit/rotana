@@ -185,12 +185,6 @@ export function LeadCaptureForm({
         <CardDescription className="text-base">
           {description || defaultDescription}
         </CardDescription>
-        {(incentive || defaultIncentive) && (
-          <Badge variant="secondary" className="mx-auto gap-2 py-2 px-4">
-            <Gift className="h-4 w-4" />
-            {incentive || defaultIncentive}
-          </Badge>
-        )}
       </CardHeader>
     </Card>
   );
