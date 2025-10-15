@@ -27,6 +27,8 @@ import {
   ArrowUpRight
 } from "lucide-react";
 
+import { ScoreInfluenceCard } from "./ScoreInfluenceCard";
+
 interface PartnerRecommendation {
   category: string;
   partners: Array<{
@@ -50,6 +52,19 @@ interface ScoreBreakdown {
   investmentReadiness?: number;
 }
 
+interface ScoreInfluence {
+  factor: string;
+  impact: 'positive' | 'negative' | 'neutral';
+  points: number;
+  evidence: string;
+}
+
+interface ScoreEvidence {
+  category: string;
+  score: number;
+  factors: ScoreInfluence[];
+}
+
 interface DetailedInsight {
   category: keyof ScoreBreakdown;
   score: number;
@@ -66,6 +81,7 @@ interface DetailedInsight {
 interface AnalysisResult {
   overallScore: number;
   scoreBreakdown: ScoreBreakdown;
+  scoreEvidence?: ScoreEvidence[];
   roadmap: string[];
   summary: string;
   detailedInsights?: DetailedInsight[];
@@ -247,50 +263,73 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
                 </Badge>
               </div>
               <CardDescription>
-                Comprehensive analysis across all key business dimensions
+                Evidence-based analysis using proprietary scoring algorithms
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {scoreCategories.map((category) => {
-                  const score = analysis.scoreBreakdown[category.key];
-                  if (score === undefined) return null;
-                  
-                  const Icon = category.icon;
-                  
-                  return (
-                    <div key={category.key} className="group space-y-4 p-4 rounded-lg border bg-gradient-to-br from-card to-muted/20 hover:shadow-md transition-all">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                            <Icon className="h-5 w-5 text-primary" />
+              {/* Score Evidence Cards - New Evidence-Based Display */}
+              {analysis.scoreEvidence && analysis.scoreEvidence.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                  {analysis.scoreEvidence.map((evidence) => {
+                    const categoryKey = evidence.category
+                      .toLowerCase()
+                      .replace(/ & /g, '')
+                      .replace(/ /g, '')
+                      .replace('founder/team', 'founderTeam') as keyof ScoreBreakdown;
+                    
+                    return (
+                      <ScoreInfluenceCard
+                        key={evidence.category}
+                        category={evidence.category}
+                        score={evidence.score}
+                        influences={evidence.factors}
+                      />
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Fallback to original grid display if no evidence */
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {scoreCategories.map((category) => {
+                    const score = analysis.scoreBreakdown[category.key];
+                    if (score === undefined) return null;
+                    
+                    const Icon = category.icon;
+                    
+                    return (
+                      <div key={category.key} className="group space-y-4 p-4 rounded-lg border bg-gradient-to-br from-card to-muted/20 hover:shadow-md transition-all">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <Icon className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <span className="font-semibold text-lg">{category.label}</span>
+                              <p className="text-sm text-muted-foreground">{category.description}</p>
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-semibold text-lg">{category.label}</span>
-                            <p className="text-sm text-muted-foreground">{category.description}</p>
+                          <div className="text-right">
+                            <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                              {score}%
+                            </div>
+                            <Badge variant={getScoreBadgeVariant(score)} className="mt-1">
+                              {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Needs Work'}
+                            </Badge>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
-                            {score}%
+                        <div className="space-y-2">
+                          <Progress value={score} className="h-3" />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>0%</span>
+                            <span className="font-medium">Current: {score}%</span>
+                            <span>100%</span>
                           </div>
-                          <Badge variant={getScoreBadgeVariant(score)} className="mt-1">
-                            {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Needs Work'}
-                          </Badge>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <Progress value={score} className="h-3" />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>0%</span>
-                          <span className="font-medium">Current: {score}%</span>
-                          <span>100%</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
               
               {/* Analysis Summary */}
               <div className="mt-8 space-y-4">

@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.4';
+import { calculateComprehensiveScore } from './scoring-engine.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,6 +28,9 @@ serve(async (req) => {
 
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
+    // Calculate evidence-based scores using research-backed algorithms
+    console.log('Calculating comprehensive scores...');
+
     // Verify UK company registration if company number provided
     let companyVerification = null;
     if (businessData.companyNumber || businessData.ukRegistered === 'yes') {
@@ -52,8 +56,18 @@ serve(async (req) => {
       }
     }
 
-    // Create detailed prompt for comprehensive analysis with evidence-based scoring
-    const prompt = `You are a senior UK market entry analyst with expertise in business assessment, regulatory compliance, and market strategy. 
+    // Calculate comprehensive scores using evidence-based algorithms
+    const scoringResult = calculateComprehensiveScore(businessData, companyVerification);
+    console.log('Calculated scores:', {
+      overall: scoringResult.overallScore,
+      confidence: scoringResult.confidenceLevel,
+      dataCompleteness: scoringResult.dataCompleteness
+    });
+
+    // Create detailed prompt for AI to generate insights based on calculated scores
+    const prompt = `You are a senior UK market entry analyst with expertise in business assessment, regulatory compliance, and market strategy.
+
+A comprehensive scoring analysis has been completed for this business. Your task is to provide detailed insights, actionable recommendations, and strategic guidance based on the calculated scores and evidence.
 
 Conduct a rigorous, evidence-based analysis of the following business for UK market entry readiness.
 
@@ -84,77 +98,53 @@ Planned Investments: ${businessData.plannedInvestments?.join(', ') || 'None'}
 Support Needed: ${businessData.requiredSupport?.join(', ') || 'None'}
 Success Metrics: ${businessData.keySuccessMetrics?.join(', ') || 'None'}
 
-SCORING METHODOLOGY:
-For each category, apply these evidence-based criteria:
+CALCULATED SCORES (Evidence-Based Algorithms):
+Overall Score: ${scoringResult.overallScore}/100
+Data Completeness: ${scoringResult.dataCompleteness}%
+Confidence Level: ${scoringResult.confidenceLevel.toUpperCase()}
 
-1. Product-Market Fit (0-100):
-   - Market demand evidence: +20-30 points
-   - Competitive positioning: +15-25 points
-   - Value proposition clarity: +15-20 points
-   - Customer validation: +15-25 points
-   
-2. Regulatory Compatibility (0-100):
-   - UK registration status: +25 points if complete${companyVerification?.verified ? ' (VERIFIED via Companies House)' : ''}
-   - Industry compliance progress: +25 points
-   - IP protection status: +20 points
-   - Legal structure suitability: +15-30 points
-   ${companyVerification?.data ? `
-   VERIFIED COMPANY DATA:
-   - Company Number: ${companyVerification.data.companyNumber}
-   - Status: ${companyVerification.data.companyStatus}
-   - Type: ${companyVerification.data.companyType}
-   - Incorporated: ${companyVerification.data.dateOfCreation}
-   - Age: ${companyVerification.insights?.ageInYears || 'N/A'} years
-   ` : ''}
+Score Breakdown:
+- Product-Market Fit: ${scoringResult.scoreBreakdown.productMarketFit}/100
+- Regulatory Compatibility: ${scoringResult.scoreBreakdown.regulatoryCompatibility}/100
+- Digital Readiness: ${scoringResult.scoreBreakdown.digitalReadiness}/100
+- Logistics Potential: ${scoringResult.scoreBreakdown.logisticsPotential}/100
+- Scalability & Automation: ${scoringResult.scoreBreakdown.scalabilityAutomation}/100
+- Founder & Team Strength: ${scoringResult.scoreBreakdown.founderTeamStrength}/100
+- Investment Readiness: ${scoringResult.scoreBreakdown.investmentReadiness}/100
 
-3. Digital Readiness (0-100):
-   - E-commerce capability: +25 points
-   - Website functionality: +20-25 points
-   - Social media presence: +15-20 points
-   - Digital marketing strategy: +15-30 points
+SCORING EVIDENCE:
+${scoringResult.scoreEvidence.map(evidence => `
+${evidence.category} (${evidence.score}/100):
+${evidence.factors.map(f => `  • ${f.factor} (${f.points > 0 ? '+' : ''}${f.points} points): ${f.evidence}`).join('\n')}
+`).join('\n')}
 
-4. Logistics Potential (0-100):
-   - Supply chain clarity: +25-30 points
-   - Distribution strategy: +20-25 points
-   - Inventory management: +15-25 points
-   - Fulfilment readiness: +15-25 points
+YOUR TASK:
 
-5. Scalability & Automation (0-100):
-   - Process documentation: +20-25 points
-   - Technology infrastructure: +25-30 points
-   - Automation level: +20-25 points
-   - Growth capacity: +15-25 points
+Based on the calculated scores and evidence above, provide:
+1. Strategic insights explaining WHY each score is at its current level
+2. Specific strengths to leverage in each category
+3. Critical weaknesses that need immediate attention
+4. Prioritized action items with timelines and expected impact
+5. UK market-specific recommendations and regulatory guidance
 
-6. Founder & Team Strength (0-100):
-   - Market expertise: +25-30 points
-   - Team completeness: +20-25 points
-   - Advisory support: +15-20 points
-   - Execution track record: +20-30 points
+IMPORTANT:
+- DO NOT recalculate scores - use the provided scores as-is
+- Focus on actionable insights and strategic recommendations
+- Explain the business implications of each score
+- Provide specific next steps tied to improving low scores
+- Reference UK market conditions and requirements
 
-7. Investment Readiness (0-100):
-   - Financial planning: +25-30 points
-   - Funding strategy: +20-25 points
-   - ROI projection quality: +20-25 points
-   - Resource allocation: +15-25 points
-
-CRITICAL REQUIREMENTS:
-- Base scores on ACTUAL data provided, not assumptions
-- Cite specific evidence from the business data for each score
-- Flag missing information that impacts scoring accuracy
-- Provide concrete, actionable next steps tied to score gaps
-- Include UK-specific regulatory and market context
-
-Provide comprehensive analysis in this JSON structure:
+Provide your analysis in this JSON structure (using the pre-calculated scores):
 {
-  "overallScore": <0-100>,
+  "overallScore": ${scoringResult.overallScore},
   "scoreBreakdown": {
-    "productMarketFit": <0-100>,
-    "regulatoryCompatibility": <0-100>,
-    "digitalReadiness": <0-100>,
-    "logisticsPotential": <0-100>,
-    "scalabilityAutomation": <0-100>,
-    "founderTeamStrength": <0-100>,
-    "investmentReadiness": <0-100>
+    "productMarketFit": ${scoringResult.scoreBreakdown.productMarketFit},
+    "regulatoryCompatibility": ${scoringResult.scoreBreakdown.regulatoryCompatibility},
+    "digitalReadiness": ${scoringResult.scoreBreakdown.digitalReadiness},
+    "logisticsPotential": ${scoringResult.scoreBreakdown.logisticsPotential},
+    "scalabilityAutomation": ${scoringResult.scoreBreakdown.scalabilityAutomation},
+    "founderTeamStrength": ${scoringResult.scoreBreakdown.founderTeamStrength},
+    "investmentReadiness": ${scoringResult.scoreBreakdown.investmentReadiness}
   },
   "summary": "<2-3 sentence executive summary>",
   "detailedInsights": [
@@ -260,16 +250,15 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
     console.log('AI Analysis received, parsing...');
     
     // Parse AI response
-    let analysis;
+    let aiAnalysis;
     try {
-      analysis = JSON.parse(analysisText);
+      aiAnalysis = JSON.parse(analysisText);
     } catch (parseError) {
       console.error('Failed to parse AI response:', analysisText);
       throw new Error('Invalid AI response format');
     }
 
-    // Calculate data completeness score for transparency
-    const dataCompleteness = calculateDataCompleteness(businessData);
+    console.log('Merging AI insights with calculated scores...');
 
     // Fetch verified partners from database
     console.log('Fetching verified partners...');
@@ -282,28 +271,42 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
       console.error('Error fetching partners:', partnersError);
     }
 
-    // Advanced partner matching algorithm
+    // Advanced partner matching algorithm using calculated scores
     const partnerRecommendations = generateSmartPartnerMatches(
       partners || [],
       businessData,
-      analysis
+      { ...aiAnalysis, scoreBreakdown: scoringResult.scoreBreakdown }
     );
 
-    // Add transparency metadata
+    // Build comprehensive result with calculated scores + AI insights
     const comprehensiveResult = {
-      ...analysis,
+      ...aiAnalysis,
+      overallScore: scoringResult.overallScore, // Use calculated score
+      scoreBreakdown: scoringResult.scoreBreakdown, // Use calculated breakdown
+      scoreEvidence: scoringResult.scoreEvidence, // Add scoring evidence
       partnerRecommendations,
       metadata: {
-        dataCompleteness,
-        analysisVersion: '2.0',
-        modelUsed: 'gpt-5-2025-08-07',
+        dataCompleteness: {
+          score: scoringResult.dataCompleteness,
+          missingFields: [],
+          completedSections: []
+        },
+        analysisVersion: 'v2.1-evidence-based',
+        modelUsed: 'gpt-5 + proprietary-scoring-engine',
         analysisDate: new Date().toISOString(),
-        confidenceLevel: calculateConfidenceLevel(dataCompleteness, analysis),
-        companyVerification: companyVerification || { verified: false },
+        confidenceLevel: scoringResult.confidenceLevel,
+        scoringMethod: 'evidence-based-algorithms',
+        companyVerification: companyVerification ? {
+          verified: companyVerification.verified,
+          data: companyVerification.data,
+          insights: companyVerification.insights
+        } : { verified: false },
         dataSourcesUsed: [
-          'OpenAI GPT-5',
+          'Evidence-Based Scoring Algorithms',
+          'Business Form Data',
+          companyVerification?.verified ? 'Companies House API (Verified)' : null,
           'Supabase Partner Database',
-          companyVerification?.verified ? 'UK Companies House API' : null
+          'GPT-5 Strategic Analysis'
         ].filter(Boolean)
       }
     };
