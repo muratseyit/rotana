@@ -168,8 +168,8 @@ serve(async (req) => {
     promptParts.push('   - "score": use the calculated score above\n');
     promptParts.push('   - "strengths": array of 2-3 strengths\n');
     promptParts.push('   - "weaknesses": array of 2-3 weaknesses\n');
-    promptParts.push('   - "actionItems": array of 3-5 actions with "action", "priority" (high/medium/low), "timeframe" (immediate/1-3 months/3-6 months)\n');
-    promptParts.push('3. "recommendations": object with "immediate", "shortTerm", "longTerm" arrays (3-5 items each)\n');
+    promptParts.push('   - "actionItems": array of 2-3 actions with "action", "priority" (high/medium/low), "timeframe" (immediate/1-3 months/3-6 months)\n');
+    promptParts.push('3. "recommendations": object with "immediate", "shortTerm", "longTerm" arrays (2-3 items each)\n');
     promptParts.push('4. "risks": array of 3-5 key risks with "risk", "severity" (high/medium/low), "mitigation"\n');
     promptParts.push('5. "opportunities": array of 3-5 opportunities with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
     promptParts.push('Keep insights specific to UK market entry. Focus on actionable recommendations.');
@@ -200,7 +200,7 @@ serve(async (req) => {
             },
             { role: 'user', content: prompt }
           ],
-          max_completion_tokens: 3000,
+          max_completion_tokens: 5000,
           response_format: { type: "json_object" }
         }),
         signal: controller.signal
