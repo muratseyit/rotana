@@ -140,15 +140,15 @@ html {
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
 
-    /* Converta Brand Colors - Silver Grey & Black */
-    --primary: 0 0% 74%;  /* Silver #bdbdbd */
-    --primary-foreground: 0 0% 9%;
+    /* Converta Brand Colors - Dark Metallic Silver & Black */
+    --primary: 0 0% 30%;  /* Dark Metallic Silver */
+    --primary-foreground: 0 0% 100%;
     
-    --brand: 0 0% 74%;  /* Silver #bdbdbd */
-    --brand-foreground: 0 0% 9%;
+    --brand: 0 0% 30%;  /* Dark Metallic Silver */
+    --brand-foreground: 0 0% 100%;
     
-    --accent-silver: 0 0% 65%;  /* Darker silver for contrast */
-    --accent-silver-foreground: 0 0% 9%;
+    --accent-silver: 0 0% 45%;  /* Lighter metallic for accents */
+    --accent-silver-foreground: 0 0% 100%;
     
     --success: 142 76% 36%;  /* Green for success states */
     --success-foreground: 0 0% 100%;
@@ -198,14 +198,14 @@ html {
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 0% 74%;  /* Silver #bdbdbd */
-    --primary-foreground: 0 0% 9%;
+    --primary: 0 0% 30%;  /* Dark Metallic Silver */
+    --primary-foreground: 0 0% 100%;
     
-    --brand: 0 0% 74%;  /* Silver #bdbdbd */
-    --brand-foreground: 0 0% 9%;
+    --brand: 0 0% 30%;  /* Dark Metallic Silver */
+    --brand-foreground: 0 0% 100%;
     
-    --accent-silver: 0 0% 65%;
-    --accent-silver-foreground: 0 0% 9%;
+    --accent-silver: 0 0% 45%;
+    --accent-silver-foreground: 0 0% 100%;
     
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -236,16 +236,16 @@ html {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  /* Gradients for hero sections - Clean, professional silver */
+  /* Gradients - Dark Metallic Silver */
   :root {
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 74%), hsl(0 0% 85%));
-    --gradient-brand: linear-gradient(135deg, hsl(0 0% 9%), hsl(0 0% 74%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 30%), hsl(0 0% 45%));
+    --gradient-brand: linear-gradient(135deg, hsl(0 0% 9%), hsl(0 0% 30%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
   }
 
   .dark {
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 65%), hsl(0 0% 74%));
-    --gradient-brand: linear-gradient(135deg, hsl(0 0% 9%), hsl(0 0% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 30%), hsl(0 0% 45%));
+    --gradient-brand: linear-gradient(135deg, hsl(0 0% 9%), hsl(0 0% 30%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 9%), hsl(0 0% 12%));
   }
 }
