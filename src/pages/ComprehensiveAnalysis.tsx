@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { IntelligentPartnerDashboard } from "@/components/IntelligentPartnerDashboard";
+import { ExportReportDialog } from "@/components/ExportReportDialog";
 import {
   Dialog,
   DialogContent,
@@ -200,13 +201,6 @@ export default function ComprehensiveAnalysis() {
     setContactDialogOpen(true);
   };
 
-  const handleDownloadReport = () => {
-    toast({
-      title: "Report Generated",
-      description: "Your comprehensive report is being prepared for download."
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -388,10 +382,17 @@ export default function ComprehensiveAnalysis() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={handleDownloadReport} variant="outline" className="gap-2">
-                <Download className="h-4 w-4" />
-                Export Report
-              </Button>
+              <ExportReportDialog
+                companyName={businessData.companyName}
+                overallScore={analysisResult.overallScore}
+                analysis={analysisResult}
+                trigger={
+                  <Button variant="outline" className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export Report
+                  </Button>
+                }
+              />
               <Button onClick={() => navigate('/')} variant="ghost" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
