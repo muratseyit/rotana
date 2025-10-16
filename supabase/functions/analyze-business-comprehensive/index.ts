@@ -196,11 +196,11 @@ serve(async (req) => {
           messages: [
             { 
               role: 'system', 
-              content: 'You are a senior UK market entry analyst specializing in evidence-based business assessments. You provide rigorous, data-driven analysis with specific scoring methodologies. Always respond with valid JSON only, citing specific evidence for each score and recommendation.' 
+              content: 'You are a senior UK market entry analyst. Provide concise, actionable JSON analysis with specific evidence for each score.' 
             },
             { role: 'user', content: prompt }
           ],
-          max_completion_tokens: 8000,
+          max_completion_tokens: 3000,
           response_format: { type: "json_object" }
         }),
         signal: controller.signal
