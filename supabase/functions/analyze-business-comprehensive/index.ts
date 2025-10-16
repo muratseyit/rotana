@@ -126,304 +126,55 @@ serve(async (req) => {
     console.log('Industry benchmark data:', industryBenchmark);
     console.log('Regulatory requirements:', regulatoryRequirements.length);
     
-    console.log('Preparing AI prompt with data...');
-    console.log('Prompt will include website analysis:', !!websiteAnalysis);
-    console.log('Prompt will include company verification:', !!companyVerification);
-
-    // Create detailed prompt for AI to generate insights based on calculated scores
-    let prompt;
-    try {
-      console.log('Building prompt string...');
-      prompt = `You are a senior UK market entry analyst with 15+ years of expertise in business assessment, regulatory compliance, and market strategy across multiple industries.
-
-A comprehensive scoring analysis has been completed for this business. Your task is to provide detailed, industry-specific insights, actionable recommendations with concrete timelines and costs, and strategic guidance based on the calculated scores and evidence.
-
-Conduct a rigorous, evidence-based analysis of the following business for UK market entry readiness.
-
-BUSINESS PROFILE:
-Company: ${businessData.companyName}
-Description: ${businessData.businessDescription}
-Industry: ${businessData.industry}
-Company Size: ${businessData.companySize}
-Website: ${businessData.websiteUrl || 'Not provided'}
-Target Market: ${businessData.targetMarket || 'Not specified'}
-Market Entry Timeline: ${businessData.marketEntryTimeline || 'Not specified'}
-
-${websiteAnalysis ? `
-DETAILED WEBSITE ANALYSIS:
-Core Metrics:
-- Page Title: ${websiteAnalysis.title}
-- Meta Description: ${websiteAnalysis.description}
-- Content Length: ${websiteAnalysis.content.length} characters
-- Content Quality: ${websiteAnalysis.content.length > 1500 ? 'Comprehensive and detailed' : websiteAnalysis.content.length > 800 ? 'Moderate depth' : 'Basic content'}
-- Content Preview: ${websiteAnalysis.content.substring(0, 500)}...
-
-Digital Infrastructure:
-- Navigation Menu: ${websiteAnalysis.structure.hasNavigation ? 'Yes - Professional site structure' : 'No - May impact user experience'}
-- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes - Enables lead capture' : 'No - Missing lead generation tool'}
-- Social Media Integration: ${websiteAnalysis.structure.hasSocialLinks ? 'Yes - Connected to social platforms' : 'No - Limited social presence'}
-- Multi-language Support: ${websiteAnalysis.structure.languages.length > 1 ? `Yes (${websiteAnalysis.structure.languages.join(', ')})` : 'English only'}
-
-E-commerce Capabilities:
-- Shopping Cart: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes - E-commerce enabled' : 'No - Not e-commerce ready'}
-- Pricing Displayed: ${websiteAnalysis.ecommerce.hasPricing ? 'Yes - Transparent pricing' : 'No - Pricing not visible'}
-- Payment Integration: ${websiteAnalysis.ecommerce.acceptsPayments ? 'Yes - Checkout flow present' : 'No - No payment processing'}
-
-UK Market Readiness Signals:
-- GBP Pricing: ${websiteAnalysis.ukAlignment.hasPoundsGBP ? 'Yes - UK market targeting detected' : 'No - No GBP pricing found'}
-- UK Address Listed: ${websiteAnalysis.ukAlignment.hasUKAddress ? 'Yes - UK presence confirmed' : 'No - No UK address detected'}
-- UK Phone Number: ${websiteAnalysis.ukAlignment.hasUKPhone ? 'Yes - UK contact available' : 'No - No UK phone number'}
-
-Trust & Compliance:
-- SSL Certificate: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes - Secure HTTPS connection' : 'No - CRITICAL: No SSL security'}
-- Privacy Policy: ${websiteAnalysis.trustSignals.hasPrivacyPolicy ? 'Yes - GDPR compliance indicator' : 'No - Missing privacy policy'}
-- Terms of Service: ${websiteAnalysis.trustSignals.hasTermsOfService ? 'Yes - Legal protection present' : 'No - Missing terms'}
-
-WEBSITE QUALITY ASSESSMENT:
-${websiteAnalysis.content.length > 1500 && websiteAnalysis.structure.hasNavigation && websiteAnalysis.trustSignals.hasSSL ? 
-  'Professional website with comprehensive content and proper infrastructure' :
-  websiteAnalysis.content.length > 800 && websiteAnalysis.trustSignals.hasSSL ?
-  'Functional website but could benefit from more content and features' :
-  'Basic website requiring significant enhancement for UK market credibility'}
-` : 'Website not analyzed (no URL provided or scraping failed)'}
-
-DIGITAL INFRASTRUCTURE:
-Online Sales Platform: ${businessData.onlineSalesPlatform || 'No'}
-Social Media: ${businessData.socialMediaPlatforms?.join(', ') || 'None'}
-Website Features: ${businessData.websiteFeatures?.join(', ') || 'None'}
-Digital Marketing Budget: ${businessData.digitalMarketingBudget || 'Not specified'}
-
-COMPLIANCE STATUS:
-UK Registered: ${businessData.ukRegistered || 'No'}
-Business Type: ${businessData.businessType || 'Not specified'}
-Completed Compliance: ${businessData.complianceCompleted?.join(', ') || 'None'}
-IP Protection: ${businessData.ipProtection?.join(', ') || 'None'}
-
-STRATEGIC OBJECTIVES:
-Primary Goal: ${businessData.primaryObjective || 'Not specified'}
-Planned Investments: ${businessData.plannedInvestments?.join(', ') || 'None'}
-Support Needed: ${businessData.requiredSupport?.join(', ') || 'None'}
-Success Metrics: ${businessData.keySuccessMetrics?.join(', ') || 'None'}
-
-CALCULATED SCORES (Evidence-Based Algorithms):
-Overall Score: ${scoringResult.overallScore}/100
-Data Completeness: ${scoringResult.dataCompleteness}%
-Confidence Level: ${scoringResult.confidenceLevel.toUpperCase()}
-
-Score Breakdown:
-- Product-Market Fit: ${scoringResult.scoreBreakdown.productMarketFit}/100
-- Regulatory Compatibility: ${scoringResult.scoreBreakdown.regulatoryCompatibility}/100
-- Digital Readiness: ${scoringResult.scoreBreakdown.digitalReadiness}/100
-- Logistics Potential: ${scoringResult.scoreBreakdown.logisticsPotential}/100
-- Scalability & Automation: ${scoringResult.scoreBreakdown.scalabilityAutomation}/100
-- Founder & Team Strength: ${scoringResult.scoreBreakdown.founderTeamStrength}/100
-- Investment Readiness: ${scoringResult.scoreBreakdown.investmentReadiness}/100
-
-SCORING EVIDENCE:
-${scoringResult.scoreEvidence.map(evidence => `
-${evidence.category} (${evidence.score}/100):
-${evidence.factors.map(f => `  • ${f.factor} (${f.points > 0 ? '+' : ''}${f.points} points): ${f.evidence}`).join('\n')}
-`).join('\n')}
-
-UK MARKET-SPECIFIC REQUIREMENTS TO EVALUATE:
-
-REGULATORY COMPLIANCE:
-- Companies House registration and annual filing requirements
-- HMRC tax registration (Corporation Tax, VAT if turnover >£90k, PAYE if employing)
-- Industry-specific licenses (FSA for food, FCA for financial services, CQC for healthcare, etc.)
-- GDPR compliance and ICO registration (if processing personal data)
-- Product safety and CE/UKCA marking requirements
-- Trading Standards compliance
-- Anti-money laundering (AML) requirements for relevant sectors
-
-INDUSTRY-SPECIFIC CRITERIA FOR ${businessData.industry}:
-- Analyze this industry's competitive landscape in the UK
-- Identify UK-specific regulations, certifications, or standards required
-- Assess market saturation and growth trends in the UK for this sector
-- Evaluate typical customer acquisition costs and sales cycles in UK market
-- Consider seasonal variations and UK consumer behavior patterns
-- Identify key UK competitors and market positioning opportunities
-
-MARKET ENTRY BARRIERS:
-- Legal entity setup costs and timeline (£12-£500 + professional fees)
-- UK business bank account requirements and processing times (2-6 weeks)
-- Physical presence requirements (registered office address, trade premises)
-- Professional indemnity insurance requirements for the sector
-- Employee rights and employment law compliance (if hiring UK staff)
-- Import duties, customs procedures, and Brexit implications (if importing goods)
-
-YOUR TASK:
-
-Based on the calculated scores and evidence above, provide:
-
-1. STRATEGIC INSIGHTS (for each category):
-   - WHY the score is at its current level based on UK market context
-   - Specific UK market benchmarks and how this business compares
-   - Industry-specific considerations and competitive positioning in UK
-
-2. STRENGTHS TO LEVERAGE:
-   - Concrete competitive advantages for UK market entry
-   - How to maximize these strengths in UK context
-   - Potential UK partnerships or channels to leverage
-
-3. CRITICAL WEAKNESSES:
-   - Specific gaps that will prevent or delay UK market success
-   - UK regulatory non-compliance risks with potential penalties
-   - Competitive disadvantages versus established UK players
-
-4. PRIORITIZED ACTION ITEMS (for each category):
-   - SPECIFIC action with detailed steps (not generic advice)
-   - ESTIMATED cost range in GBP (e.g., "£2,000-£5,000")
-   - TIMELINE with milestones (e.g., "Week 1-2: X, Week 3-4: Y")
-   - RESOURCES needed (people, tools, partners)
-   - EXPECTED IMPACT on score and business outcomes
-   - PRIORITY level based on urgency and UK legal requirements
-
-5. UK MARKET-SPECIFIC RECOMMENDATIONS:
-   - Immediate actions required for UK legal compliance
-   - Industry-specific UK certifications or memberships to pursue
-   - Recommended UK service providers (accountants, solicitors, etc.)
-   - UK government grants, schemes, or support programs available
-   - Networking opportunities and industry associations in UK
-   - Geographic considerations (London vs. regions for this industry)
-
-INDUSTRY BENCHMARKS (UK Market Data):
-Average Industry Growth Rate: ${industryBenchmark.averageGrowthRate}% per year
-UK Market Size: £${industryBenchmark.marketSize} billion
-Competition Level: ${industryBenchmark.competitionLevel.toUpperCase()}
-Entry Barriers: ${industryBenchmark.entryBarriers.toUpperCase()}
-Digital Adoption Rate: ${industryBenchmark.digitalAdoptionRate}%
-Average Profit Margins: ${industryBenchmark.averageMargins}%
-Typical Customer Acquisition Cost: ${industryBenchmark.typicalCustomerAcquisitionCost}
-Average Time to Market: ${industryBenchmark.averageTimeToMarket}
-Regulatory Complexity: ${industryBenchmark.regulatoryComplexity.toUpperCase()}
-Seasonality Impact: ${industryBenchmark.seasonality.toUpperCase()}
-Key Success Factors: ${industryBenchmark.keySuccessFactors.join(', ')}
-
-REGULATORY REQUIREMENTS (Real-time UK Compliance):
-${regulatoryRequirements.map(req => `
-- ${req.name} (${req.authority})
-  Required: ${req.required ? 'YES' : 'NO'} | Urgency: ${req.urgency.toUpperCase()}
-  Cost: ${req.estimatedCost} | Timeline: ${req.timeToComplete}
-  Description: ${req.description}
-  More info: ${req.link}
-`).join('\n')}
-
-COMPANY VERIFICATION DATA:
-${companyVerification?.verified ? `
-Verified UK Company: YES
-Company Number: ${companyVerification.data?.companyNumber || 'N/A'}
-Company Status: ${companyVerification.data?.companyStatus || 'N/A'}
-Company Age: ${companyVerification.insights?.ageInYears || 'N/A'} years
-Filing Compliance: ${companyVerification.insights?.filingCompliance ? 'UP TO DATE' : 'OVERDUE'}
-Accounts Overdue: ${companyVerification.insights?.accountsOverdue ? 'YES' : 'NO'}
-Number of Officers: ${companyVerification.insights?.numberOfOfficers || 0}
-Has Charges: ${companyVerification.insights?.hasCharges ? 'YES' : 'NO'}
-Insolvency History: ${companyVerification.insights?.hasInsolvencyHistory ? 'YES' : 'NO'}
-Industry Classification (SIC): ${companyVerification.insights?.industryClassification?.map((sic: any) => sic.description).join(', ') || 'N/A'}
-` : 'Company not verified with Companies House - UK registration required'}
-
-CRITICAL REQUIREMENTS:
-- DO NOT recalculate scores - use the provided scores as-is
-- Every action item MUST include: specific steps, cost estimate, timeline, resources, and expected impact
-- Reference SPECIFIC UK regulations, not generic compliance advice
-- Provide INDUSTRY-SPECIFIC insights based on the benchmark data above
-- Compare business performance against industry benchmarks
-- Include concrete examples and case studies where relevant
-- Prioritize based on LEGAL REQUIREMENTS first, then strategic importance
-- Consider the stated market entry timeline and budget constraints
-- Use the real regulatory requirements data to provide accurate compliance guidance
-- Reference Companies House verification data in your assessment
-
-Provide your analysis in this JSON structure (using the pre-calculated scores):
-{
-  "overallScore": ${scoringResult.overallScore},
-  "scoreBreakdown": {
-    "productMarketFit": ${scoringResult.scoreBreakdown.productMarketFit},
-    "regulatoryCompatibility": ${scoringResult.scoreBreakdown.regulatoryCompatibility},
-    "digitalReadiness": ${scoringResult.scoreBreakdown.digitalReadiness},
-    "logisticsPotential": ${scoringResult.scoreBreakdown.logisticsPotential},
-    "scalabilityAutomation": ${scoringResult.scoreBreakdown.scalabilityAutomation},
-    "founderTeamStrength": ${scoringResult.scoreBreakdown.founderTeamStrength},
-    "investmentReadiness": ${scoringResult.scoreBreakdown.investmentReadiness}
-  },
-  "summary": "<2-3 sentence executive summary>",
-  "detailedInsights": [
-    {
-      "category": "Product-Market Fit",
-      "score": <0-100>,
-      "strengths": ["strength 1", "strength 2", "strength 3"],
-      "weaknesses": ["weakness 1", "weakness 2"],
-      "actionItems": [
-        {
-          "action": "specific action to take",
-          "priority": "high|medium|low",
-          "timeframe": "immediate|1-3 months|3-6 months"
-        }
-      ]
-    },
-    {
-      "category": "Regulatory Compatibility",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
-    },
-    {
-      "category": "Digital Readiness",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
-    },
-    {
-      "category": "Logistics Potential",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
-    },
-    {
-      "category": "Scalability & Automation",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
-    },
-    {
-      "category": "Founder & Team Strength",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
-    },
-    {
-      "category": "Investment Readiness",
-      "score": <0-100>,
-      "strengths": [...],
-      "weaknesses": [...],
-      "actionItems": [...]
+    // Build AI prompt in smaller chunks to avoid memory issues
+    console.log('Building AI analysis prompt...');
+    
+    const promptParts: string[] = [];
+    promptParts.push('You are a senior UK market entry analyst. Provide actionable insights based on calculated scores.\n\n');
+    promptParts.push(`BUSINESS: ${businessData.companyName}\n`);
+    promptParts.push(`Industry: ${businessData.industry}\n`);
+    promptParts.push(`Description: ${businessData.description || businessData.businessDescription || 'Not provided'}\n\n`);
+    
+    promptParts.push('CALCULATED SCORES:\n');
+    promptParts.push(`Overall: ${scoringResult.overallScore}/100\n`);
+    promptParts.push(`Product-Market Fit: ${scoringResult.scoreBreakdown.productMarketFit}/100\n`);
+    promptParts.push(`Regulatory: ${scoringResult.scoreBreakdown.regulatoryCompatibility}/100\n`);
+    promptParts.push(`Digital Readiness: ${scoringResult.scoreBreakdown.digitalReadiness}/100\n`);
+    promptParts.push(`Logistics: ${scoringResult.scoreBreakdown.logisticsPotential}/100\n`);
+    promptParts.push(`Scalability: ${scoringResult.scoreBreakdown.scalabilityAutomation}/100\n`);
+    promptParts.push(`Team: ${scoringResult.scoreBreakdown.founderTeamStrength}/100\n`);
+    promptParts.push(`Investment: ${scoringResult.scoreBreakdown.investmentReadiness}/100\n\n`);
+    
+    if (websiteAnalysis) {
+      promptParts.push('WEBSITE ANALYSIS:\n');
+      promptParts.push(`- SSL: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- E-commerce: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- UK signals: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress ? 'Yes' : 'No'}\n\n`);
     }
-  ],
-  "recommendations": {
-    "immediate": ["action 1", "action 2", "action 3"],
-    "shortTerm": ["action 1", "action 2", "action 3"],
-    "longTerm": ["action 1", "action 2", "action 3"]
-  },
-  "complianceAssessment": {
-    "criticalRequirements": ["requirement 1", "requirement 2"],
-    "riskAreas": ["risk 1", "risk 2"],
-    "complianceScore": <0-100>
-  }
-}
-
-Provide detailed, actionable insights based on the UK market context. Be specific and practical.`;
-      
-      console.log('Prompt built successfully, length:', prompt.length);
-    } catch (promptError) {
-      console.error('Error building prompt:', promptError);
-      throw new Error(`Failed to build analysis prompt: ${promptError.message}`);
+    
+    if (companyVerification?.verified) {
+      promptParts.push('UK COMPANY VERIFIED\n\n');
     }
+    
+    promptParts.push(`INDUSTRY BENCHMARKS (${businessData.industry}):\n`);
+    promptParts.push(`- Market size: £${industryBenchmark.marketSize}B\n`);
+    promptParts.push(`- Growth rate: ${industryBenchmark.averageGrowthRate}%\n`);
+    promptParts.push(`- Competition: ${industryBenchmark.competitionLevel}\n\n`);
+    
+    promptParts.push('TASK: Provide JSON with:\n');
+    promptParts.push('1. "summary": 2-3 sentence executive summary\n');
+    promptParts.push('2. "detailedInsights": array of 7 categories (Product-Market Fit, Regulatory Compatibility, Digital Readiness, Logistics Potential, Scalability, Team, Investment), each with:\n');
+    promptParts.push('   - "category": name\n');
+    promptParts.push('   - "score": use the calculated score above\n');
+    promptParts.push('   - "strengths": array of 2-3 strengths\n');
+    promptParts.push('   - "weaknesses": array of 2-3 weaknesses\n');
+    promptParts.push('   - "actionItems": array of 3-5 actions with "action", "priority" (high/medium/low), "timeframe" (immediate/1-3 months/3-6 months)\n');
+    promptParts.push('3. "risks": array of 3-5 key risks with "risk", "severity" (high/medium/low), "mitigation"\n');
+    promptParts.push('4. "opportunities": array of 3-5 opportunities with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
+    promptParts.push('Keep insights specific to UK market entry. Focus on actionable recommendations.');
+    
+    const prompt = promptParts.join('');
+    console.log('Prompt built successfully, length:', prompt.length);
 
     // Call OpenAI API with timeout
     console.log('Initiating OpenAI API call...');
