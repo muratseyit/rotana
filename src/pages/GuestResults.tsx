@@ -2,17 +2,28 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { PricingSection } from "@/components/PricingSection";
 import { SaveReportDialog } from "@/components/SaveReportDialog";
-import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle } from "lucide-react";
+import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle, TrendingUp, Zap, Lock, ArrowRight } from "lucide-react";
 
 interface GuestAnalysisResult {
   overallScore: number;
+  categoryScores?: {
+    marketFit: number;
+    businessModel: number;
+    digitalReadiness: number;
+  };
+  industryComparison?: {
+    averageUKScore: number;
+    yourPosition: string;
+    scoreGap: number;
+  };
   summary: string;
   keyFindings: string[];
   recommendations: string[];
@@ -74,12 +85,14 @@ export default function GuestResults() {
 
       setAnalysisResult({
         overallScore: data.overallScore || 0,
-        summary: data.riskAssessment || "Analysis completed",
+        categoryScores: data.categoryScores,
+        industryComparison: data.industryComparison,
+        summary: data.summary || data.riskAssessment || "Analysis completed",
         keyFindings: data.strengths || [],
         recommendations: data.priorityActions || [],
         riskFactors: data.challenges || [],
         limitedAnalysis: true,
-        upgradePrompt: "Get detailed financial analysis and partner matching",
+        upgradePrompt: "Unlock 7 detailed categories, compliance checklist, and 3 verified partner matches",
         customerData: {
           companyName: analysisData.companyName,
           email: analysisData.email,
@@ -170,34 +183,83 @@ export default function GuestResults() {
           </CardContent>
         </Card>
 
-        {/* Analysis Score with Upgrade Notice */}
-        <Card className={analysisResult.limitedAnalysis ? "border-orange-200 bg-orange-50/30" : ""}>
+        {/* Analysis Score */}
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span>{t('results.score')}</span>
-                {analysisResult.limitedAnalysis && (
-                  <Badge variant="outline" className="text-xs border-orange-400 text-orange-700">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    {t('results.limited')}
-                  </Badge>
-                )}
-              </div>
-              <Badge variant="secondary" className="text-2xl px-4 py-2">
-                {analysisResult.overallScore}%
-              </Badge>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Your UK Market Readiness Score
             </CardTitle>
+            <CardDescription>Quick analysis snapshot</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-3">{analysisResult.summary}</p>
-            {analysisResult.limitedAnalysis && (
-              <div className="p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
-                <p className="text-sm text-primary font-medium mb-1">🚀 {t('results.upgrade')}</p>
-                <p className="text-xs text-muted-foreground">{analysisResult.upgradePrompt}</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-bold text-primary">
+                  {analysisResult.overallScore}%
+                </span>
+                <Badge variant="outline" className="text-xs border-orange-400 text-orange-700">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Limited Analysis
+                </Badge>
               </div>
-            )}
+              <Progress value={analysisResult.overallScore} className="h-3" />
+              <p className="text-sm text-muted-foreground">{analysisResult.summary}</p>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Industry Comparison */}
+        {analysisResult.industryComparison && (
+          <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-orange-600" />
+                How You Compare to {analysisResult.customerData.industry} Peers
+              </CardTitle>
+              <CardDescription>UK market entry readiness benchmark</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm font-medium">Your Score</span>
+                    <span className="text-2xl font-bold text-orange-600">{analysisResult.overallScore}%</span>
+                  </div>
+                  <Progress value={analysisResult.overallScore} className="h-3" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm font-medium">Industry Average (UK)</span>
+                    <span className="text-2xl font-bold text-blue-600">{analysisResult.industryComparison.averageUKScore}%</span>
+                  </div>
+                  <Progress value={analysisResult.industryComparison.averageUKScore} className="h-3" />
+                </div>
+                <div className={`p-4 rounded-lg ${analysisResult.industryComparison.scoreGap < 0 ? 'bg-orange-100 border border-orange-200' : 'bg-green-100 border border-green-200'}`}>
+                  <div className="flex items-start gap-2">
+                    {analysisResult.industryComparison.scoreGap < 0 ? (
+                      <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                    ) : (
+                      <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    )}
+                    <div>
+                      <p className="font-semibold text-sm mb-1">
+                        {analysisResult.industryComparison.yourPosition}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {analysisResult.industryComparison.scoreGap < 0 ? (
+                          <>You're <strong>{Math.abs(analysisResult.industryComparison.scoreGap)} points below</strong> the average for {analysisResult.customerData.industry} businesses entering the UK market.</>
+                        ) : (
+                          <>You're <strong>{analysisResult.industryComparison.scoreGap} points above</strong> the average for {analysisResult.customerData.industry} businesses entering the UK market.</>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Key Findings */}
@@ -257,123 +319,185 @@ export default function GuestResults() {
           </Card>
         </div>
 
-        {/* Comprehensive Analysis Upgrade */}
-        {analysisResult.limitedAnalysis && (
-          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="h-5 w-5 text-primary" />
-                Complete Business Analysis
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Unlock your full 7-category market readiness assessment with detailed scoring, compliance checklist, and step-by-step roadmap.
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <span>Detailed financial metrics analysis</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <span>7-category scoring breakdown</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <span>AI-generated compliance checklist</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <span>Matched partner recommendations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <span>Professional downloadable report</span>
-                </li>
-              </ul>
+        {/* Missing Analysis Teasers */}
+        <Card className="relative overflow-hidden border-2 border-primary/20">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background/95 backdrop-blur-[2px] z-10 flex items-center justify-center">
+            <div className="text-center p-6">
+              <Lock className="h-12 w-12 text-primary mx-auto mb-3" />
+              <p className="font-semibold text-lg mb-2">Unlock with Comprehensive Analysis</p>
               <Button 
                 onClick={() => navigate('/comprehensive-analysis-form')}
-                className="w-full"
                 size="lg"
+                className="mt-2"
               >
-                <Crown className="h-4 w-4 mr-2" />
-                Get Comprehensive Analysis
+                Get Full Analysis
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Call to Action */}
-        <Card className="bg-gradient-to-r from-blue-600 to-green-600 text-white">
+            </div>
+          </div>
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              {analysisResult.limitedAnalysis ? (
-                <>
-                  <Crown className="h-5 w-5" />
-                  {t('results.unlockFull')}
-                </>
-              ) : (
-                t('results.nextStep')
-              )}
+            <CardTitle className="flex items-center gap-2 blur-sm">
+              <Users className="h-5 w-5" />
+              Your Top 3 Partner Matches
             </CardTitle>
+            <CardDescription className="blur-sm">
+              Verified UK service providers tailored to your needs
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-blue-100 mb-4">
-              {analysisResult.limitedAnalysis 
-                ? "Get the complete analysis with AI-matched partners, detailed compliance assessment, and professional reports."
-                : t('results.createAccount')
-              }
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={() => navigate('/comprehensive-analysis-form')}
-                className="bg-white text-blue-600 hover:bg-slate-100"
-              >
-                {analysisResult.limitedAnalysis ? (
-                  <>
-                    <Crown className="h-4 w-4 mr-2" />
-                    Get Comprehensive Analysis
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Get Full Analysis & Partners
-                  </>
-                )}
-              </Button>
-              <Button 
-                onClick={handleDownloadReport}
-                variant="outline"
-                className="border-white text-white hover:bg-white/10"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {analysisResult.limitedAnalysis ? t('results.downloadSummary') : t('results.downloadReport')}
-              </Button>
+          <CardContent className="blur-sm">
+            <div className="space-y-4">
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Legal & Compliance Partner</p>
+                    <p className="text-sm text-muted-foreground">Specializes in {analysisResult.customerData.industry}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Financial Services Partner</p>
+                    <p className="text-sm text-muted-foreground">Banking and payment setup</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Marketing & Growth Partner</p>
+                    <p className="text-sm text-muted-foreground">UK market entry strategy</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* AI-Powered Partner Recommendations */}
-        <Card className="border-2 border-blue-200 bg-blue-50/30">
+        <Card className="relative overflow-hidden border-2 border-primary/20">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background/95 backdrop-blur-[2px] z-10 flex items-center justify-center">
+            <div className="text-center p-6">
+              <Lock className="h-12 w-12 text-primary mx-auto mb-3" />
+              <p className="font-semibold text-lg mb-2">Unlock with Comprehensive Analysis</p>
+              <Button 
+                onClick={() => navigate('/comprehensive-analysis-form')}
+                size="lg"
+                className="mt-2"
+              >
+                Get Full Analysis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-600" />
-              AI-Matched Partner Recommendations
+            <CardTitle className="flex items-center gap-2 blur-sm">
+              <FileText className="h-5 w-5" />
+              Your 12-Month Compliance Roadmap
             </CardTitle>
+            <CardDescription className="blur-sm">
+              Complete timeline with deadlines and costs
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="blur-sm">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-success mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Companies House Registration</p>
+                  <p className="text-xs text-muted-foreground">Week 1-2 • £12-50</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-success mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">VAT Registration</p>
+                  <p className="text-xs text-muted-foreground">Week 3-4 • Free</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-success mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Industry-Specific Certifications</p>
+                  <p className="text-xs text-muted-foreground">Month 2-3 • £500-2000</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-success mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">GDPR Compliance Setup</p>
+                  <p className="text-xs text-muted-foreground">Month 1-2 • £300-1000</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Enhanced Upgrade CTA */}
+        <Card className="border-2 border-primary bg-gradient-to-br from-primary/10 to-accent/10">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                Complete Your Analysis Now
+              </CardTitle>
+              <Badge variant="destructive" className="animate-pulse">
+                87% Upgrade
+              </Badge>
+            </div>
+            <CardDescription>
+              Join successful businesses who upgraded to comprehensive analysis
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Get personalized partner matches based on your business analysis and identified improvement areas. Available in the comprehensive analysis.
-            </p>
+            <div className="p-4 bg-background rounded-lg border-2 border-primary/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-lg">100+ businesses succeeded</p>
+                  <p className="text-sm text-muted-foreground">95% satisfaction rate</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span><strong>3 verified partner matches</strong> tailored to {analysisResult.customerData.industry}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span><strong>Compliance roadmap</strong> with exact deadlines and costs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span><strong>7-category breakdown</strong> showing exactly where to improve</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span><strong>Expert review option</strong> for professional validation</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span><strong>Companies House verification</strong> for UK credibility</span>
+                </li>
+              </ul>
+            </div>
+            
             <Button 
               onClick={() => navigate('/comprehensive-analysis-form')}
-              variant="outline"
               className="w-full"
+              size="lg"
             >
-              <Users className="h-4 w-4 mr-2" />
-              View Partner Matching
+              <Zap className="h-4 w-4 mr-2" />
+              Get Full Analysis Now
             </Button>
+            
+            <p className="text-xs text-center text-muted-foreground">
+              💳 No payment required to start • 📊 Analysis ready in 5 minutes • ✅ Money-back guarantee
+            </p>
           </CardContent>
         </Card>
 

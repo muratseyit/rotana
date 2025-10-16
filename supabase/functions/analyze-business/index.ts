@@ -4,6 +4,63 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { scrapeWebsite } from '../_shared/website-scraper.ts';
 
+// Industry benchmarks for UK market comparison
+interface IndustryBenchmark {
+  industry: string;
+  averageGrowthRate: number;
+  marketSize: string;
+  competitionLevel: 'low' | 'medium' | 'high';
+  digitalAdoptionRate: number;
+  averageMargins: number;
+}
+
+const UK_INDUSTRY_BENCHMARKS: Record<string, IndustryBenchmark> = {
+  'Technology & Software': {
+    industry: 'Technology & Software',
+    averageGrowthRate: 12.5,
+    marketSize: '£200B',
+    competitionLevel: 'high',
+    digitalAdoptionRate: 95,
+    averageMargins: 25
+  },
+  'Retail & E-commerce': {
+    industry: 'Retail & E-commerce',
+    averageGrowthRate: 8.3,
+    marketSize: '£450B',
+    competitionLevel: 'high',
+    digitalAdoptionRate: 85,
+    averageMargins: 15
+  },
+  'Manufacturing': {
+    industry: 'Manufacturing',
+    averageGrowthRate: 5.2,
+    marketSize: '£180B',
+    competitionLevel: 'medium',
+    digitalAdoptionRate: 65,
+    averageMargins: 18
+  },
+  'Professional Services': {
+    industry: 'Professional Services',
+    averageGrowthRate: 7.8,
+    marketSize: '£220B',
+    competitionLevel: 'medium',
+    digitalAdoptionRate: 80,
+    averageMargins: 22
+  },
+  'default': {
+    industry: 'General',
+    averageGrowthRate: 7.5,
+    marketSize: '£100B',
+    competitionLevel: 'medium',
+    digitalAdoptionRate: 70,
+    averageMargins: 20
+  }
+};
+
+function getIndustryBenchmark(industry: string): IndustryBenchmark {
+  return UK_INDUSTRY_BENCHMARKS[industry] || UK_INDUSTRY_BENCHMARKS['default'];
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -91,6 +148,10 @@ serve(async (req) => {
       }
     }
 
+    // Get industry benchmark data for comparison
+    const industryBenchmark = getIndustryBenchmark(industry);
+    console.log(`Industry benchmark loaded for: ${industry}`);
+
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -104,15 +165,24 @@ serve(async (req) => {
 
     console.log('Starting AI analysis...');
 
-    // Create comprehensive analysis prompt
-    const analysisPrompt = `You are a UK market entry expert. Analyze this business for UK market readiness:
+    // Create comprehensive analysis prompt with industry benchmarks
+    const analysisPrompt = `You are a UK market entry expert analyzing a Turkish SME's readiness for UK market expansion.
 
+BUSINESS INFORMATION:
 Company: ${companyName}
 Industry: ${industry}
 Company Size: ${companySize}
 Description: ${businessDescription}
-${websiteUrl ? `Website: ${websiteUrl}` : ''}
 
+UK MARKET CONTEXT FOR ${industry}:
+- Market Size: ${industryBenchmark.marketSize}
+- Average Growth Rate: ${industryBenchmark.averageGrowthRate}% per year
+- Competition Level: ${industryBenchmark.competitionLevel.toUpperCase()}
+- Digital Adoption Rate: ${industryBenchmark.digitalAdoptionRate}%
+- Average Profit Margins: ${industryBenchmark.averageMargins}%
+- **UK Industry Average Score: 72/100** (use this as benchmark for comparison)
+
+${websiteUrl ? `Website: ${websiteUrl}` : ''}
 ${websiteAnalysis ? `
 Website Analysis:
 - Title: ${websiteAnalysis.title}
@@ -130,40 +200,26 @@ Website Analysis:
 - Content Preview: ${websiteAnalysis.content.substring(0, 300)}...
 ` : 'Website not analyzed (no URL provided or scraping failed)'}
 
-Financial Metrics: ${JSON.stringify(financialMetrics || {})}
-Compliance Status: ${JSON.stringify(complianceStatus || {})}
+IMPORTANT: Compare this business against the ${industry} UK market average score of 72/100. Provide context on whether they're above or below average.
 
-Provide a comprehensive analysis with the following structure:
-1. Overall UK Market Readiness Score (0-100)
-2. Score Breakdown by Category:
-   - Market Fit
-   - Financial Readiness
-   - Compliance Readiness
-   - Operational Capability
-   - Growth Potential
-3. Key Strengths (3-5 bullet points)
-4. Key Challenges (3-5 bullet points)
-5. Priority Actions (5-7 specific, actionable recommendations)
-6. Market Entry Timeline Estimate
-7. Investment Requirements
-8. Risk Assessment
-
-Format the response as a JSON object with these exact keys:
+Provide a JSON response with this EXACT structure:
 {
-  "overallScore": number,
-  "scoreBreakdown": {
-    "marketFit": number,
-    "financialReadiness": number,
-    "complianceReadiness": number,
-    "operationalCapability": number,
-    "growthPotential": number
+  "overallScore": <number 0-100>,
+  "categoryScores": {
+    "marketFit": <number 0-100>,
+    "businessModel": <number 0-100>,
+    "digitalReadiness": <number 0-100>
   },
-  "strengths": string[],
-  "challenges": string[],
-  "priorityActions": string[],
-  "timeline": string,
-  "investmentRequirements": string,
-  "riskAssessment": string
+  "industryComparison": {
+    "averageUKScore": 72,
+    "yourPosition": "<Above Average|Average|Below Average>",
+    "scoreGap": <number - positive if above average, negative if below>
+  },
+  "summary": "<2-3 sentence assessment with industry benchmark comparison>",
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "challenges": ["<challenge 1 with ${industry} context>", "<challenge 2>", "<challenge 3>"],
+  "priorityActions": ["<action 1 based on ${industry} benchmarks>", "<action 2>", "<action 3>"],
+  "riskAssessment": "<brief risk summary with ${industry} market context>"
 }`;
 
     // Call OpenAI API
