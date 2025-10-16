@@ -21,8 +21,10 @@ serve(async (req) => {
     
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
+      console.error('OPENAI_API_KEY not found in environment');
       throw new Error('OpenAI API key not configured');
     }
+    console.log('OpenAI API key loaded successfully');
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -123,9 +125,16 @@ serve(async (req) => {
     
     console.log('Industry benchmark data:', industryBenchmark);
     console.log('Regulatory requirements:', regulatoryRequirements.length);
+    
+    console.log('Preparing AI prompt with data...');
+    console.log('Prompt will include website analysis:', !!websiteAnalysis);
+    console.log('Prompt will include company verification:', !!companyVerification);
 
     // Create detailed prompt for AI to generate insights based on calculated scores
-    const prompt = `You are a senior UK market entry analyst with 15+ years of expertise in business assessment, regulatory compliance, and market strategy across multiple industries.
+    let prompt;
+    try {
+      console.log('Building prompt string...');
+      prompt = `You are a senior UK market entry analyst with 15+ years of expertise in business assessment, regulatory compliance, and market strategy across multiple industries.
 
 A comprehensive scoring analysis has been completed for this business. Your task is to provide detailed, industry-specific insights, actionable recommendations with concrete timelines and costs, and strategic guidance based on the calculated scores and evidence.
 
@@ -409,34 +418,86 @@ Provide your analysis in this JSON structure (using the pre-calculated scores):
 }
 
 Provide detailed, actionable insights based on the UK market context. Be specific and practical.`;
+      
+      console.log('Prompt built successfully, length:', prompt.length);
+    } catch (promptError) {
+      console.error('Error building prompt:', promptError);
+      throw new Error(`Failed to build analysis prompt: ${promptError.message}`);
+    }
 
-    // Call OpenAI API
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are a senior UK market entry analyst specializing in evidence-based business assessments. You provide rigorous, data-driven analysis with specific scoring methodologies. Always respond with valid JSON only, citing specific evidence for each score and recommendation.' 
-          },
-          { role: 'user', content: prompt }
-        ],
-        max_completion_tokens: 10000,
-        response_format: { type: "json_object" }
-      }),
-    });
-
-    console.log('OpenAI API call initiated with GPT-5-mini...');
+    // Call OpenAI API with timeout
+    console.log('Initiating OpenAI API call...');
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    
+    let openAIResponse;
+    try {
+      openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-5-mini-2025-08-07',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'You are a senior UK market entry analyst specializing in evidence-based business assessments. You provide rigorous, data-driven analysis with specific scoring methodologies. Always respond with valid JSON only, citing specific evidence for each score and recommendation.' 
+            },
+            { role: 'user', content: prompt }
+          ],
+          max_completion_tokens: 8000,
+          response_format: { type: "json_object" }
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      console.log('OpenAI API responded with status:', openAIResponse.status);
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error('OpenAI API fetch error:', fetchError);
+      throw new Error(`Failed to connect to OpenAI API: ${fetchError.message}`);
+    }
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
       console.error('OpenAI API error:', openAIResponse.status, errorText);
-      throw new Error(`OpenAI API error: ${openAIResponse.status} - ${errorText}`);
+      
+      // Return calculated scores even if AI analysis fails
+      return new Response(
+        JSON.stringify({
+          overallScore: scoringResult.overallScore,
+          scoreBreakdown: scoringResult.scoreBreakdown,
+          scoreEvidence: scoringResult.scoreEvidence,
+          summary: `Analysis completed with an overall score of ${scoringResult.overallScore}/100. AI insights temporarily unavailable.`,
+          partnerRecommendations: generateEnhancedPartnerRecommendations(
+            partnersResult || [],
+            businessData,
+            { scoreBreakdown: scoringResult.scoreBreakdown }
+          ),
+          metadata: {
+            dataCompleteness: {
+              score: scoringResult.dataCompleteness,
+              missingFields: [],
+              completedSections: []
+            },
+            analysisVersion: 'v2.1-evidence-based',
+            modelUsed: 'proprietary-scoring-engine',
+            analysisDate: new Date().toISOString(),
+            confidenceLevel: scoringResult.confidenceLevel,
+            scoringMethod: 'evidence-based-algorithms',
+            aiAnalysisError: `OpenAI API error: ${openAIResponse.status}`,
+            industryBenchmark,
+            regulatoryRequirements
+          }
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
     }
 
     const openAIData = await openAIResponse.json();
