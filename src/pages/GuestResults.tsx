@@ -11,6 +11,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { PricingSection } from "@/components/PricingSection";
 import { SaveReportDialog } from "@/components/SaveReportDialog";
 import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle, TrendingUp, Zap, Lock, ArrowRight } from "lucide-react";
+import { trackEvent, trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 interface GuestAnalysisResult {
   overallScore: number;
@@ -61,6 +62,11 @@ export default function GuestResults() {
   const { t } = useLanguage();
 
   useEffect(() => {
+    // Track page view and engagement
+    trackFunnel('results_view');
+    const trackTime = trackTimeOnPage('guest-results');
+    const trackScroll = trackScrollDepth('guest-results');
+
     const storedData = localStorage.getItem('guestAnalysisData');
     
     if (!storedData) {
@@ -74,6 +80,12 @@ export default function GuestResults() {
     }
 
     processAnalysis(JSON.parse(storedData));
+
+    // Cleanup tracking on unmount
+    return () => {
+      trackTime();
+      trackScroll();
+    };
   }, []);
 
   const processAnalysis = async (analysisData: any) => {
@@ -93,6 +105,24 @@ export default function GuestResults() {
       if (error) {
         console.error('Analysis error:', error);
         throw new Error('Failed to process analysis');
+      }
+
+      // Send analysis email nurture sequence
+      try {
+        await supabase.functions.invoke('send-analysis-email', {
+          body: {
+            email: analysisData.email,
+            companyName: analysisData.companyName,
+            overallScore: data.overallScore || 0,
+            topChallenge: data.challenges?.[0] || 'Market entry complexity',
+            upgradeUrl: `${window.location.origin}/comprehensive-analysis-form?ref=email`,
+            industry: analysisData.industry,
+          }
+        });
+        console.log('Analysis email sent successfully');
+      } catch (emailError) {
+        // Don't block the user experience if email fails
+        console.warn('Failed to send analysis email:', emailError);
       }
 
       setAnalysisResult({
@@ -404,7 +434,11 @@ export default function GuestResults() {
               <Lock className="h-12 w-12 text-primary mx-auto mb-3" />
               <p className="font-semibold text-lg mb-2">Unlock with Comprehensive Analysis</p>
               <Button 
-                onClick={() => navigate('/comprehensive-analysis-form')}
+                onClick={() => {
+                  trackFunnel('upgrade_click', { location: 'partner_matches_teaser' });
+                  trackEvent('upgrade_clicked', { source: 'partner_matches_card', score: analysisResult?.overallScore });
+                  navigate('/comprehensive-analysis-form');
+                }}
                 size="lg"
                 className="mt-2"
               >
@@ -461,7 +495,11 @@ export default function GuestResults() {
               <Lock className="h-12 w-12 text-primary mx-auto mb-3" />
               <p className="font-semibold text-lg mb-2">Unlock with Comprehensive Analysis</p>
               <Button 
-                onClick={() => navigate('/comprehensive-analysis-form')}
+                onClick={() => {
+                  trackFunnel('upgrade_click', { location: 'compliance_roadmap_teaser' });
+                  trackEvent('upgrade_clicked', { source: 'compliance_roadmap_card', score: analysisResult?.overallScore });
+                  navigate('/comprehensive-analysis-form');
+                }}
                 size="lg"
                 className="mt-2"
               >
@@ -565,7 +603,15 @@ export default function GuestResults() {
             </div>
             
             <Button 
-              onClick={() => navigate('/comprehensive-analysis-form')}
+              onClick={() => {
+                trackFunnel('upgrade_click', { location: 'main_cta_bottom' });
+                trackEvent('upgrade_clicked', { 
+                  source: 'main_cta', 
+                  score: analysisResult?.overallScore,
+                  urgencyLevel: analysisResult?.urgencyLevel 
+                });
+                navigate('/comprehensive-analysis-form');
+              }}
               className="w-full"
               size="lg"
             >

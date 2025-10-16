@@ -8,10 +8,23 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { SEOHead } from "@/components/SEOHead";
 import { LeadCaptureForm } from "@/components/LeadCaptureForm";
+import { trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    // Track landing page view
+    trackFunnel('landing');
+    const trackTime = trackTimeOnPage('index');
+    const trackScroll = trackScrollDepth('index');
+
+    return () => {
+      trackTime();
+      trackScroll();
+    };
+  }, []);
 
   const handleGetStarted = () => {
     navigate('/guest-analysis');

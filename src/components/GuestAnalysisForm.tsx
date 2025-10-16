@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Building, FileText, Globe, Users, Briefcase, Loader2, ArrowRight } from "lucide-react";
+import { trackFunnel, trackEvent } from "@/utils/analytics";
 
 const industries = [
   "Technology & Software",
@@ -52,8 +53,18 @@ export function GuestAnalysisForm() {
     email: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  // Track when user starts filling the form
+  const handleFirstInteraction = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      trackFunnel('form_start');
+      trackEvent('analysis_started', { timestamp: Date.now() });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +83,14 @@ export function GuestAnalysisForm() {
     setIsSubmitting(true);
 
     try {
+      // Track form completion
+      trackFunnel('form_complete', {
+        industry: formData.industry,
+        companySize: formData.companySize,
+        hasWebsite: !!formData.websiteUrl
+      });
+      trackEvent('email_captured', { email: formData.email });
+
       // Store the analysis data in localStorage for the results page
       localStorage.setItem('guestAnalysisData', JSON.stringify(formData));
       
@@ -115,6 +134,7 @@ export function GuestAnalysisForm() {
               placeholder="your@email.com"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              onFocus={handleFirstInteraction}
               required
             />
           </div>
