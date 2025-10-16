@@ -337,7 +337,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           },
           { role: 'user', content: prompt }
         ],
-        max_completion_tokens: 4000,
+        max_completion_tokens: 16000,
         response_format: { type: "json_object" }
       }),
     });
