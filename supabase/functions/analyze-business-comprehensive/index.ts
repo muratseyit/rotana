@@ -418,7 +418,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           { 
             role: 'system', 
@@ -431,7 +431,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
       }),
     });
 
-    console.log('OpenAI API call initiated with GPT-5...');
+    console.log('OpenAI API call initiated with GPT-5-mini...');
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
@@ -493,7 +493,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           completedSections: []
         },
         analysisVersion: 'v2.1-evidence-based',
-        modelUsed: 'gpt-5 + proprietary-scoring-engine',
+        modelUsed: 'gpt-5-mini + proprietary-scoring-engine',
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
         scoringMethod: 'evidence-based-algorithms',
