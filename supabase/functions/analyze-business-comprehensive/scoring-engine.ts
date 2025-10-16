@@ -79,13 +79,13 @@ const DEFAULT_WEIGHTS: ScoringWeights = {
   investmentReadiness: 1.0
 };
 
-export function calculateComprehensiveScore(businessData: any, companyVerification?: any): ScoringResult {
+export function calculateComprehensiveScore(businessData: any, companyVerification?: any, websiteAnalysis?: any): ScoringResult {
   const weights = getIndustryWeights(businessData.industry);
   
   // Calculate individual category scores with evidence
   const productMarketFitResult = calculateProductMarketFit(businessData);
   const regulatoryResult = calculateRegulatoryCompatibility(businessData, companyVerification);
-  const digitalResult = calculateDigitalReadiness(businessData);
+  const digitalResult = calculateDigitalReadiness(businessData, websiteAnalysis);
   const logisticsResult = calculateLogisticsPotential(businessData);
   const scalabilityResult = calculateScalabilityAutomation(businessData);
   const founderResult = calculateFounderTeamStrength(businessData);
@@ -357,19 +357,77 @@ function calculateRegulatoryCompatibility(data: any, verification?: any): ScoreE
   };
 }
 
-function calculateDigitalReadiness(data: any): ScoreEvidence {
+function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvidence {
   let score = 0;
   const factors: ScoreEvidence['factors'] = [];
 
-  // Website presence (0-15 points)
-  if (data.websiteUrl && data.websiteUrl !== 'Not provided') {
-    const points = 15;
+  // Website presence and quality (0-30 points) - enhanced with actual content analysis
+  if (websiteAnalysis) {
+    // Base score for having a website
+    let websitePoints = 5;
+    let websiteEvidence = 'Website exists';
+
+    // Content quality (0-5 points)
+    if (websiteAnalysis.content.length > 1500) {
+      websitePoints += 5;
+      websiteEvidence += ', comprehensive content (1500+ chars)';
+    } else if (websiteAnalysis.content.length > 800) {
+      websitePoints += 3;
+      websiteEvidence += ', moderate content';
+    }
+
+    // Professional structure (0-3 points)
+    if (websiteAnalysis.structure.hasNavigation) {
+      websitePoints += 3;
+      websiteEvidence += ', professional navigation';
+    }
+
+    // Lead generation (0-3 points)
+    if (websiteAnalysis.structure.hasContactForm) {
+      websitePoints += 3;
+      websiteEvidence += ', contact form present';
+    }
+
+    // SSL security (0-2 points)
+    if (websiteAnalysis.trustSignals.hasSSL) {
+      websitePoints += 2;
+      websiteEvidence += ', SSL secured';
+    }
+
+    // E-commerce capability (0-5 points)
+    if (websiteAnalysis.ecommerce.hasShoppingCart) {
+      websitePoints += 5;
+      websiteEvidence += ', e-commerce enabled';
+    }
+
+    // UK market signals (0-5 points)
+    if (websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress) {
+      websitePoints += 5;
+      websiteEvidence += ', UK market targeting';
+    }
+
+    // Multi-language support (0-2 points)
+    if (websiteAnalysis.structure.languages.length > 1) {
+      websitePoints += 2;
+      websiteEvidence += `, ${websiteAnalysis.structure.languages.length} languages`;
+    }
+
+    score += websitePoints;
+    factors.push({
+      factor: 'Website Quality',
+      impact: 'positive',
+      points: websitePoints,
+      evidence: websiteEvidence
+    });
+  } else if (data.websiteUrl && data.websiteUrl !== 'Not provided') {
+    // Basic score for URL only (website not analyzed)
+    const points = 5;
     score += points;
     factors.push({
-      factor: 'Active Website',
-      impact: 'positive',
+      factor: 'Website URL Provided',
+      impact: 'neutral',
       points,
-      evidence: 'Company website present for UK market access'
+      evidence: 'Website URL present but content not analyzed'
     });
   } else {
     factors.push({

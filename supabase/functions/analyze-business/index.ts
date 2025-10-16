@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { scrapeWebsite } from '../_shared/website-scraper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,6 +79,18 @@ serve(async (req) => {
       complianceStatus
     } = validated;
 
+    // Scrape website if URL provided
+    let websiteAnalysis = null;
+    if (websiteUrl && isSafeUrl(websiteUrl)) {
+      console.log('Scraping website content...');
+      websiteAnalysis = await scrapeWebsite(websiteUrl);
+      if (websiteAnalysis) {
+        console.log('Website scraping successful');
+      } else {
+        console.log('Website scraping failed, continuing with URL only');
+      }
+    }
+
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -99,6 +112,23 @@ Industry: ${industry}
 Company Size: ${companySize}
 Description: ${businessDescription}
 ${websiteUrl ? `Website: ${websiteUrl}` : ''}
+
+${websiteAnalysis ? `
+Website Analysis:
+- Title: ${websiteAnalysis.title}
+- Description: ${websiteAnalysis.description}
+- Content Quality: ${websiteAnalysis.content.length > 1000 ? 'Comprehensive content (1000+ chars)' : websiteAnalysis.content.length > 500 ? 'Moderate content' : 'Limited content'}
+- Navigation: ${websiteAnalysis.structure.hasNavigation ? 'Yes' : 'No'}
+- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes' : 'No'}
+- Social Media: ${websiteAnalysis.structure.hasSocialLinks ? 'Yes' : 'No'}
+- Languages: ${websiteAnalysis.structure.languages.join(', ')}
+- E-commerce Ready: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes (Shopping Cart)' : 'No'}
+- Pricing Displayed: ${websiteAnalysis.ecommerce.hasPricing ? 'Yes' : 'No'}
+- SSL Secured: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes' : 'No'}
+- Privacy Policy: ${websiteAnalysis.trustSignals.hasPrivacyPolicy ? 'Yes' : 'No'}
+- UK Alignment: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress || websiteAnalysis.ukAlignment.hasUKPhone ? 'Strong (GBP pricing or UK contact details present)' : 'Weak (no UK-specific signals detected)'}
+- Content Preview: ${websiteAnalysis.content.substring(0, 300)}...
+` : 'Website not analyzed (no URL provided or scraping failed)'}
 
 Financial Metrics: ${JSON.stringify(financialMetrics || {})}
 Compliance Status: ${JSON.stringify(complianceStatus || {})}

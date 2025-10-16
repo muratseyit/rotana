@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.4';
 import { calculateComprehensiveScore } from './scoring-engine.ts';
 import { getIndustryBenchmark, getRegulatoryRequirements } from './market-data.ts';
 import { generateEnhancedPartnerRecommendations } from './partner-matching.ts';
+import { scrapeWebsite } from '../_shared/website-scraper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,6 +30,23 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     console.log('Processing comprehensive analysis for:', businessData.companyName);
+
+    // Scrape website if URL provided
+    let websiteAnalysis = null;
+    if (businessData.websiteUrl) {
+      console.log('Scraping website content...');
+      websiteAnalysis = await scrapeWebsite(businessData.websiteUrl);
+      if (websiteAnalysis) {
+        console.log('Website scraping successful:', {
+          title: websiteAnalysis.title,
+          contentLength: websiteAnalysis.content.length,
+          hasEcommerce: websiteAnalysis.ecommerce.hasShoppingCart,
+          ukAlignment: websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress
+        });
+      } else {
+        console.log('Website scraping failed, continuing with URL only');
+      }
+    }
 
     // Calculate evidence-based scores using research-backed algorithms
     console.log('Calculating comprehensive scores...');
@@ -58,8 +76,8 @@ serve(async (req) => {
       }
     }
 
-    // Calculate comprehensive scores using evidence-based algorithms
-    const scoringResult = calculateComprehensiveScore(businessData, companyVerification);
+    // Calculate comprehensive scores using evidence-based algorithms with website data
+    const scoringResult = calculateComprehensiveScore(businessData, companyVerification, websiteAnalysis);
     console.log('Calculated scores:', {
       overall: scoringResult.overallScore,
       confidence: scoringResult.confidenceLevel,
@@ -88,6 +106,44 @@ Company Size: ${businessData.companySize}
 Website: ${businessData.websiteUrl || 'Not provided'}
 Target Market: ${businessData.targetMarket || 'Not specified'}
 Market Entry Timeline: ${businessData.marketEntryTimeline || 'Not specified'}
+
+${websiteAnalysis ? `
+DETAILED WEBSITE ANALYSIS:
+Core Metrics:
+- Page Title: ${websiteAnalysis.title}
+- Meta Description: ${websiteAnalysis.description}
+- Content Length: ${websiteAnalysis.content.length} characters
+- Content Quality: ${websiteAnalysis.content.length > 1500 ? 'Comprehensive and detailed' : websiteAnalysis.content.length > 800 ? 'Moderate depth' : 'Basic content'}
+- Content Preview: ${websiteAnalysis.content.substring(0, 500)}...
+
+Digital Infrastructure:
+- Navigation Menu: ${websiteAnalysis.structure.hasNavigation ? 'Yes - Professional site structure' : 'No - May impact user experience'}
+- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes - Enables lead capture' : 'No - Missing lead generation tool'}
+- Social Media Integration: ${websiteAnalysis.structure.hasSocialLinks ? 'Yes - Connected to social platforms' : 'No - Limited social presence'}
+- Multi-language Support: ${websiteAnalysis.structure.languages.length > 1 ? `Yes (${websiteAnalysis.structure.languages.join(', ')})` : 'English only'}
+
+E-commerce Capabilities:
+- Shopping Cart: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes - E-commerce enabled' : 'No - Not e-commerce ready'}
+- Pricing Displayed: ${websiteAnalysis.ecommerce.hasPricing ? 'Yes - Transparent pricing' : 'No - Pricing not visible'}
+- Payment Integration: ${websiteAnalysis.ecommerce.acceptsPayments ? 'Yes - Checkout flow present' : 'No - No payment processing'}
+
+UK Market Readiness Signals:
+- GBP Pricing: ${websiteAnalysis.ukAlignment.hasPoundsGBP ? 'Yes - UK market targeting detected' : 'No - No GBP pricing found'}
+- UK Address Listed: ${websiteAnalysis.ukAlignment.hasUKAddress ? 'Yes - UK presence confirmed' : 'No - No UK address detected'}
+- UK Phone Number: ${websiteAnalysis.ukAlignment.hasUKPhone ? 'Yes - UK contact available' : 'No - No UK phone number'}
+
+Trust & Compliance:
+- SSL Certificate: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes - Secure HTTPS connection' : 'No - CRITICAL: No SSL security'}
+- Privacy Policy: ${websiteAnalysis.trustSignals.hasPrivacyPolicy ? 'Yes - GDPR compliance indicator' : 'No - Missing privacy policy'}
+- Terms of Service: ${websiteAnalysis.trustSignals.hasTermsOfService ? 'Yes - Legal protection present' : 'No - Missing terms'}
+
+WEBSITE QUALITY ASSESSMENT:
+${websiteAnalysis.content.length > 1500 && websiteAnalysis.structure.hasNavigation && websiteAnalysis.trustSignals.hasSSL ? 
+  'Professional website with comprehensive content and proper infrastructure' :
+  websiteAnalysis.content.length > 800 && websiteAnalysis.trustSignals.hasSSL ?
+  'Functional website but could benefit from more content and features' :
+  'Basic website requiring significant enhancement for UK market credibility'}
+` : 'Website not analyzed (no URL provided or scraping failed)'}
 
 DIGITAL INFRASTRUCTURE:
 Online Sales Platform: ${businessData.onlineSalesPlatform || 'No'}
