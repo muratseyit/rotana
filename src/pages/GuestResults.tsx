@@ -20,16 +20,28 @@ interface GuestAnalysisResult {
     digitalReadiness: number;
   };
   industryComparison?: {
+    industry: string;
     averageUKScore: number;
     yourPosition: string;
     scoreGap: number;
+    percentile?: number;
   };
   summary: string;
+  keyInsight?: string;
   keyFindings: string[];
   recommendations: string[];
   riskFactors: string[];
   limitedAnalysis?: boolean;
-  upgradePrompt?: string;
+  upgradeMessage?: string;
+  urgencyLevel?: 'high' | 'medium' | 'low';
+  websiteInsights?: {
+    hasWebsite: boolean;
+    digitalScore: number;
+    strengths?: string[];
+    improvements?: string[];
+    criticalIssue?: string;
+  };
+  missingInsights?: string[];
   nextSteps?: string[];
   customerData: {
     companyName: string;
@@ -88,11 +100,15 @@ export default function GuestResults() {
         categoryScores: data.categoryScores,
         industryComparison: data.industryComparison,
         summary: data.summary || data.riskAssessment || "Analysis completed",
+        keyInsight: data.keyInsight,
         keyFindings: data.strengths || [],
         recommendations: data.priorityActions || [],
         riskFactors: data.challenges || [],
         limitedAnalysis: true,
-        upgradePrompt: "Unlock 7 detailed categories, compliance checklist, and 3 verified partner matches",
+        upgradeMessage: data.upgradeMessage,
+        urgencyLevel: data.urgencyLevel,
+        websiteInsights: data.websiteInsights,
+        missingInsights: data.missingInsights,
         customerData: {
           companyName: analysisData.companyName,
           email: analysisData.email,
@@ -213,10 +229,13 @@ export default function GuestResults() {
         {analysisResult.industryComparison && (
           <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-orange-600" />
-                How You Compare to {analysisResult.customerData.industry} Peers
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-orange-600" />
+              Industry Benchmark Comparison
+            </CardTitle>
+            <CardDescription>
+              {analysisResult.industryComparison.industry} sector average in UK market
+            </CardDescription>
               <CardDescription>UK market entry readiness benchmark</CardDescription>
             </CardHeader>
             <CardContent>
@@ -318,6 +337,65 @@ export default function GuestResults() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Website Insights Card */}
+        {analysisResult.websiteInsights && (
+          <Card className={analysisResult.websiteInsights.hasWebsite ? "border-blue-200 bg-blue-50/50" : "border-red-200 bg-red-50/50"}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className={`h-5 w-5 ${analysisResult.websiteInsights.hasWebsite ? 'text-blue-600' : 'text-red-600'}`} />
+                Digital Presence Analysis
+              </CardTitle>
+              <CardDescription>
+                {analysisResult.websiteInsights.hasWebsite 
+                  ? `Digital Readiness Score: ${analysisResult.websiteInsights.digitalScore}/100`
+                  : 'Critical Issue Detected'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {analysisResult.websiteInsights.hasWebsite ? (
+                <>
+                  {analysisResult.websiteInsights.strengths && analysisResult.websiteInsights.strengths.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2 text-green-700">✓ Website Strengths:</p>
+                      <ul className="space-y-1">
+                        {analysisResult.websiteInsights.strengths.map((strength: string, idx: number) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            {strength}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {analysisResult.websiteInsights.improvements && analysisResult.websiteInsights.improvements.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2 text-orange-700">⚠ Recommended Improvements:</p>
+                      <ul className="space-y-1">
+                        {analysisResult.websiteInsights.improvements.map((improvement: string, idx: number) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-orange-600" />
+                            {improvement}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="p-4 bg-white rounded-lg border-2 border-red-200">
+                  <p className="text-sm font-medium text-red-700 mb-2">
+                    <AlertTriangle className="inline h-4 w-4 mr-1" />
+                    {analysisResult.websiteInsights.criticalIssue}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    A professional website is crucial for UK market credibility. 87% of UK businesses research online before partnerships.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Missing Analysis Teasers */}
         <Card className="relative overflow-hidden border-2 border-primary/20">

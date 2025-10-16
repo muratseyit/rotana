@@ -165,7 +165,36 @@ serve(async (req) => {
 
     console.log('Starting AI analysis...');
 
-    // Create comprehensive analysis prompt with industry benchmarks
+    // Calculate digital readiness based on website analysis
+    let digitalReadinessScore = 0;
+    if (websiteAnalysis) {
+      // SSL Certificate (15 points)
+      if (websiteAnalysis.trustSignals.hasSSL) digitalReadinessScore += 15;
+      
+      // Content Quality (20 points)
+      if (websiteAnalysis.content.length > 2000) digitalReadinessScore += 20;
+      else if (websiteAnalysis.content.length > 1000) digitalReadinessScore += 12;
+      else if (websiteAnalysis.content.length > 500) digitalReadinessScore += 6;
+      
+      // Contact Form (15 points)
+      if (websiteAnalysis.structure.hasContactForm) digitalReadinessScore += 15;
+      
+      // E-commerce Readiness (20 points)
+      if (websiteAnalysis.ecommerce.hasShoppingCart) digitalReadinessScore += 20;
+      else if (websiteAnalysis.ecommerce.hasPricing) digitalReadinessScore += 10;
+      
+      // UK Alignment (20 points)
+      if (websiteAnalysis.ukAlignment.hasPoundsGBP) digitalReadinessScore += 10;
+      if (websiteAnalysis.ukAlignment.hasUKAddress || websiteAnalysis.ukAlignment.hasUKPhone) digitalReadinessScore += 10;
+      
+      // Professional Structure (10 points)
+      if (websiteAnalysis.structure.hasNavigation) digitalReadinessScore += 5;
+      if (websiteAnalysis.structure.hasSocialLinks) digitalReadinessScore += 5;
+    }
+
+    const avgUKScore = 72;
+
+    // Create comprehensive analysis prompt with enhanced scoring instructions
     const analysisPrompt = `You are a UK market entry expert analyzing a Turkish SME's readiness for UK market expansion.
 
 BUSINESS INFORMATION:
@@ -180,47 +209,54 @@ UK MARKET CONTEXT FOR ${industry}:
 - Competition Level: ${industryBenchmark.competitionLevel.toUpperCase()}
 - Digital Adoption Rate: ${industryBenchmark.digitalAdoptionRate}%
 - Average Profit Margins: ${industryBenchmark.averageMargins}%
-- **UK Industry Average Score: 72/100** (use this as benchmark for comparison)
+- **UK Industry Average Score: ${avgUKScore}/100** (use this as benchmark for comparison)
 
-${websiteUrl ? `Website: ${websiteUrl}` : ''}
+${websiteUrl ? `Website: ${websiteUrl}` : 'No website provided'}
 ${websiteAnalysis ? `
-Website Analysis:
+Website Analysis (Pre-calculated Digital Readiness: ${digitalReadinessScore}/100):
 - Title: ${websiteAnalysis.title}
 - Description: ${websiteAnalysis.description}
-- Content Quality: ${websiteAnalysis.content.length > 1000 ? 'Comprehensive content (1000+ chars)' : websiteAnalysis.content.length > 500 ? 'Moderate content' : 'Limited content'}
-- Navigation: ${websiteAnalysis.structure.hasNavigation ? 'Yes' : 'No'}
-- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes' : 'No'}
-- Social Media: ${websiteAnalysis.structure.hasSocialLinks ? 'Yes' : 'No'}
-- Languages: ${websiteAnalysis.structure.languages.join(', ')}
-- E-commerce Ready: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes (Shopping Cart)' : 'No'}
-- Pricing Displayed: ${websiteAnalysis.ecommerce.hasPricing ? 'Yes' : 'No'}
-- SSL Secured: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes' : 'No'}
-- Privacy Policy: ${websiteAnalysis.trustSignals.hasPrivacyPolicy ? 'Yes' : 'No'}
-- UK Alignment: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress || websiteAnalysis.ukAlignment.hasUKPhone ? 'Strong (GBP pricing or UK contact details present)' : 'Weak (no UK-specific signals detected)'}
-- Content Preview: ${websiteAnalysis.content.substring(0, 300)}...
-` : 'Website not analyzed (no URL provided or scraping failed)'}
+- Content Quality: ${websiteAnalysis.content.length > 1000 ? 'Comprehensive ✓' : 'Limited ✗'} (${websiteAnalysis.content.length} chars)
+- Navigation: ${websiteAnalysis.structure.hasNavigation ? 'Yes ✓' : 'No ✗'}
+- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes ✓' : 'No ✗'}
+- E-commerce Ready: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes ✓' : 'No ✗'}
+- SSL Secured: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes ✓' : 'No ✗'}
+- UK Alignment: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress ? 'Strong ✓' : 'Weak ✗'}
+` : 'Website not analyzed - Digital Readiness Score: 0/100 ✗'}
 
-IMPORTANT: Compare this business against the ${industry} UK market average score of 72/100. Provide context on whether they're above or below average.
+SCORING INSTRUCTIONS:
+- **Market Fit Score** (0-100): How well does this business fit UK market needs?
+  - Consider: Industry growth in UK, competition level, consumer demand
+  - Be realistic: most should score 50-75
+  
+- **Business Model Score** (0-100): How scalable and competitive is the business model?
+  - Consider: Revenue model strength, scalability, years operating, competitive advantage
+  - Be realistic: most should score 50-75
+  
+- **Digital Readiness**: Pre-calculated as ${digitalReadinessScore}/100 (don't change this)
+
+- **Overall Score**: Calculate as weighted average:
+  - Market Fit: 35%
+  - Business Model: 35%
+  - Digital Readiness: 30%
+
+- **Industry Comparison**: Compare to ${avgUKScore}/100 average for ${industry}
+  - Position: "Above Average" if score ≥ 77, "Average" if 67-76, "Below Average" if < 67
 
 Provide a JSON response with this EXACT structure:
 {
-  "overallScore": <number 0-100>,
-  "categoryScores": {
-    "marketFit": <number 0-100>,
-    "businessModel": <number 0-100>,
-    "digitalReadiness": <number 0-100>
-  },
-  "industryComparison": {
-    "averageUKScore": 72,
-    "yourPosition": "<Above Average|Average|Below Average>",
-    "scoreGap": <number - positive if above average, negative if below>
-  },
-  "summary": "<2-3 sentence assessment with industry benchmark comparison>",
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "challenges": ["<challenge 1 with ${industry} context>", "<challenge 2>", "<challenge 3>"],
-  "priorityActions": ["<action 1 based on ${industry} benchmarks>", "<action 2>", "<action 3>"],
-  "riskAssessment": "<brief risk summary with ${industry} market context>"
-}`;
+  "marketFitScore": <number 0-100>,
+  "businessModelScore": <number 0-100>,
+  "overallScore": <calculated weighted average>,
+  "summary": "<2-3 sentence realistic assessment mentioning they scored X points ${avgUKScore > 65 ? 'below/above' : 'near'} industry average>",
+  "keyInsight": "<one critical insight about UK market positioning>",
+  "strengths": ["<specific strength 1>", "<specific strength 2>", "<specific strength 3>"],
+  "challenges": ["<specific challenge with ${industry} context>", "<challenge 2>", "<challenge 3>"],
+  "priorityActions": ["<actionable step 1>", "<actionable step 2>", "<actionable step 3>"],
+  "riskAssessment": "<1-2 sentences on main UK market entry risks for this business>"
+}
+
+Be specific, realistic, and actionable. Avoid generic advice.`;
 
     // Call OpenAI API
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -261,39 +297,101 @@ Provide a JSON response with this EXACT structure:
       throw new Error('No analysis generated from OpenAI');
     }
 
-    let analysisResult;
+    let result;
     try {
-      analysisResult = JSON.parse(analysisText);
+      result = JSON.parse(analysisText);
     } catch (parseError) {
       console.error('Error parsing OpenAI response:', parseError);
       throw new Error('Failed to parse AI analysis result');
     }
 
-    // Fetch relevant partners based on industry and compliance needs
-    const { data: partners, error: partnersError } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('verification_status', 'verified')
-      .limit(5);
+    // Calculate weighted overall score with proper rounding
+    const calculatedOverallScore = Math.round(
+      (result.marketFitScore * 0.35) + 
+      (result.businessModelScore * 0.35) + 
+      (digitalReadinessScore * 0.30)
+    );
+    
+    // Use AI's score if reasonable, otherwise use calculated
+    const finalOverallScore = result.overallScore && result.overallScore > 0 && result.overallScore <= 100
+      ? result.overallScore 
+      : calculatedOverallScore;
+    
+    // Calculate position relative to industry average
+    const scoreGap = finalOverallScore - avgUKScore;
+    const position = scoreGap >= 5 ? 'Above Average' : 
+                     scoreGap >= -5 ? 'Average' : 
+                     'Below Average';
 
-    if (partnersError) {
-      console.error('Error fetching partners:', partnersError);
-    }
+    // Determine urgency level for upgrade based on score
+    const urgencyLevel = finalOverallScore < 60 ? 'high' : 
+                        finalOverallScore < 75 ? 'medium' : 
+                        'low';
 
-    // Add partner recommendations to analysis
-    if (partners && partners.length > 0) {
-      analysisResult.recommendedPartners = partners.map(p => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        specialties: p.specialties
-      }));
-    }
+    // Generate website insights
+    const websiteInsights = websiteAnalysis ? {
+      hasWebsite: true,
+      digitalScore: digitalReadinessScore,
+      strengths: [
+        websiteAnalysis.trustSignals.hasSSL && 'SSL Security',
+        websiteAnalysis.structure.hasContactForm && 'Contact Form',
+        websiteAnalysis.ecommerce.hasShoppingCart && 'E-commerce Ready',
+        (websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress) && 'UK-focused Content'
+      ].filter(Boolean),
+      improvements: [
+        !websiteAnalysis.trustSignals.hasSSL && 'Add SSL certificate for security',
+        !websiteAnalysis.structure.hasContactForm && 'Add contact form to capture leads',
+        websiteAnalysis.content.length < 1000 && 'Expand website content (currently under 1000 chars)',
+        !websiteAnalysis.ukAlignment.hasPoundsGBP && !websiteAnalysis.ukAlignment.hasUKAddress && 'Add UK-specific content (GBP pricing, UK address)',
+        !websiteAnalysis.ecommerce.hasShoppingCart && industry.toLowerCase().includes('retail') && 'Consider adding e-commerce functionality'
+      ].filter(Boolean)
+    } : {
+      hasWebsite: false,
+      digitalScore: 0,
+      criticalIssue: 'No website detected - essential for UK market credibility and partner trust'
+    };
 
-    console.log('Analysis complete, returning results');
+    console.log('Analysis complete, returning enhanced results');
 
     return new Response(
-      JSON.stringify(analysisResult),
+      JSON.stringify({
+        overallScore: finalOverallScore,
+        categoryScores: {
+          marketFit: result.marketFitScore,
+          businessModel: result.businessModelScore,
+          digitalReadiness: digitalReadinessScore
+        },
+        summary: result.summary,
+        keyInsight: result.keyInsight || result.summary,
+        strengths: result.strengths,
+        challenges: result.challenges,
+        priorityActions: result.priorityActions,
+        riskAssessment: result.riskAssessment,
+        industryComparison: {
+          industry: industry,
+          averageUKScore: avgUKScore,
+          yourPosition: position,
+          scoreGap: Math.abs(scoreGap),
+          percentile: finalOverallScore > avgUKScore ? 
+            Math.min(75, Math.round(50 + (scoreGap * 2))) : 
+            Math.max(25, Math.round(50 + (scoreGap * 2)))
+        },
+        websiteInsights: websiteInsights,
+        urgencyLevel: urgencyLevel,
+        upgradeMessage: urgencyLevel === 'high' 
+          ? "⚠️ Your score indicates significant gaps. Get the Comprehensive Analysis to identify exactly what to fix."
+          : urgencyLevel === 'medium'
+          ? "📊 You're close to being market-ready. Comprehensive Analysis shows the exact steps to get there."
+          : "✅ Good foundation! Comprehensive Analysis helps you optimize and find the right UK partners.",
+        missingInsights: [
+          "🔍 Detailed compliance checklist with timelines and costs",
+          "🤝 3 verified UK partner matches for your specific industry",
+          "📋 12-month market entry roadmap with milestones",
+          "💰 Complete cost breakdown for UK market entry",
+          "⚖️ Legal structure recommendations (Ltd, Branch, etc.)",
+          "📞 Expert review session to validate your strategy"
+        ]
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
