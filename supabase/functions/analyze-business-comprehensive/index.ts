@@ -19,12 +19,12 @@ serve(async (req) => {
   try {
     const businessData = await req.json();
     
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      console.error('OPENAI_API_KEY not found in environment');
-      throw new Error('OpenAI API key not configured');
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY not found in environment');
+      throw new Error('Lovable AI key not configured');
     }
-    console.log('OpenAI API key loaded successfully');
+    console.log('Lovable AI key loaded successfully');
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -177,45 +177,45 @@ serve(async (req) => {
     const prompt = promptParts.join('');
     console.log('Prompt built successfully, length:', prompt.length);
 
-    // Call OpenAI API with timeout
-    console.log('Initiating OpenAI API call...');
+    // Call Lovable AI (Gemini) with timeout
+    console.log('Initiating Lovable AI call...');
     
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
     
-    let openAIResponse;
+    let aiResponse;
     try {
-      openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
+          'Authorization': `Bearer ${lovableApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-5-mini-2025-08-07',
+          model: 'google/gemini-2.5-flash',
           messages: [
             { 
               role: 'system', 
-              content: 'You are a senior UK market entry analyst. Provide concise, actionable JSON analysis with specific evidence for each score.' 
+              content: 'You are a senior UK market entry analyst. Provide concise, actionable JSON analysis with specific evidence for each score. Respond ONLY with valid JSON, no markdown or extra text.' 
             },
             { role: 'user', content: prompt }
           ],
-          max_completion_tokens: 5000,
+          max_tokens: 5000,
           response_format: { type: "json_object" }
         }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      console.log('OpenAI API responded with status:', openAIResponse.status);
+      console.log('Lovable AI responded with status:', aiResponse.status);
     } catch (fetchError) {
       clearTimeout(timeoutId);
-      console.error('OpenAI API fetch error:', fetchError);
-      throw new Error(`Failed to connect to OpenAI API: ${fetchError.message}`);
+      console.error('Lovable AI fetch error:', fetchError);
+      throw new Error(`Failed to connect to Lovable AI: ${fetchError.message}`);
     }
 
-    if (!openAIResponse.ok) {
-      const errorText = await openAIResponse.text();
-      console.error('OpenAI API error:', openAIResponse.status, errorText);
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error('Lovable AI error:', aiResponse.status, errorText);
       
       // Return calculated scores even if AI analysis fails
       return new Response(
@@ -240,7 +240,7 @@ serve(async (req) => {
             analysisDate: new Date().toISOString(),
             confidenceLevel: scoringResult.confidenceLevel,
             scoringMethod: 'evidence-based-algorithms',
-            aiAnalysisError: `OpenAI API error: ${openAIResponse.status}`,
+            aiAnalysisError: `Lovable AI error: ${aiResponse.status}`,
             industryBenchmark,
             regulatoryRequirements
           }
@@ -252,15 +252,15 @@ serve(async (req) => {
       );
     }
 
-    const openAIData = await openAIResponse.json();
-    console.log('OpenAI response received, structure check...');
+    const aiData = await aiResponse.json();
+    console.log('Lovable AI response received, structure check...');
     
-    if (!openAIData.choices || !openAIData.choices[0] || !openAIData.choices[0].message) {
-      console.error('Invalid OpenAI response structure:', JSON.stringify(openAIData, null, 2));
-      throw new Error('Invalid OpenAI response structure');
+    if (!aiData.choices || !aiData.choices[0] || !aiData.choices[0].message) {
+      console.error('Invalid AI response structure:', JSON.stringify(aiData, null, 2));
+      throw new Error('Invalid AI response structure');
     }
     
-    const analysisText = openAIData.choices[0].message.content;
+    const analysisText = aiData.choices[0].message.content;
     console.log('Analysis text length:', analysisText?.length || 0);
     
     if (!analysisText || analysisText.trim() === '') {
@@ -306,7 +306,7 @@ serve(async (req) => {
           completedSections: []
         },
         analysisVersion: 'v2.1-evidence-based',
-        modelUsed: 'gpt-5-mini + proprietary-scoring-engine',
+        modelUsed: 'gemini-2.5-flash + proprietary-scoring-engine',
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
         scoringMethod: 'evidence-based-algorithms',
@@ -324,7 +324,7 @@ serve(async (req) => {
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
           'Supabase Partner Database',
-          'GPT-5 Strategic Analysis'
+          'Gemini 2.5 Flash AI Analysis'
         ].filter(Boolean)
       }
     };
