@@ -602,65 +602,73 @@ export default function ComprehensiveAnalysis() {
         </div>
 
         {/* Roadmap */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Market Entry Roadmap</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold text-destructive mb-3 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Immediate Actions
-                </h4>
-                <ul className="space-y-2">
-                  {analysisResult.recommendations.immediate.map((item, index) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
-                      <Badge variant="destructive" className="text-xs px-1">
-                        {index + 1}
-                      </Badge>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        {analysisResult.recommendations && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Market Entry Roadmap</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                {analysisResult.recommendations.immediate && analysisResult.recommendations.immediate.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-destructive mb-3 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      Immediate Actions
+                    </h4>
+                    <ul className="space-y-2">
+                      {analysisResult.recommendations.immediate.map((item, index) => (
+                        <li key={index} className="text-sm flex items-start gap-2">
+                          <Badge variant="destructive" className="text-xs px-1">
+                            {index + 1}
+                          </Badge>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              <div>
-                <h4 className="font-semibold text-yellow-600 mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Short Term (1-3 months)
-                </h4>
-                <ul className="space-y-2">
-                  {analysisResult.recommendations.shortTerm.map((item, index) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
-                      <Badge variant="secondary" className="text-xs px-1">
-                        {index + 1}
-                      </Badge>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                {analysisResult.recommendations.shortTerm && analysisResult.recommendations.shortTerm.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-yellow-600 mb-3 flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Short Term (1-3 months)
+                    </h4>
+                    <ul className="space-y-2">
+                      {analysisResult.recommendations.shortTerm.map((item, index) => (
+                        <li key={index} className="text-sm flex items-start gap-2">
+                          <Badge variant="secondary" className="text-xs px-1">
+                            {index + 1}
+                          </Badge>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              <div>
-                <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Long Term (3+ months)
-                </h4>
-                <ul className="space-y-2">
-                  {analysisResult.recommendations.longTerm.map((item, index) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
-                      <Badge variant="outline" className="text-xs px-1 border-success text-success">
-                        {index + 1}
-                      </Badge>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                {analysisResult.recommendations.longTerm && analysisResult.recommendations.longTerm.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Long Term (3+ months)
+                    </h4>
+                    <ul className="space-y-2">
+                      {analysisResult.recommendations.longTerm.map((item, index) => (
+                        <li key={index} className="text-sm flex items-start gap-2">
+                          <Badge variant="outline" className="text-xs px-1 border-success text-success">
+                            {index + 1}
+                          </Badge>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* AI Partner Recommendations */}
         <IntelligentPartnerDashboard
