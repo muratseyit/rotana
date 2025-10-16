@@ -4,7 +4,7 @@ project_id = "qafetzoqccqafbbspjcp"
 verify_jwt = true
 
 [functions.analyze-business-comprehensive]
-verify_jwt = true
+verify_jwt = false
 request_timeout_ms = 120000
 
 [functions.check-subscription]
