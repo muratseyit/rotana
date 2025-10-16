@@ -31,50 +31,83 @@ serve(async (req) => {
 
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
-    // Scrape website if URL provided
-    let websiteAnalysis = null;
-    if (businessData.websiteUrl) {
-      console.log('Scraping website content...');
-      websiteAnalysis = await scrapeWebsite(businessData.websiteUrl);
-      if (websiteAnalysis) {
-        console.log('Website scraping successful:', {
-          title: websiteAnalysis.title,
-          contentLength: websiteAnalysis.content.length,
-          hasEcommerce: websiteAnalysis.ecommerce.hasShoppingCart,
-          ukAlignment: websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress
-        });
-      } else {
-        console.log('Website scraping failed, continuing with URL only');
-      }
-    }
-
-    // Calculate evidence-based scores using research-backed algorithms
-    console.log('Calculating comprehensive scores...');
-
-    // Verify UK company registration if company number provided
-    let companyVerification = null;
-    if (businessData.companyNumber || businessData.ukRegistered === 'yes') {
-      try {
-        const verifyResponse = await fetch(`${supabaseUrl}/functions/v1/verify-uk-company`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            companyName: businessData.companyName,
-            companyNumber: businessData.companyNumber
-          })
-        });
+    // Run independent operations in parallel for better performance
+    console.log('Starting parallel operations: website scraping, company verification, partner fetching...');
+    
+    const [websiteAnalysis, companyVerification, partnersResult] = await Promise.all([
+      // 1. Scrape website if URL provided
+      (async () => {
+        if (!businessData.websiteUrl) return null;
         
-        if (verifyResponse.ok) {
-          companyVerification = await verifyResponse.json();
-          console.log('Company verification result:', companyVerification.verified);
+        console.log('Scraping website content...');
+        try {
+          const analysis = await scrapeWebsite(businessData.websiteUrl);
+          if (analysis) {
+            console.log('Website scraping successful:', {
+              title: analysis.title,
+              contentLength: analysis.content.length,
+              hasEcommerce: analysis.ecommerce.hasShoppingCart,
+              ukAlignment: analysis.ukAlignment.hasPoundsGBP || analysis.ukAlignment.hasUKAddress
+            });
+          } else {
+            console.log('Website scraping failed, continuing with URL only');
+          }
+          return analysis;
+        } catch (error) {
+          console.log('Website scraping error:', error);
+          return null;
         }
-      } catch (verifyError) {
-        console.log('Company verification failed, continuing without it:', verifyError);
-      }
-    }
+      })(),
+      
+      // 2. Verify UK company registration if company number provided
+      (async () => {
+        if (!businessData.companyNumber && businessData.ukRegistered !== 'yes') return null;
+        
+        try {
+          const verifyResponse = await fetch(`${supabaseUrl}/functions/v1/verify-uk-company`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              companyName: businessData.companyName,
+              companyNumber: businessData.companyNumber
+            })
+          });
+          
+          if (verifyResponse.ok) {
+            const verification = await verifyResponse.json();
+            console.log('Company verification result:', verification.verified);
+            return verification;
+          }
+          return null;
+        } catch (verifyError) {
+          console.log('Company verification failed, continuing without it:', verifyError);
+          return null;
+        }
+      })(),
+      
+      // 3. Fetch verified partners from database
+      (async () => {
+        console.log('Fetching verified partners...');
+        const { data: partners, error: partnersError } = await supabase
+          .from('partners')
+          .select('*')
+          .eq('verification_status', 'verified');
+
+        if (partnersError) {
+          console.error('Error fetching partners:', partnersError);
+          return null;
+        }
+        
+        console.log('Partners fetched:', partners?.length || 0);
+        return partners;
+      })()
+    ]);
+
+    console.log('Parallel operations completed');
+    console.log('Calculating comprehensive scores...');
 
     // Calculate comprehensive scores using evidence-based algorithms with website data
     const scoringResult = calculateComprehensiveScore(businessData, companyVerification, websiteAnalysis);
@@ -436,16 +469,8 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
 
     console.log('Merging AI insights with calculated scores...');
 
-    // Fetch verified partners from database
-    console.log('Fetching verified partners...');
-    const { data: partners, error: partnersError } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('verification_status', 'verified');
-
-    if (partnersError) {
-      console.error('Error fetching partners:', partnersError);
-    }
+    // Use partners fetched in parallel (already available from Promise.all above)
+    const partners = partnersResult;
 
     // Advanced partner matching algorithm using calculated scores and enhanced matching
     const partnerRecommendations = generateEnhancedPartnerRecommendations(
