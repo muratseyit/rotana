@@ -329,7 +329,7 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-5-2025-08-07',
         messages: [
           { 
             role: 'system', 
@@ -337,13 +337,12 @@ Provide detailed, actionable insights based on the UK market context. Be specifi
           },
           { role: 'user', content: prompt }
         ],
-        max_tokens: 4000,
-        temperature: 0.7,
+        max_completion_tokens: 4000,
         response_format: { type: "json_object" }
       }),
     });
 
-    console.log('OpenAI API call initiated...');
+    console.log('OpenAI API call initiated with GPT-5...');
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
