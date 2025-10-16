@@ -264,18 +264,23 @@ serve(async (req) => {
     console.log('Analysis text length:', analysisText?.length || 0);
     
     if (!analysisText || analysisText.trim() === '') {
-      console.error('Empty AI response received. Full response:', JSON.stringify(openAIData, null, 2));
+      console.error('Empty AI response received. Full response:', JSON.stringify(aiData, null, 2));
       throw new Error('Empty AI response');
     }
     
     console.log('AI Analysis received, parsing...');
     
+    // Sanitize the response text to remove problematic control characters
+    // but preserve valid JSON escape sequences
+    const sanitizedText = analysisText
+      .replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F]/g, ' '); // Replace control chars with space, preserve \n and \r
+    
     // Parse AI response
     let aiAnalysis;
     try {
-      aiAnalysis = JSON.parse(analysisText);
+      aiAnalysis = JSON.parse(sanitizedText);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', analysisText);
+      console.error('Failed to parse AI response. First 500 chars:', sanitizedText.substring(0, 500));
       console.error('Parse error details:', parseError);
       throw new Error(`Invalid AI response format: ${parseError.message}`);
     }
