@@ -102,14 +102,11 @@ export function IntelligentPartnerDashboard({
     return <AlertCircle className="h-4 w-4 text-destructive" />;
   };
 
-  const handleContactPriorityPartners = () => {
-    const criticalRecommendations = prioritizedRecommendations.filter(r => r.urgency === 'high');
-    if (criticalRecommendations.length > 0 && criticalRecommendations[0].partners.length > 0) {
-      // Contact the first partner from the highest priority category
-      onContactPartner(criticalRecommendations[0].partners[0]);
-    } else if (prioritizedRecommendations.length > 0 && prioritizedRecommendations[0].partners.length > 0) {
-      // Fallback to first available partner
-      onContactPartner(prioritizedRecommendations[0].partners[0]);
+  const handleViewPriorityPartners = () => {
+    // Scroll to the priority recommendations section
+    const recommendationsSection = document.getElementById('priority-recommendations');
+    if (recommendationsSection) {
+      recommendationsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -209,7 +206,7 @@ export function IntelligentPartnerDashboard({
 
       {/* Priority Recommendations */}
       {prioritizedRecommendations.length > 0 && (
-        <div className="space-y-4">
+        <div id="priority-recommendations" className="space-y-4 scroll-mt-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold">Priority Recommendations</h3>
             <Badge variant="outline" className="text-sm">
@@ -243,12 +240,12 @@ export function IntelligentPartnerDashboard({
             <Button 
               variant="default" 
               className="justify-start gap-2"
-              onClick={handleContactPriorityPartners}
+              onClick={handleViewPriorityPartners}
               disabled={prioritizedRecommendations.length === 0 || 
                 prioritizedRecommendations.every(r => r.partners.length === 0)}
             >
               <Users className="h-4 w-4" />
-              Contact Priority Partners
+              View Priority Partners
             </Button>
             <Button variant="outline" className="justify-start gap-2">
               <TrendingUp className="h-4 w-4" />
