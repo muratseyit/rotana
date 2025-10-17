@@ -164,9 +164,14 @@ export function PartnerRecommendationCard({
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-sm group-hover:text-primary transition-colors">
+                      <h3 className="font-semibold text-base group-hover:text-primary transition-colors">
                         {partner.name}
-                      </h4>
+                      </h3>
+                      {partner.verification_status === 'verified' && (
+                        <Badge variant="secondary" className="text-xs">
+                          Verified Partner
+                        </Badge>
+                      )}
                       {partner.matchScore && (
                         <Badge variant={partner.matchScore >= 85 ? "default" : partner.matchScore >= 70 ? "secondary" : "outline"} className="text-xs">
                           {partner.matchScore}% match
