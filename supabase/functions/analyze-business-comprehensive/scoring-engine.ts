@@ -234,7 +234,8 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
   }
 
   // Business goals alignment (0-15 points)
-  const businessGoals = data.businessGoals || [];
+  const businessGoalsRaw = data.businessGoals || [];
+  const businessGoals = Array.isArray(businessGoalsRaw) ? businessGoalsRaw : [];
   if (businessGoals.length >= 3) {
     const points = 15;
     score += points;
