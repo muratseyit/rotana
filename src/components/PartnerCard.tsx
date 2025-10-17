@@ -37,15 +37,19 @@ export function PartnerCard({ partner }: PartnerCardProps) {
               />
             )}
             <div>
-              <CardTitle className="text-lg">{partner.name}</CardTitle>
-              <Badge variant="outline" className="capitalize mt-1">
-                {partner.category}
-              </Badge>
+              <CardTitle className="text-xl font-semibold">{partner.name}</CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className="capitalize">
+                  {partner.category}
+                </Badge>
+                {partner.verification_status === 'verified' && (
+                  <Badge variant="secondary" className="text-xs">
+                    Verified Partner
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
-          <Badge className="bg-green-100 text-green-800">
-            Verified
-          </Badge>
         </div>
       </CardHeader>
       
