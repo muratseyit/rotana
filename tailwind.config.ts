@@ -56,14 +56,14 @@ export default {
 					DEFAULT: 'hsl(var(--success))',
 					foreground: 'hsl(var(--success-foreground))'
 				},
-			brand: {
-				DEFAULT: 'hsl(var(--brand))',
-				foreground: 'hsl(var(--brand-foreground))'
-			},
-			'accent-silver': {
-				DEFAULT: 'hsl(var(--accent-silver))',
-				foreground: 'hsl(var(--accent-silver-foreground))'
-			},
+				brand: {
+					DEFAULT: 'hsl(var(--brand))',
+					foreground: 'hsl(var(--brand-foreground))'
+				},
+				'accent-red': {
+					DEFAULT: 'hsl(var(--accent-red))',
+					foreground: 'hsl(var(--accent-red-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -78,11 +78,10 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
 			},
-		backgroundImage: {
-			'gradient-hero': 'var(--gradient-hero)',
-			'gradient-brand': 'var(--gradient-brand)',
-			'gradient-subtle': 'var(--gradient-subtle)',
-		},
+			backgroundImage: {
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-brand': 'var(--gradient-brand)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',

@@ -142,7 +142,7 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
   let score = 0;
   const factors: ScoreEvidence['factors'] = [];
 
-  // Market definition clarity (0-20 points)
+  // Market definition clarity (0-25 points)
   if (data.targetMarket && data.targetMarket !== 'Not specified') {
     const points = 20;
     score += points;
@@ -161,54 +161,10 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
     });
   }
 
-  // Target regions clarity (0-15 points) - NEW
-  const targetRegions = data.targetRegions || [];
-  if (targetRegions.includes('UK') || targetRegions.includes('Europe')) {
-    const points = 15;
-    score += points;
-    factors.push({
-      factor: 'UK Market Targeting',
-      impact: 'positive',
-      points,
-      evidence: `UK specifically targeted among: ${targetRegions.join(', ')}`
-    });
-  } else if (targetRegions.length > 0) {
-    const points = 8;
-    score += points;
-    factors.push({
-      factor: 'International Targeting',
-      impact: 'neutral',
-      points,
-      evidence: `Targeting ${targetRegions.join(', ')} - UK should be prioritized`
-    });
-  }
-
-  // Current market presence (0-15 points) - NEW
-  const currentMarkets = data.currentMarkets || [];
-  if (currentMarkets.length >= 2) {
-    const points = 15;
-    score += points;
-    factors.push({
-      factor: 'Multi-Market Experience',
-      impact: 'positive',
-      points,
-      evidence: `Operating in ${currentMarkets.length} markets: ${currentMarkets.slice(0, 3).join(', ')}`
-    });
-  } else if (currentMarkets.length > 0) {
-    const points = 8;
-    score += points;
-    factors.push({
-      factor: 'Single Market Presence',
-      impact: 'neutral',
-      points,
-      evidence: `Currently operating in: ${currentMarkets[0]}`
-    });
-  }
-
-  // Business description quality (0-15 points)
-  const descriptionLength = (data.businessDescription || data.description || '').length;
+  // Business description quality (0-20 points)
+  const descriptionLength = data.businessDescription?.length || 0;
   if (descriptionLength > 200) {
-    const points = 15;
+    const points = 20;
     score += points;
     factors.push({
       factor: 'Detailed Value Proposition',
@@ -217,7 +173,7 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
       evidence: 'Comprehensive business description provided'
     });
   } else if (descriptionLength > 50) {
-    const points = 10;
+    const points = 12;
     score += points;
     factors.push({
       factor: 'Basic Value Proposition',
@@ -227,36 +183,14 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
     });
   }
 
-  // Business goals clarity (0-15 points) - NEW
-  const businessGoals = data.businessGoals || '';
-  if (businessGoals.length > 100) {
-    const points = 15;
-    score += points;
-    factors.push({
-      factor: 'Clear Strategic Goals',
-      impact: 'positive',
-      points,
-      evidence: 'Detailed business goals and objectives defined'
-    });
-  } else if (businessGoals.length > 0) {
-    const points = 8;
-    score += points;
-    factors.push({
-      factor: 'Basic Goals Outlined',
-      impact: 'neutral',
-      points,
-      evidence: 'Initial business goals documented'
-    });
-  }
-
-  // Industry alignment (0-15 points)
+  // Industry alignment (0-20 points)
   if (data.industry && data.industry !== 'Not specified') {
     const highGrowthIndustries = ['technology', 'e-commerce', 'healthcare', 'fintech'];
     const isHighGrowth = highGrowthIndustries.some(ind => 
       data.industry.toLowerCase().includes(ind)
     );
     
-    const points = isHighGrowth ? 15 : 12;
+    const points = isHighGrowth ? 20 : 15;
     score += points;
     factors.push({
       factor: 'Industry Selection',
@@ -268,34 +202,33 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
     });
   }
 
-  // Market entry timeline (0-10 points)
-  const timeline = data.timeline || data.marketEntryTimeline || '';
-  if (timeline) {
-    const timelineLower = timeline.toLowerCase();
+  // Market entry timeline (0-15 points)
+  if (data.marketEntryTimeline) {
+    const timeline = data.marketEntryTimeline.toLowerCase();
     let points = 0;
-    if (timelineLower.includes('3-6') || timelineLower.includes('immediate')) {
-      points = 10;
+    if (timeline.includes('3-6 months') || timeline.includes('immediate')) {
+      points = 15;
       factors.push({
         factor: 'Realistic Timeline',
         impact: 'positive',
         points,
-        evidence: `${timeline} timeline demonstrates readiness`
+        evidence: 'Well-planned market entry timeline demonstrates readiness'
       });
-    } else if (timelineLower.includes('6-12')) {
-      points = 8;
+    } else if (timeline.includes('6-12 months')) {
+      points = 12;
       factors.push({
         factor: 'Measured Timeline',
         impact: 'positive',
         points,
-        evidence: `${timeline} approach shows strategic planning`
+        evidence: 'Gradual market entry approach shows strategic planning'
       });
     }
     score += points;
   }
 
-  // Competitive positioning (0-15 points)
+  // Competitive positioning (0-20 points)
   if (data.competitiveAdvantage || data.uniqueSellingPoints) {
-    const points = 15;
+    const points = 18;
     score += points;
     factors.push({
       factor: 'Competitive Differentiation',
@@ -384,28 +317,16 @@ function calculateRegulatoryCompatibility(data: any, verification?: any): ScoreE
     });
   }
 
-  // Regulatory compliance experience (0-25 points) - ENHANCED
-  const regulatoryCompliance = data.regulatoryCompliance || [];
-  const complianceCompleted = data.complianceCompleted || [];
-  const allCompliance = [...new Set([...regulatoryCompliance, ...complianceCompleted])];
-  
-  if (allCompliance.length >= 3) {
-    const points = 25;
-    score += points;
-    factors.push({
-      factor: 'Strong Compliance Track Record',
-      impact: 'positive',
-      points,
-      evidence: `${allCompliance.length} compliance areas completed: ${allCompliance.slice(0, 3).join(', ')}`
-    });
-  } else if (allCompliance.length > 0) {
-    const points = Math.min(20, allCompliance.length * 8);
+  // Compliance progress (0-25 points)
+  const completedCompliance = data.complianceCompleted || [];
+  if (completedCompliance.length > 0) {
+    const points = Math.min(25, completedCompliance.length * 8);
     score += points;
     factors.push({
       factor: 'Compliance Progress',
       impact: 'positive',
       points,
-      evidence: `${allCompliance.length} compliance item(s) completed: ${allCompliance.join(', ')}`
+      evidence: `${completedCompliance.length} compliance items completed: ${completedCompliance.join(', ')}`
     });
   } else {
     factors.push({
@@ -416,32 +337,10 @@ function calculateRegulatoryCompatibility(data: any, verification?: any): ScoreE
     });
   }
 
-  // Quality certifications (0-20 points) - NEW
-  const qualityCertifications = data.qualityCertifications || [];
-  if (qualityCertifications.length >= 2) {
-    const points = 20;
-    score += points;
-    factors.push({
-      factor: 'Quality Certifications',
-      impact: 'positive',
-      points,
-      evidence: `${qualityCertifications.length} certifications: ${qualityCertifications.join(', ')}`
-    });
-  } else if (qualityCertifications.length > 0) {
-    const points = 12;
-    score += points;
-    factors.push({
-      factor: 'Basic Certification',
-      impact: 'neutral',
-      points,
-      evidence: `${qualityCertifications[0]} certification obtained`
-    });
-  }
-
-  // IP protection (0-15 points)
+  // IP protection (0-25 points)
   const ipProtection = data.ipProtection || [];
   if (ipProtection.length > 0) {
-    const points = Math.min(15, ipProtection.length * 8);
+    const points = Math.min(25, ipProtection.length * 10);
     score += points;
     factors.push({
       factor: 'Intellectual Property Protection',
@@ -520,7 +419,7 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
       points: websitePoints,
       evidence: websiteEvidence
     });
-  } else if (data.websiteUrl && data.websiteUrl !== 'Not provided' && data.website && data.website !== 'Not provided') {
+  } else if (data.websiteUrl && data.websiteUrl !== 'Not provided') {
     // Basic score for URL only (website not analyzed)
     const points = 5;
     score += points;
@@ -539,29 +438,9 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     });
   }
 
-  // English website availability (0-15 points) - NEW
-  if (data.hasEnglishWebsite === true) {
-    const points = 15;
-    score += points;
-    factors.push({
-      factor: 'English Language Support',
-      impact: 'positive',
-      points,
-      evidence: 'Website available in English - critical for UK market access'
-    });
-  } else if (data.hasEnglishWebsite === false) {
-    factors.push({
-      factor: 'No English Website',
-      impact: 'negative',
-      points: -10,
-      evidence: 'English language website required for UK market'
-    });
-  }
-
-  // E-commerce capability (0-25 points)
-  if (data.onlineSalesPlatform === 'yes' || data.onlineSalesPlatform === true || 
-      data.hasOnlineStore === true || data.hasEcommercePlatform === true) {
-    const points = 25;
+  // E-commerce capability (0-30 points)
+  if (data.onlineSalesPlatform === 'yes' || data.onlineSalesPlatform === true) {
+    const points = 30;
     score += points;
     factors.push({
       factor: 'E-commerce Enabled',
@@ -578,44 +457,32 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     });
   }
 
-  // Digital presence platforms (0-20 points) - ENHANCED
-  const digitalPresence = data.digitalPresence || [];
+  // Social media presence (0-20 points)
   const socialMedia = data.socialMediaPlatforms || [];
-  const allPlatforms = [...new Set([...digitalPresence, ...socialMedia])];
-  
-  if (allPlatforms.length >= 4) {
+  if (socialMedia.length >= 3) {
     const points = 20;
     score += points;
     factors.push({
-      factor: 'Strong Multi-Channel Presence',
+      factor: 'Strong Social Media Presence',
       impact: 'positive',
       points,
-      evidence: `Active on ${allPlatforms.length} platforms: ${allPlatforms.slice(0, 4).join(', ')}`
+      evidence: `Active on ${socialMedia.length} platforms: ${socialMedia.join(', ')}`
     });
-  } else if (allPlatforms.length >= 2) {
-    const points = 15;
+  } else if (socialMedia.length > 0) {
+    const points = 12;
     score += points;
     factors.push({
-      factor: 'Good Digital Presence',
-      impact: 'positive',
-      points,
-      evidence: `Present on ${allPlatforms.length} platforms`
-    });
-  } else if (allPlatforms.length > 0) {
-    const points = 8;
-    score += points;
-    factors.push({
-      factor: 'Basic Digital Presence',
+      factor: 'Basic Social Media',
       impact: 'neutral',
       points,
-      evidence: `Limited to ${allPlatforms.length} platform(s)`
+      evidence: `Present on ${socialMedia.length} platform(s)`
     });
   }
 
-  // Website features (0-15 points)
+  // Website features (0-20 points)
   const websiteFeatures = data.websiteFeatures || [];
   if (websiteFeatures.length >= 4) {
-    const points = 15;
+    const points = 20;
     score += points;
     factors.push({
       factor: 'Advanced Website Features',
@@ -624,7 +491,7 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
       evidence: `${websiteFeatures.length} features implemented including ${websiteFeatures.slice(0, 3).join(', ')}`
     });
   } else if (websiteFeatures.length > 0) {
-    const points = 8;
+    const points = 12;
     score += points;
     factors.push({
       factor: 'Basic Website Features',
@@ -634,9 +501,9 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     });
   }
 
-  // Digital marketing budget (0-10 points)
+  // Digital marketing budget (0-15 points)
   if (data.digitalMarketingBudget && data.digitalMarketingBudget !== 'Not specified') {
-    const points = 10;
+    const points = 15;
     score += points;
     factors.push({
       factor: 'Marketing Budget Allocated',
@@ -906,74 +773,10 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
     evidence: 'Actively pursuing UK market entry'
   });
 
-  // Budget allocation (0-25 points) - NEW
-  const budget = data.budget || '';
-  if (budget) {
-    let points = 0;
-    if (budget.includes('100k+') || budget.includes('50k-100k')) {
-      points = 25;
-      factors.push({
-        factor: 'Substantial Investment Budget',
-        impact: 'positive',
-        points,
-        evidence: `Budget range: ${budget} - demonstrates serious commitment`
-      });
-    } else if (budget.includes('10k-50k')) {
-      points = 18;
-      factors.push({
-        factor: 'Moderate Investment Budget',
-        impact: 'positive',
-        points,
-        evidence: `Budget range: ${budget} - adequate for initial entry`
-      });
-    } else if (budget.includes('0-10k')) {
-      points = 10;
-      factors.push({
-        factor: 'Limited Investment Budget',
-        impact: 'neutral',
-        points,
-        evidence: `Budget range: ${budget} - will require careful prioritization`
-      });
-    }
-    score += points;
-  }
-
-  // Annual revenue indicator (0-20 points) - NEW
-  const annualRevenue = data.annualRevenue || '';
-  if (annualRevenue) {
-    let points = 0;
-    if (annualRevenue.includes('5m+') || annualRevenue.includes('1m-5m')) {
-      points = 20;
-      factors.push({
-        factor: 'Strong Revenue Base',
-        impact: 'positive',
-        points,
-        evidence: `Revenue: ${annualRevenue} - solid financial foundation for expansion`
-      });
-    } else if (annualRevenue.includes('250k-1m')) {
-      points = 15;
-      factors.push({
-        factor: 'Growing Revenue',
-        impact: 'positive',
-        points,
-        evidence: `Revenue: ${annualRevenue} - good growth trajectory`
-      });
-    } else if (annualRevenue.includes('50k-250k')) {
-      points = 10;
-      factors.push({
-        factor: 'Early Revenue',
-        impact: 'neutral',
-        points,
-        evidence: `Revenue: ${annualRevenue} - early stage business`
-      });
-    }
-    score += points;
-  }
-
-  // Planned investments (0-20 points)
+  // Planned investments (0-30 points)
   const plannedInvestments = data.plannedInvestments || [];
   if (plannedInvestments.length >= 3) {
-    const points = 20;
+    const points = 30;
     score += points;
     factors.push({
       factor: 'Comprehensive Investment Plan',
@@ -982,7 +785,7 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
       evidence: `${plannedInvestments.length} investment areas identified: ${plannedInvestments.slice(0, 3).join(', ')}`
     });
   } else if (plannedInvestments.length > 0) {
-    const points = 12;
+    const points = 18;
     score += points;
     factors.push({
       factor: 'Initial Investment Planning',
@@ -992,10 +795,10 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
     });
   }
 
-  // Success metrics defined (0-15 points)
+  // Success metrics defined (0-20 points)
   const successMetrics = data.keySuccessMetrics || [];
   if (successMetrics.length >= 3) {
-    const points = 15;
+    const points = 20;
     score += points;
     factors.push({
       factor: 'KPIs Established',
@@ -1004,7 +807,7 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
       evidence: `${successMetrics.length} success metrics tracked: ${successMetrics.slice(0, 3).join(', ')}`
     });
   } else if (successMetrics.length > 0) {
-    const points = 10;
+    const points = 12;
     score += points;
     factors.push({
       factor: 'Basic Metrics Tracked',
@@ -1014,9 +817,9 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
     });
   }
 
-  // Financial planning (0-15 points)
+  // Budget/financial planning (0-25 points)
   if (data.financialProjections || data.revenueModel) {
-    const points = 15;
+    const points = 25;
     score += points;
     factors.push({
       factor: 'Financial Planning Complete',
@@ -1024,14 +827,14 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
       points,
       evidence: 'Revenue model and financial projections developed'
     });
-  } else if ((plannedInvestments && plannedInvestments.length > 0) || budget) {
-    const points = 8;
+  } else if (data.plannedInvestments && data.plannedInvestments.length > 0) {
+    const points = 15;
     score += points;
     factors.push({
       factor: 'Basic Financial Planning',
       impact: 'neutral',
       points,
-      evidence: 'Investment areas and budget identified, detailed projections recommended'
+      evidence: 'Investment areas identified, detailed projections recommended'
     });
   }
 
