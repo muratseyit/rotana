@@ -192,7 +192,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-2.5-pro',
           messages: [
             { 
               role: 'system', 
@@ -311,7 +311,7 @@ serve(async (req) => {
           completedSections: []
         },
         analysisVersion: 'v2.1-evidence-based',
-        modelUsed: 'gemini-2.5-flash + proprietary-scoring-engine',
+        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine',
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
         scoringMethod: 'evidence-based-algorithms',
@@ -329,7 +329,7 @@ serve(async (req) => {
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
           'Supabase Partner Database',
-          'Gemini 2.5 Flash AI Analysis'
+          'Gemini 2.5 Pro AI Analysis'
         ].filter(Boolean)
       }
     };
