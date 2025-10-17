@@ -239,11 +239,14 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
   if (businessGoals.length >= 3) {
     const points = 15;
     score += points;
+    const goalsPreview = businessGoals.slice(0, 3).map(g => 
+      typeof g === 'string' ? g : (typeof g === 'object' && g !== null ? JSON.stringify(g) : String(g))
+    ).join(', ');
     factors.push({
       factor: 'Strategic Objectives Defined',
       impact: 'positive',
       points,
-      evidence: `${businessGoals.length} clear objectives: ${businessGoals.slice(0, 3).join(', ')}`
+      evidence: `${businessGoals.length} clear objectives: ${goalsPreview}`
     });
   } else if (businessGoals.length > 0) {
     const points = 8;
