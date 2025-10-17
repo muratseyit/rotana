@@ -145,22 +145,38 @@ export default function ComprehensiveAnalysis() {
   const processComprehensiveAnalysis = async (data: BusinessData) => {
     try {
       setLoading(true);
+      console.log('Starting comprehensive analysis for:', data.companyName);
+      console.log('Business data:', data);
 
       const { data: result, error } = await supabase.functions.invoke('analyze-business-comprehensive', {
         body: data
       });
 
+      console.log('Supabase function response:', { result, error });
+
       if (error) {
-        console.error('Analysis error:', error);
-        throw new Error('Failed to process comprehensive analysis');
+        console.error('Analysis error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          error: error
+        });
+        throw new Error(`Failed to process comprehensive analysis: ${error.message}`);
       }
 
+      if (!result) {
+        console.error('No result returned from analysis');
+        throw new Error('No analysis result returned');
+      }
+
+      console.log('Analysis successful, setting result');
       setAnalysisResult(result);
     } catch (error) {
       console.error("Error processing analysis:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
         title: "Analysis Failed",
-        description: "Failed to process your comprehensive analysis. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
       navigate('/');
