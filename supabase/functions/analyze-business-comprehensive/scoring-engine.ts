@@ -202,25 +202,94 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
     });
   }
 
+  // Current markets and international experience (0-15 points)
+  const currentMarkets = data.currentMarkets || [];
+  if (currentMarkets.length > 0) {
+    const points = Math.min(15, currentMarkets.length * 5);
+    score += points;
+    factors.push({
+      factor: 'International Experience',
+      impact: 'positive',
+      points,
+      evidence: `Operating in ${currentMarkets.length} market(s): ${currentMarkets.slice(0, 3).join(', ')}`
+    });
+  }
+
+  // Target regions with UK prioritization (0-15 points)
+  const targetRegions = data.targetRegions || [];
+  if (targetRegions.length > 0) {
+    const hasUK = targetRegions.some((region: string) => 
+      region.toLowerCase().includes('uk') || region.toLowerCase().includes('united kingdom')
+    );
+    const points = hasUK ? 15 : 10;
+    score += points;
+    factors.push({
+      factor: 'Target Region Clarity',
+      impact: 'positive',
+      points,
+      evidence: hasUK 
+        ? `UK specifically targeted among ${targetRegions.length} region(s)`
+        : `${targetRegions.length} target region(s) identified`
+    });
+  }
+
+  // Business goals alignment (0-15 points)
+  const businessGoals = data.businessGoals || [];
+  if (businessGoals.length >= 3) {
+    const points = 15;
+    score += points;
+    factors.push({
+      factor: 'Strategic Objectives Defined',
+      impact: 'positive',
+      points,
+      evidence: `${businessGoals.length} clear objectives: ${businessGoals.slice(0, 3).join(', ')}`
+    });
+  } else if (businessGoals.length > 0) {
+    const points = 8;
+    score += points;
+    factors.push({
+      factor: 'Initial Goals Set',
+      impact: 'neutral',
+      points,
+      evidence: `${businessGoals.length} business goal(s) identified`
+    });
+  }
+
   // Market entry timeline (0-15 points)
-  if (data.marketEntryTimeline) {
-    const timeline = data.marketEntryTimeline.toLowerCase();
+  const timeline = data.timeline?.toLowerCase() || data.marketEntryTimeline?.toLowerCase() || '';
+  if (timeline) {
     let points = 0;
-    if (timeline.includes('3-6 months') || timeline.includes('immediate')) {
+    if (timeline.includes('0-3 months') || timeline.includes('immediate')) {
       points = 15;
       factors.push({
-        factor: 'Realistic Timeline',
+        factor: 'Immediate Action Ready',
         impact: 'positive',
         points,
-        evidence: 'Well-planned market entry timeline demonstrates readiness'
+        evidence: 'Immediate market entry timeline shows strong readiness'
+      });
+    } else if (timeline.includes('3-6 months')) {
+      points = 13;
+      factors.push({
+        factor: 'Near-term Planning',
+        impact: 'positive',
+        points,
+        evidence: 'Well-planned near-term market entry demonstrates preparation'
       });
     } else if (timeline.includes('6-12 months')) {
-      points = 12;
+      points = 10;
       factors.push({
-        factor: 'Measured Timeline',
-        impact: 'positive',
+        factor: 'Measured Approach',
+        impact: 'neutral',
         points,
         evidence: 'Gradual market entry approach shows strategic planning'
+      });
+    } else if (timeline.includes('12+') || timeline.includes('exploring')) {
+      points = 5;
+      factors.push({
+        factor: 'Long-term Planning',
+        impact: 'neutral',
+        points,
+        evidence: 'Extended timeline - consider accelerating for market opportunities'
       });
     }
     score += points;
@@ -317,16 +386,19 @@ function calculateRegulatoryCompatibility(data: any, verification?: any): ScoreE
     });
   }
 
-  // Compliance progress (0-25 points)
+  // Regulatory compliance (0-25 points)
+  const regulatoryCompliance = data.regulatoryCompliance || [];
   const completedCompliance = data.complianceCompleted || [];
-  if (completedCompliance.length > 0) {
-    const points = Math.min(25, completedCompliance.length * 8);
+  const totalCompliance = [...new Set([...regulatoryCompliance, ...completedCompliance])];
+  
+  if (totalCompliance.length > 0) {
+    const points = Math.min(25, totalCompliance.length * 6);
     score += points;
     factors.push({
-      factor: 'Compliance Progress',
+      factor: 'Regulatory Compliance',
       impact: 'positive',
       points,
-      evidence: `${completedCompliance.length} compliance items completed: ${completedCompliance.join(', ')}`
+      evidence: `${totalCompliance.length} compliance areas addressed: ${totalCompliance.slice(0, 4).join(', ')}`
     });
   } else {
     factors.push({
@@ -334,6 +406,19 @@ function calculateRegulatoryCompatibility(data: any, verification?: any): ScoreE
       impact: 'negative',
       points: -15,
       evidence: 'No documented compliance progress - critical gap for UK market entry'
+    });
+  }
+
+  // Quality certifications (0-20 points)
+  const qualityCertifications = data.qualityCertifications || [];
+  if (qualityCertifications.length > 0) {
+    const points = Math.min(20, qualityCertifications.length * 7);
+    score += points;
+    factors.push({
+      factor: 'Quality Certifications',
+      impact: 'positive',
+      points,
+      evidence: `${qualityCertifications.length} certification(s) held: ${qualityCertifications.join(', ')}`
     });
   }
 
@@ -438,15 +523,48 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     });
   }
 
+  // English website presence (0-15 points)
+  const hasEnglishWebsite = data.hasEnglishWebsite || false;
+  if (hasEnglishWebsite) {
+    const points = 15;
+    score += points;
+    factors.push({
+      factor: 'English Website Available',
+      impact: 'positive',
+      points,
+      evidence: 'English language website ready for UK market engagement'
+    });
+  } else {
+    factors.push({
+      factor: 'No English Website',
+      impact: 'negative',
+      points: -10,
+      evidence: 'English website essential for UK market credibility'
+    });
+  }
+
   // E-commerce capability (0-30 points)
-  if (data.onlineSalesPlatform === 'yes' || data.onlineSalesPlatform === true) {
+  const hasOnlineStore = data.hasOnlineStore || false;
+  const hasEcommercePlatform = data.hasEcommercePlatform || false;
+  const hasBasicEcommerce = data.onlineSalesPlatform === 'yes' || data.onlineSalesPlatform === true;
+  
+  if (hasOnlineStore && hasEcommercePlatform) {
     const points = 30;
     score += points;
     factors.push({
-      factor: 'E-commerce Enabled',
+      factor: 'Full E-commerce Integration',
       impact: 'positive',
       points,
-      evidence: 'Online sales platform ready for UK market'
+      evidence: 'Online store and e-commerce platform fully operational'
+    });
+  } else if (hasOnlineStore || hasEcommercePlatform || hasBasicEcommerce) {
+    const points = 20;
+    score += points;
+    factors.push({
+      factor: 'E-commerce Partially Enabled',
+      impact: 'positive',
+      points,
+      evidence: 'E-commerce capability in development or partially implemented'
     });
   } else {
     factors.push({
@@ -457,25 +575,37 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     });
   }
 
-  // Social media presence (0-20 points)
+  // Digital presence (0-20 points)
+  const digitalPresence = data.digitalPresence || [];
   const socialMedia = data.socialMediaPlatforms || [];
-  if (socialMedia.length >= 3) {
+  const allDigitalChannels = [...new Set([...digitalPresence, ...socialMedia])];
+  
+  if (allDigitalChannels.length >= 4) {
     const points = 20;
     score += points;
     factors.push({
-      factor: 'Strong Social Media Presence',
+      factor: 'Strong Multi-channel Presence',
       impact: 'positive',
       points,
-      evidence: `Active on ${socialMedia.length} platforms: ${socialMedia.join(', ')}`
+      evidence: `Active on ${allDigitalChannels.length} channels: ${allDigitalChannels.slice(0, 4).join(', ')}`
     });
-  } else if (socialMedia.length > 0) {
-    const points = 12;
+  } else if (allDigitalChannels.length >= 2) {
+    const points = 15;
     score += points;
     factors.push({
-      factor: 'Basic Social Media',
+      factor: 'Developing Digital Presence',
+      impact: 'positive',
+      points,
+      evidence: `Present on ${allDigitalChannels.length} platform(s): ${allDigitalChannels.join(', ')}`
+    });
+  } else if (allDigitalChannels.length > 0) {
+    const points = 8;
+    score += points;
+    factors.push({
+      factor: 'Basic Digital Presence',
       impact: 'neutral',
       points,
-      evidence: `Present on ${socialMedia.length} platform(s)`
+      evidence: `Limited presence - expansion recommended`
     });
   }
 
@@ -815,6 +945,86 @@ function calculateInvestmentReadiness(data: any): ScoreEvidence {
       points,
       evidence: `${successMetrics.length} metric(s) defined`
     });
+  }
+
+  // Market entry budget (0-20 points)
+  const budget = data.budget?.toLowerCase() || '';
+  if (budget) {
+    let points = 0;
+    if (budget.includes('£50,000+') || budget.includes('50000') || budget.includes('significant')) {
+      points = 20;
+      factors.push({
+        factor: 'Strong Financial Commitment',
+        impact: 'positive',
+        points,
+        evidence: 'Substantial budget allocated for UK market entry'
+      });
+    } else if (budget.includes('£25,000-£50,000') || budget.includes('25000')) {
+      points = 15;
+      factors.push({
+        factor: 'Adequate Budget Planned',
+        impact: 'positive',
+        points,
+        evidence: 'Reasonable budget for initial UK market entry'
+      });
+    } else if (budget.includes('£10,000-£25,000') || budget.includes('10000')) {
+      points = 10;
+      factors.push({
+        factor: 'Limited Budget',
+        impact: 'neutral',
+        points,
+        evidence: 'Conservative budget - may need to prioritize activities'
+      });
+    } else if (budget.includes('under') || budget.includes('minimal')) {
+      points = 5;
+      factors.push({
+        factor: 'Minimal Budget',
+        impact: 'neutral',
+        points,
+        evidence: 'Limited financial resources - lean approach recommended'
+      });
+    }
+    score += points;
+  }
+
+  // Annual revenue (0-20 points)
+  const annualRevenue = data.annualRevenue?.toLowerCase() || '';
+  if (annualRevenue) {
+    let points = 0;
+    if (annualRevenue.includes('£1m+') || annualRevenue.includes('1000000') || annualRevenue.includes('million')) {
+      points = 20;
+      factors.push({
+        factor: 'Strong Revenue Base',
+        impact: 'positive',
+        points,
+        evidence: 'Strong revenue foundation supports UK expansion'
+      });
+    } else if (annualRevenue.includes('£500k-£1m') || annualRevenue.includes('500000')) {
+      points = 15;
+      factors.push({
+        factor: 'Solid Revenue Foundation',
+        impact: 'positive',
+        points,
+        evidence: 'Healthy revenue provides expansion capacity'
+      });
+    } else if (annualRevenue.includes('£100k-£500k') || annualRevenue.includes('100000')) {
+      points = 10;
+      factors.push({
+        factor: 'Growing Revenue',
+        impact: 'neutral',
+        points,
+        evidence: 'Developing revenue base - sustainable growth path'
+      });
+    } else if (annualRevenue.includes('under') || annualRevenue.includes('startup')) {
+      points = 5;
+      factors.push({
+        factor: 'Early Stage Revenue',
+        impact: 'neutral',
+        points,
+        evidence: 'Early stage financially - focus on lean market entry'
+      });
+    }
+    score += points;
   }
 
   // Budget/financial planning (0-25 points)
