@@ -13,6 +13,8 @@ import {
   ExternalLink,
   CheckCircle
 } from "lucide-react";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface ExportReportDialogProps {
   companyName: string;
@@ -65,34 +67,171 @@ export function ExportReportDialog({ companyName, overallScore, analysis, trigge
     }
   ];
 
+  const generatePDF = (isSummary: boolean = false) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    let yPosition = 20;
+
+    // Header
+    doc.setFillColor(189, 189, 189);
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.text('Converta', 15, 15);
+    doc.setFontSize(12);
+    doc.text('UK Market Readiness Report', 15, 23);
+
+    // Company Info
+    yPosition = 40;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(16);
+    doc.text(companyName, 15, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, 15, yPosition);
+
+    // Overall Score
+    yPosition += 15;
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Overall Market Readiness Score', 15, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(24);
+    const scoreColor = overallScore >= 80 ? [76, 175, 80] : overallScore >= 60 ? [255, 152, 0] : [244, 67, 54];
+    doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+    doc.text(`${overallScore}%`, 15, yPosition);
+
+    if (!isSummary && analysis?.scoreBreakdown) {
+      // Score Breakdown
+      yPosition += 20;
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Category Breakdown', 15, yPosition);
+      
+      yPosition += 5;
+      const breakdownData = Object.entries(analysis.scoreBreakdown).map(([key, value]) => [
+        key.replace(/([A-Z])/g, ' $1').trim(),
+        `${value}%`
+      ]);
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['Category', 'Score']],
+        body: breakdownData,
+        theme: 'grid',
+        headStyles: { fillColor: [189, 189, 189], textColor: [255, 255, 255] },
+        margin: { left: 15, right: 15 }
+      });
+
+      yPosition = (doc as any).lastAutoTable.finalY + 15;
+    }
+
+    // Key Recommendations
+    if (yPosition > pageHeight - 40) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Key Recommendations', 15, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    const recommendations = analysis?.recommendations?.slice(0, isSummary ? 3 : 5) || [
+      'Complete regulatory compliance requirements',
+      'Enhance digital presence for UK market',
+      'Establish partnerships with verified UK providers'
+    ];
+
+    recommendations.forEach((rec: string, index: number) => {
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`${index + 1}. ${rec}`, 20, yPosition);
+      yPosition += 7;
+    });
+
+    // Compliance Assessment
+    if (!isSummary && analysis?.complianceAssessment) {
+      yPosition += 10;
+      if (yPosition > pageHeight - 40) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFontSize(14);
+      doc.text('Compliance Status', 15, yPosition);
+      
+      yPosition += 5;
+      const complianceData = analysis.complianceAssessment.map((item: any) => [
+        item.requirement || item.name,
+        item.status || item.completed ? 'Completed' : 'Pending'
+      ]);
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['Requirement', 'Status']],
+        body: complianceData,
+        theme: 'striped',
+        headStyles: { fillColor: [189, 189, 189], textColor: [255, 255, 255] },
+        margin: { left: 15, right: 15 }
+      });
+    }
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Converta - AI-powered UK market analysis | Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' }
+      );
+    }
+
+    return doc;
+  };
+
   const handleExport = async (optionId: string) => {
     setIsExporting(true);
     
     try {
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       switch (optionId) {
         case 'pdf':
+          const pdfDoc = generatePDF(false);
+          pdfDoc.save(`${companyName.replace(/\s+/g, '-')}-UK-Market-Report.pdf`);
           toast({
             title: "PDF Generated",
             description: "Your comprehensive report has been downloaded successfully.",
           });
           break;
         case 'summary':
+          const summaryDoc = generatePDF(true);
+          summaryDoc.save(`${companyName.replace(/\s+/g, '-')}-Executive-Summary.pdf`);
           toast({
             title: "Executive Summary Ready",
             description: "One-page summary has been downloaded.",
           });
           break;
         case 'email':
+          // Simulated for now - would need backend integration
+          await new Promise(resolve => setTimeout(resolve, 1500));
           toast({
             title: "Email Sent",
             description: "Report has been sent to the specified recipients.",
           });
           break;
         case 'link':
-          navigator.clipboard.writeText(`https://businessbridge.com/reports/shared/${Date.now()}`);
+          navigator.clipboard.writeText(`https://converta.uk/reports/shared/${Date.now()}`);
           toast({
             title: "Link Copied",
             description: "Shareable link has been copied to your clipboard.",
@@ -102,6 +241,7 @@ export function ExportReportDialog({ companyName, overallScore, analysis, trigge
       
       setIsOpen(false);
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Export Failed",
         description: "There was an error generating your report. Please try again.",
