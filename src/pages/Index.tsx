@@ -88,11 +88,11 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" className="bg-background text-brand hover:bg-background/90 transition-colors px-8 py-4 text-lg shadow-lg font-semibold" onClick={() => navigate('/comprehensive-analysis-form')}>
-              Get Comprehensive Analysis
+              {t('hero.getComprehensive')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button size="lg" variant="outline" className="bg-transparent border-2 border-background text-background hover:bg-background hover:text-brand transition-colors px-8 py-4 text-lg shadow-lg" onClick={() => navigate('/guest-analysis')}>
-              Try Quick Analysis (Free)
+              {t('hero.tryQuickAnalysis')}
             </Button>
           </div>
         </div>
@@ -107,7 +107,7 @@ const Index = () => {
                 <div>
                   <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    Most Popular Choice
+                    {t('hero.mostPopularChoice')}
                   </div>
                   <h2 className="text-3xl font-bold text-foreground mb-4">
                     Comprehensive UK Market Analysis
@@ -150,7 +150,7 @@ const Index = () => {
                     className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8"
                     onClick={() => navigate('/comprehensive-analysis-form')}
                   >
-                    Start Comprehensive Analysis
+                    {t('hero.startComprehensive')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>

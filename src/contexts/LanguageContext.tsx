@@ -26,6 +26,10 @@ const translations = {
     'hero.description': 'Get comprehensive analysis of your business with AI-powered insights. Understand your market position, identify opportunities, and make data-driven decisions.',
     'hero.startJourney': 'Start Your Analysis',
     'hero.watchDemo': 'Watch Demo',
+    'hero.getComprehensive': 'Get Comprehensive Analysis',
+    'hero.tryQuickAnalysis': 'Try Quick Analysis (Free)',
+    'hero.mostPopularChoice': 'Most Popular Choice',
+    'hero.startComprehensive': 'Start Comprehensive Analysis',
 
     // Features Section
     'features.title': 'Powerful Features for Business Growth',
@@ -300,6 +304,10 @@ const translations = {
     'hero.description': 'AI destekli içgörülerle işinizin kapsamlı analizini alın. Pazar konumunuzu anlayın, fırsatları belirleyin ve veriye dayalı kararlar alın.',
     'hero.startJourney': 'Analizinizi Başlatın',
     'hero.watchDemo': 'Demo İzleyin',
+    'hero.getComprehensive': 'Kapsamlı Analiz Al',
+    'hero.tryQuickAnalysis': 'Hızlı Analiz Dene (Ücretsiz)',
+    'hero.mostPopularChoice': 'En Popüler Seçim',
+    'hero.startComprehensive': 'Kapsamlı Analizi Başlat',
 
     // Features Section
     'features.title': 'İş Büyümesi İçin Güçlü Özellikler',
