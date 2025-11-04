@@ -300,7 +300,7 @@ const translations = {
 
     // Hero Section
     'hero.badge': 'AI Destekli İş Zekası',
-    'hero.title': 'Akıllı Analitikle UK Pazarına Girişinizi Hızlandırın',
+    'hero.title': 'Akıllı Analitikle İngiltere Pazarına Girişinizi Hızlandırın',
     'hero.description': 'AI destekli içgörülerle işinizin kapsamlı analizini alın. Pazar konumunuzu anlayın, fırsatları belirleyin ve veriye dayalı kararlar alın.',
     'hero.startJourney': 'Analizinizi Başlatın',
     'hero.watchDemo': 'Demo İzleyin',
