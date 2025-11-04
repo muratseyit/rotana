@@ -266,7 +266,22 @@ const translations = {
     'pricing.authRequiredDesc': 'Please sign in to subscribe to a plan.',
     'pricing.errorTitle': 'Error',
     'pricing.subscriptionError': 'Failed to process subscription. Please try again.',
-    'pricing.manageError': 'Failed to open subscription management. Please try again.'
+    'pricing.manageError': 'Failed to open subscription management. Please try again.',
+
+    // Access Gate
+    'accessGate.title': 'Welcome to Converta MVP',
+    'accessGate.description': 'Enter your access code to continue',
+    'accessGate.codeLabel': 'Access Code',
+    'accessGate.codePlaceholder': 'Enter your access code',
+    'accessGate.errorMessage': 'Invalid access code. Please try again.',
+    'accessGate.verifying': 'Verifying...',
+    'accessGate.submitButton': 'Access Platform',
+    'accessGate.accessIncludes': 'What you\'ll get access to:',
+    'accessGate.feature1': 'Full platform landing pages and features overview',
+    'accessGate.feature2': 'Comprehensive AI business analysis tool',
+    'accessGate.feature3': 'Verified UK partner directory',
+    'accessGate.feature4': 'Detailed market readiness reports',
+    'accessGate.contactNote': 'Need an access code? Contact the Converta team.',
   },
   tr: {
     // Header
@@ -525,7 +540,22 @@ const translations = {
     'pricing.authRequiredDesc': 'Bir plana abone olmak için lütfen giriş yapın.',
     'pricing.errorTitle': 'Hata',
     'pricing.subscriptionError': 'Abonelik işlenemedi. Lütfen tekrar deneyin.',
-    'pricing.manageError': 'Abonelik yönetimi açılamadı. Lütfen tekrar deneyin.'
+    'pricing.manageError': 'Abonelik yönetimi açılamadı. Lütfen tekrar deneyin.',
+
+    // Access Gate
+    'accessGate.title': 'Converta MVP\'ye Hoş Geldiniz',
+    'accessGate.description': 'Devam etmek için erişim kodunuzu girin',
+    'accessGate.codeLabel': 'Erişim Kodu',
+    'accessGate.codePlaceholder': 'Erişim kodunuzu girin',
+    'accessGate.errorMessage': 'Geçersiz erişim kodu. Lütfen tekrar deneyin.',
+    'accessGate.verifying': 'Doğrulanıyor...',
+    'accessGate.submitButton': 'Platforma Erişin',
+    'accessGate.accessIncludes': 'Erişeceğiniz içerikler:',
+    'accessGate.feature1': 'Tüm platform sayfaları ve özellikler genel bakışı',
+    'accessGate.feature2': 'Kapsamlı AI iş analizi aracı',
+    'accessGate.feature3': 'Doğrulanmış UK partner dizini',
+    'accessGate.feature4': 'Detaylı pazar hazırlık raporları',
+    'accessGate.contactNote': 'Erişim koduna mı ihtiyacınız var? Converta ekibiyle iletişime geçin.',
   }
 };
 
