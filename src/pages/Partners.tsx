@@ -105,14 +105,14 @@ export default function Partners() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Verified Partners
+                {t('partners.verifiedPartners')}
               </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{partners.length}</div>
               <p className="text-xs text-muted-foreground">
-                Ready to help your business
+                {t('partners.readyToHelp')}
               </p>
             </CardContent>
           </Card>
@@ -120,7 +120,7 @@ export default function Partners() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Service Categories
+                {t('partners.serviceCategories')}
               </CardTitle>
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -129,7 +129,7 @@ export default function Partners() {
                 {new Set(partners.map(p => p.category)).size}
               </div>
               <p className="text-xs text-muted-foreground">
-                Different specializations
+                {t('partners.differentSpecializations')}
               </p>
             </CardContent>
           </Card>
@@ -137,7 +137,7 @@ export default function Partners() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Join Network
+                {t('partners.joinNetwork')}
               </CardTitle>
               <Plus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -149,11 +149,11 @@ export default function Partners() {
                     onClick={() => setShowApplicationDialog(true)}
                     className="w-full"
                   >
-                    Apply Now
+                    {t('partners.applyNow')}
                   </Button>
                 ) : (
                   <p className="text-muted-foreground">
-                    Sign in to apply as a partner
+                    {t('partners.signInToApply')}
                   </p>
                 )}
               </div>
@@ -163,7 +163,7 @@ export default function Partners() {
 
         {/* Partner Success Stories */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Success Stories</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('partners.successStories')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
               <CardContent className="p-6">
@@ -212,11 +212,11 @@ export default function Partners() {
         {/* Partners Section */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Verified Partners</h2>
+            <h2 className="text-xl font-semibold">{t('partners.verifiedPartners')}</h2>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8">Loading partners...</div>
+            <div className="text-center py-8">{t('partners.loading')}</div>
           ) : partners.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">

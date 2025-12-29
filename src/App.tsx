@@ -18,6 +18,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Partners = lazy(() => import("./pages/Partners"));
 const AdminPartners = lazy(() => import("./pages/AdminPartners"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Auth = lazy(() => import("./pages/Auth"));
 const TestUserJourney = lazy(() => import("./components/TestUserJourney").then(module => ({ default: module.TestUserJourney })));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const GuestAnalysis = lazy(() => import("./pages/GuestAnalysis"));
@@ -49,6 +50,7 @@ const AppContent = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/comprehensive-analysis-form" element={<ComprehensiveAnalysisForm />} />
           <Route path="/features" element={<Features />} />
           <Route path="/partners" element={<Partners />} />
