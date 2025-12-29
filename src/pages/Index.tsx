@@ -110,38 +110,38 @@ const Index = () => {
                     {t('hero.mostPopularChoice')}
                   </div>
                   <h2 className="text-3xl font-bold text-foreground mb-4">
-                    Comprehensive UK Market Analysis
+                    {t('hero.comprehensiveTitle')}
                   </h2>
                   <p className="text-muted-foreground mb-6 leading-relaxed">
-                    Get a full evidence-based assessment of your UK market readiness with actionable insights, verified partner matches, and expert review options.
+                    {t('hero.comprehensiveDesc')}
                   </p>
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start gap-3">
                       <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-foreground">Real Metrics & Validation</p>
-                        <p className="text-sm text-muted-foreground">Research-backed scoring algorithms with Companies House verification</p>
+                        <p className="font-medium text-foreground">{t('hero.realMetrics')}</p>
+                        <p className="text-sm text-muted-foreground">{t('hero.realMetricsDesc')}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-foreground">Advanced Partner Matching</p>
-                        <p className="text-sm text-muted-foreground">85%+ match accuracy with detailed explanations and case studies</p>
+                        <p className="font-medium text-foreground">{t('hero.advancedPartner')}</p>
+                        <p className="text-sm text-muted-foreground">{t('hero.advancedPartnerDesc')}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-foreground">Expert Review Available</p>
-                        <p className="text-sm text-muted-foreground">Request human expert validation and consultation calls</p>
+                        <p className="font-medium text-foreground">{t('hero.expertReview')}</p>
+                        <p className="text-sm text-muted-foreground">{t('hero.expertReviewDesc')}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-foreground">UK-Specific Requirements</p>
-                        <p className="text-sm text-muted-foreground">Industry benchmarks and regulatory compliance roadmap</p>
+                        <p className="font-medium text-foreground">{t('hero.ukRequirements')}</p>
+                        <p className="text-sm text-muted-foreground">{t('hero.ukRequirementsDesc')}</p>
                       </div>
                     </div>
                   </div>
@@ -156,48 +156,48 @@ const Index = () => {
                 </div>
                 
                 <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg p-6 border border-primary/20">
-                  <h3 className="text-xl font-semibold text-foreground mb-4">What You'll Get:</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">{t('hero.whatYouGet')}</h3>
                   <ul className="space-y-3">
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <BarChart3 className="h-3 w-3 text-primary" />
                       </div>
-                      <span>7 evidence-based category scores with detailed breakdown</span>
+                      <span>{t('hero.getItem1')}</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <FileText className="h-3 w-3 text-primary" />
                       </div>
-                      <span>Score influence reports showing which factors affect your score</span>
+                      <span>{t('hero.getItem2')}</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <Users className="h-3 w-3 text-primary" />
                       </div>
-                      <span>Smart partner matches with 5-factor compatibility analysis</span>
+                      <span>{t('hero.getItem3')}</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <Globe className="h-3 w-3 text-primary" />
                       </div>
-                      <span>UK market benchmarks and industry-specific regulations</span>
+                      <span>{t('hero.getItem4')}</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <TrendingUp className="h-3 w-3 text-primary" />
                       </div>
-                      <span>Actionable roadmap with cost estimates and timelines</span>
+                      <span>{t('hero.getItem5')}</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <CheckCircle className="h-3 w-3 text-primary" />
                       </div>
-                      <span>Data quality indicators and methodology transparency</span>
+                      <span>{t('hero.getItem6')}</span>
                     </li>
                   </ul>
                   <div className="mt-6 p-4 bg-background/50 rounded-lg">
                     <p className="text-xs text-muted-foreground text-center">
-                      ⚡ Analysis completed in minutes • 📊 Used by 100+ businesses • ⭐ 95% satisfaction rate
+                      {t('hero.statsLine')}
                     </p>
                   </div>
                 </div>
