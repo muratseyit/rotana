@@ -157,13 +157,14 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get OpenAI API key
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Get Lovable API key (pre-configured)
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY not configured');
+      throw new Error('AI API key not configured');
     }
 
-    console.log('Starting AI analysis...');
+    console.log('Starting AI analysis with Lovable AI Gateway...');
 
     // Calculate digital readiness based on website analysis
     let digitalReadinessScore = 0;
@@ -258,50 +259,73 @@ Provide a JSON response with this EXACT structure:
 
 Be specific, realistic, and actionable. Avoid generic advice.`;
 
-    // Call OpenAI API
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call Lovable AI Gateway
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert business analyst specializing in UK market entry for international companies. Provide detailed, actionable insights based on the business information provided. Always respond with valid JSON.'
+            content: 'You are an expert business analyst specializing in UK market entry for international companies. Provide detailed, actionable insights based on the business information provided. Always respond with valid JSON only, no markdown formatting.'
           },
           {
             role: 'user',
             content: analysisPrompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 2000,
-        response_format: { type: "json_object" }
       }),
     });
 
-    if (!openaiResponse.ok) {
-      const errorData = await openaiResponse.text();
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${openaiResponse.statusText}`);
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error('Lovable AI Gateway error:', aiResponse.status, errorText);
+      
+      // Handle rate limits and payment errors
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'AI service rate limit exceeded. Please try again in a few moments.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'AI service payment required. Please contact support.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      throw new Error(`AI Gateway error: ${aiResponse.statusText}`);
     }
 
-    const openaiData = await openaiResponse.json();
-    console.log('OpenAI response received');
+    const aiData = await aiResponse.json();
+    console.log('Lovable AI response received');
 
-    const analysisText = openaiData.choices[0]?.message?.content;
+    const analysisText = aiData.choices[0]?.message?.content;
     if (!analysisText) {
-      throw new Error('No analysis generated from OpenAI');
+      throw new Error('No analysis generated from AI');
     }
 
     let result;
     try {
-      result = JSON.parse(analysisText);
+      // Clean up the response - remove markdown code blocks if present
+      let cleanedText = analysisText.trim();
+      if (cleanedText.startsWith('```json')) {
+        cleanedText = cleanedText.slice(7);
+      }
+      if (cleanedText.startsWith('```')) {
+        cleanedText = cleanedText.slice(3);
+      }
+      if (cleanedText.endsWith('```')) {
+        cleanedText = cleanedText.slice(0, -3);
+      }
+      result = JSON.parse(cleanedText.trim());
     } catch (parseError) {
-      console.error('Error parsing OpenAI response:', parseError);
+      console.error('Error parsing AI response:', parseError, 'Raw:', analysisText);
       throw new Error('Failed to parse AI analysis result');
     }
 
@@ -390,7 +414,8 @@ Be specific, realistic, and actionable. Avoid generic advice.`;
           "💰 Complete cost breakdown for UK market entry",
           "⚖️ Legal structure recommendations (Ltd, Branch, etc.)",
           "📞 Expert review session to validate your strategy"
-        ]
+        ],
+        disclaimer: "AI-generated analysis results are for informational purposes only and do not constitute legal or financial advice."
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
