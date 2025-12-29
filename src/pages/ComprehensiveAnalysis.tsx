@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { IntelligentPartnerDashboard } from "@/components/IntelligentPartnerDashboard";
 import { ExportReportDialog } from "@/components/ExportReportDialog";
 import {
@@ -113,6 +114,7 @@ export default function ComprehensiveAnalysis() {
   const [selectedPartner, setSelectedPartner] = useState<any | null>(null);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Try to get data from location state first, then from localStorage
@@ -127,8 +129,8 @@ export default function ComprehensiveAnalysis() {
     
     if (!businessFormData) {
       toast({
-        title: "No Business Data",
-        description: "Please complete the comprehensive analysis form first.",
+        title: t('compResults.noData'),
+        description: t('compResults.noDataDesc'),
         variant: "destructive"
       });
       navigate('/comprehensive-analysis-form');
@@ -140,7 +142,7 @@ export default function ComprehensiveAnalysis() {
     
     // Clear localStorage after loading
     localStorage.removeItem('comprehensiveBusinessData');
-  }, [location.state, navigate, toast]);
+  }, [location.state, navigate, toast, t]);
 
   const processComprehensiveAnalysis = async (data: BusinessData) => {
     try {

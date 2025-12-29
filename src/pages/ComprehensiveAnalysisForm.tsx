@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, Building, Users, Globe, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+
 interface BusinessData {
   companyName: string;
   industry: string;
@@ -55,9 +57,8 @@ const ComprehensiveAnalysisForm = () => {
     budget: ""
   });
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { t } = useLanguage();
   const totalSteps = 4;
   const progress = currentStep / totalSteps * 100;
   const handleNext = () => {
@@ -76,8 +77,8 @@ const ComprehensiveAnalysisForm = () => {
     // Save data to localStorage for comprehensive analysis
     localStorage.setItem('comprehensiveBusinessData', JSON.stringify(businessData));
     toast({
-      title: "Information Submitted!",
-      description: "Processing your comprehensive analysis..."
+      title: t('compForm.submitted'),
+      description: t('compForm.processing')
     });
     setTimeout(() => {
       navigate('/comprehensive-analysis');
@@ -107,9 +108,9 @@ const ComprehensiveAnalysisForm = () => {
   };
   const renderStep1 = () => <div className="space-y-6">
       <div className="text-center mb-8">
-        <Building className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900">Company Information</h2>
-        <p className="text-slate-600">Tell us about your business</p>
+        <Building className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-foreground">{t('compForm.step1Title')}</h2>
+        <p className="text-muted-foreground">{t('compForm.step1Desc')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -173,9 +174,9 @@ const ComprehensiveAnalysisForm = () => {
     </div>;
   const renderStep2 = () => <div className="space-y-6">
       <div className="text-center mb-8">
-        <Globe className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900">Market & Digital Presence</h2>
-        <p className="text-slate-600">Tell us about your current market reach</p>
+        <Globe className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-foreground">{t('compForm.step2Title')}</h2>
+        <p className="text-muted-foreground">{t('compForm.step2Desc')}</p>
       </div>
 
       <div className="space-y-6">
@@ -240,9 +241,9 @@ const ComprehensiveAnalysisForm = () => {
     </div>;
   const renderStep3 = () => <div className="space-y-6">
       <div className="text-center mb-8">
-        <FileText className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900">Compliance & Certifications</h2>
-        <p className="text-slate-600">Help us understand your regulatory position</p>
+        <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-foreground">{t('compForm.step3Title')}</h2>
+        <p className="text-muted-foreground">{t('compForm.step3Desc')}</p>
       </div>
 
       <div className="space-y-6">
@@ -279,9 +280,9 @@ const ComprehensiveAnalysisForm = () => {
     </div>;
   const renderStep4 = () => <div className="space-y-6">
       <div className="text-center mb-8">
-        <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900">Goals & Timeline</h2>
-        <p className="text-slate-600">Tell us about your expansion plans</p>
+        <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-foreground">{t('compForm.step4Title')}</h2>
+        <p className="text-muted-foreground">{t('compForm.step4Desc')}</p>
       </div>
 
       <div className="space-y-6">
@@ -321,17 +322,17 @@ const ComprehensiveAnalysisForm = () => {
         </div>
       </div>
     </div>;
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+  return <div className="min-h-screen bg-gradient-to-br from-background to-primary/5">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="bg-card/80 backdrop-blur-md border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <Building className="h-6 w-6 text-blue-600" />
-              <span className="text-xl font-bold text-slate-900">Converta</span>
+              <Building className="h-6 w-6 text-primary" />
+              <span className="text-xl font-bold text-foreground">Converta</span>
             </Link>
-            <div className="text-sm text-slate-600">
-              Step {currentStep} of {totalSteps}
+            <div className="text-sm text-muted-foreground">
+              {t('compForm.step')} {currentStep} {t('compForm.of')} {totalSteps}
             </div>
           </div>
         </div>
@@ -345,8 +346,8 @@ const ComprehensiveAnalysisForm = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-3">Comprehensive Business Analysis</h1>
-          <p className="text-lg text-slate-600">Get your complete 7-category assessment with AI-powered insights and partner matching</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t('compForm.title')}</h1>
+          <p className="text-lg text-muted-foreground">{t('compForm.subtitle')}</p>
         </div>
 
         <Card>
@@ -357,14 +358,14 @@ const ComprehensiveAnalysisForm = () => {
             {currentStep === 4 && renderStep4()}
 
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200">
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
               <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="flex items-center space-x-2">
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                <span>{t('compForm.back')}</span>
               </Button>
 
               <Button onClick={handleNext} className="flex items-center space-x-2">
-                <span>{currentStep === totalSteps ? 'Complete' : 'Next'}</span>
+                <span>{currentStep === totalSteps ? t('compForm.complete') : t('compForm.next')}</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
