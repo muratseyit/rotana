@@ -115,63 +115,79 @@ const ComprehensiveAnalysisForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="companyName">Company Name *</Label>
-          <Input id="companyName" value={businessData.companyName} onChange={e => updateBusinessData('companyName', e.target.value)} placeholder="Enter your company name" />
+          <Label htmlFor="companyName">{t('compForm.companyName')} *</Label>
+          <Input id="companyName" value={businessData.companyName} onChange={e => updateBusinessData('companyName', e.target.value)} placeholder={t('compForm.companyNamePlaceholder')} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="industry">Industry *</Label>
+          <Label htmlFor="industry">{t('compForm.industry')} *</Label>
           <Select value={businessData.industry} onValueChange={value => updateBusinessData('industry', value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select your industry" />
+              <SelectValue placeholder={t('compForm.selectIndustry')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="technology">Technology</SelectItem>
-              <SelectItem value="healthcare">Healthcare</SelectItem>
-              <SelectItem value="retail">Retail</SelectItem>
-              <SelectItem value="manufacturing">Manufacturing</SelectItem>
-              <SelectItem value="services">Services</SelectItem>
-              <SelectItem value="food-beverage">Food & Beverage</SelectItem>
-              <SelectItem value="construction">Construction</SelectItem>
-              <SelectItem value="automotive">Automotive</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="technology">{t('compForm.industryTechnology')}</SelectItem>
+              <SelectItem value="healthcare">{t('compForm.industryHealthcare')}</SelectItem>
+              <SelectItem value="retail">{t('compForm.industryRetail')}</SelectItem>
+              <SelectItem value="manufacturing">{t('compForm.industryManufacturing')}</SelectItem>
+              <SelectItem value="services">{t('compForm.industryServices')}</SelectItem>
+              <SelectItem value="food-beverage">{t('compForm.industryFoodBeverage')}</SelectItem>
+              <SelectItem value="construction">{t('compForm.industryConstruction')}</SelectItem>
+              <SelectItem value="automotive">{t('compForm.industryAutomotive')}</SelectItem>
+              <SelectItem value="other">{t('compForm.industryOther')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="companySize">Company Size *</Label>
+          <Label htmlFor="companySize">{t('compForm.companySize')} *</Label>
           <Select value={businessData.companySize} onValueChange={value => updateBusinessData('companySize', value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select company size" />
+              <SelectValue placeholder={t('compForm.selectSize')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1-10">1-10 employees</SelectItem>
-              <SelectItem value="11-50">11-50 employees</SelectItem>
-              <SelectItem value="51-200">51-200 employees</SelectItem>
-              <SelectItem value="200+">200+ employees</SelectItem>
+              <SelectItem value="1-10">{t('compForm.size1to10')}</SelectItem>
+              <SelectItem value="11-50">{t('compForm.size11to50')}</SelectItem>
+              <SelectItem value="51-200">{t('compForm.size51to200')}</SelectItem>
+              <SelectItem value="200+">{t('compForm.size200plus')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="yearEstablished">Year Established</Label>
-          <Input id="yearEstablished" type="number" value={businessData.yearEstablished} onChange={e => updateBusinessData('yearEstablished', e.target.value)} placeholder="2020" min="1900" max={new Date().getFullYear()} />
+          <Label htmlFor="yearEstablished">{t('compForm.yearEstablished')}</Label>
+          <Input id="yearEstablished" type="number" value={businessData.yearEstablished} onChange={e => updateBusinessData('yearEstablished', e.target.value)} placeholder={t('compForm.yearPlaceholder')} min="1900" max={new Date().getFullYear()} />
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="website">Website URL</Label>
-          <Input id="website" value={businessData.website} onChange={e => updateBusinessData('website', e.target.value)} placeholder="https://www.yourcompany.com" />
+          <Label htmlFor="website">{t('compForm.websiteUrl')}</Label>
+          <Input id="website" value={businessData.website} onChange={e => updateBusinessData('website', e.target.value)} placeholder={t('compForm.websitePlaceholder')} />
         </div>
 
-        
-
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="description">Business Description *</Label>
-          <Textarea id="description" value={businessData.description} onChange={e => updateBusinessData('description', e.target.value)} placeholder="Describe what your business does, your main products/services, and what makes you unique" rows={4} />
+          <Label htmlFor="description">{t('compForm.businessDesc')} *</Label>
+          <Textarea id="description" value={businessData.description} onChange={e => updateBusinessData('description', e.target.value)} placeholder={t('compForm.businessDescPlaceholder')} rows={4} />
         </div>
       </div>
     </div>;
+  const marketOptions = [
+    { value: 'Domestic', label: t('compForm.marketDomestic') },
+    { value: 'Europe', label: t('compForm.marketEurope') },
+    { value: 'North America', label: t('compForm.marketNorthAmerica') },
+    { value: 'Asia', label: t('compForm.marketAsia') },
+    { value: 'Middle East', label: t('compForm.marketMiddleEast') },
+    { value: 'Other', label: t('compForm.marketOther') }
+  ];
+
+  const digitalOptions = [
+    { value: 'Website', label: t('compForm.digitalWebsite') },
+    { value: 'Social Media', label: t('compForm.digitalSocialMedia') },
+    { value: 'E-commerce', label: t('compForm.digitalEcommerce') },
+    { value: 'Mobile App', label: t('compForm.digitalMobileApp') },
+    { value: 'Email Marketing', label: t('compForm.digitalEmailMarketing') },
+    { value: 'Digital Advertising', label: t('compForm.digitalAdvertising') }
+  ];
+
   const renderStep2 = () => <div className="space-y-6">
       <div className="text-center mb-8">
         <Globe className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -181,42 +197,42 @@ const ComprehensiveAnalysisForm = () => {
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="products">Products/Services *</Label>
-          <Textarea id="products" value={businessData.products} onChange={e => updateBusinessData('products', e.target.value)} placeholder="Describe your main products or services in detail" rows={3} />
+          <Label htmlFor="products">{t('compForm.productsServices')} *</Label>
+          <Textarea id="products" value={businessData.products} onChange={e => updateBusinessData('products', e.target.value)} placeholder={t('compForm.productsPlaceholder')} rows={3} />
         </div>
 
         <div className="space-y-2">
-          <Label>Current Markets</Label>
+          <Label>{t('compForm.currentMarkets')}</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {['Domestic', 'Europe', 'North America', 'Asia', 'Middle East', 'Other'].map(market => <div key={market} className="flex items-center space-x-2">
-                <Checkbox id={market} checked={businessData.currentMarkets.includes(market)} onCheckedChange={checked => handleCheckboxChange('currentMarkets', market, checked as boolean)} />
-                <Label htmlFor={market} className="text-sm">{market}</Label>
+            {marketOptions.map(market => <div key={market.value} className="flex items-center space-x-2">
+                <Checkbox id={market.value} checked={businessData.currentMarkets.includes(market.value)} onCheckedChange={checked => handleCheckboxChange('currentMarkets', market.value, checked as boolean)} />
+                <Label htmlFor={market.value} className="text-sm">{market.label}</Label>
               </div>)}
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="annualRevenue">Annual Revenue</Label>
+          <Label htmlFor="annualRevenue">{t('compForm.annualRevenue')}</Label>
           <Select value={businessData.annualRevenue} onValueChange={value => updateBusinessData('annualRevenue', value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select revenue range" />
+              <SelectValue placeholder={t('compForm.selectRevenue')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0-50k">$0 - $50k</SelectItem>
-              <SelectItem value="50k-250k">$50k - $250k</SelectItem>
-              <SelectItem value="250k-1m">$250k - $1M</SelectItem>
-              <SelectItem value="1m-5m">$1M - $5M</SelectItem>
-              <SelectItem value="5m+">$5M+</SelectItem>
+              <SelectItem value="0-50k">{t('compForm.revenue0to50k')}</SelectItem>
+              <SelectItem value="50k-250k">{t('compForm.revenue50to250k')}</SelectItem>
+              <SelectItem value="250k-1m">{t('compForm.revenue250to1m')}</SelectItem>
+              <SelectItem value="1m-5m">{t('compForm.revenue1to5m')}</SelectItem>
+              <SelectItem value="5m+">{t('compForm.revenue5mplus')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label>Digital Presence</Label>
+          <Label>{t('compForm.digitalPresence')}</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {['Website', 'Social Media', 'E-commerce', 'Mobile App', 'Email Marketing', 'Digital Advertising'].map(platform => <div key={platform} className="flex items-center space-x-2">
-                <Checkbox id={platform} checked={businessData.digitalPresence.includes(platform)} onCheckedChange={checked => handleCheckboxChange('digitalPresence', platform, checked as boolean)} />
-                <Label htmlFor={platform} className="text-sm">{platform}</Label>
+            {digitalOptions.map(platform => <div key={platform.value} className="flex items-center space-x-2">
+                <Checkbox id={platform.value} checked={businessData.digitalPresence.includes(platform.value)} onCheckedChange={checked => handleCheckboxChange('digitalPresence', platform.value, checked as boolean)} />
+                <Label htmlFor={platform.value} className="text-sm">{platform.label}</Label>
               </div>)}
           </div>
         </div>
@@ -224,21 +240,48 @@ const ComprehensiveAnalysisForm = () => {
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <Checkbox id="hasOnlineStore" checked={businessData.hasOnlineStore} onCheckedChange={checked => updateBusinessData('hasOnlineStore', checked)} />
-            <Label htmlFor="hasOnlineStore">We have an online store</Label>
+            <Label htmlFor="hasOnlineStore">{t('compForm.hasOnlineStore')}</Label>
           </div>
 
           <div className="flex items-center space-x-2">
             <Checkbox id="hasEcommercePlatform" checked={businessData.hasEcommercePlatform} onCheckedChange={checked => updateBusinessData('hasEcommercePlatform', checked)} />
-            <Label htmlFor="hasEcommercePlatform">We use e-commerce platforms (Shopify, WooCommerce, etc.)</Label>
+            <Label htmlFor="hasEcommercePlatform">{t('compForm.hasEcommerce')}</Label>
           </div>
 
           <div className="flex items-center space-x-2">
             <Checkbox id="hasEnglishWebsite" checked={businessData.hasEnglishWebsite} onCheckedChange={checked => updateBusinessData('hasEnglishWebsite', checked)} />
-            <Label htmlFor="hasEnglishWebsite">Our website is available in English</Label>
+            <Label htmlFor="hasEnglishWebsite">{t('compForm.hasEnglishWebsite')}</Label>
           </div>
         </div>
       </div>
     </div>;
+  const complianceOptions = [
+    { value: 'ISO Standards', label: t('compForm.complianceISO') },
+    { value: 'CE Marking', label: t('compForm.complianceCE') },
+    { value: 'FDA Approval', label: t('compForm.complianceFDA') },
+    { value: 'GDPR Compliance', label: t('compForm.complianceGDPR') },
+    { value: 'Export Licensing', label: t('compForm.complianceExport') },
+    { value: 'Quality Systems', label: t('compForm.complianceQuality') }
+  ];
+
+  const certificationOptions = [
+    { value: 'ISO 9001', label: t('compForm.certISO9001') },
+    { value: 'ISO 14001', label: t('compForm.certISO14001') },
+    { value: 'OHSAS 18001', label: t('compForm.certOHSAS') },
+    { value: 'Organic Certification', label: t('compForm.certOrganic') },
+    { value: 'Fair Trade', label: t('compForm.certFairTrade') },
+    { value: 'Industry Specific', label: t('compForm.certIndustry') }
+  ];
+
+  const regionOptions = [
+    { value: 'UK', label: t('compForm.regionUK') },
+    { value: 'Europe', label: t('compForm.regionEurope') },
+    { value: 'North America', label: t('compForm.regionNorthAmerica') },
+    { value: 'Asia Pacific', label: t('compForm.regionAsiaPacific') },
+    { value: 'Middle East', label: t('compForm.regionMiddleEast') },
+    { value: 'Global', label: t('compForm.regionGlobal') }
+  ];
+
   const renderStep3 = () => <div className="space-y-6">
       <div className="text-center mb-8">
         <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -248,36 +291,37 @@ const ComprehensiveAnalysisForm = () => {
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label>Regulatory Compliance Experience</Label>
+          <Label>{t('compForm.regulatoryCompliance')}</Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {['ISO Standards', 'CE Marking', 'FDA Approval', 'GDPR Compliance', 'Export Licensing', 'Quality Systems'].map(compliance => <div key={compliance} className="flex items-center space-x-2">
-                <Checkbox id={compliance} checked={businessData.regulatoryCompliance.includes(compliance)} onCheckedChange={checked => handleCheckboxChange('regulatoryCompliance', compliance, checked as boolean)} />
-                <Label htmlFor={compliance} className="text-sm">{compliance}</Label>
+            {complianceOptions.map(compliance => <div key={compliance.value} className="flex items-center space-x-2">
+                <Checkbox id={compliance.value} checked={businessData.regulatoryCompliance.includes(compliance.value)} onCheckedChange={checked => handleCheckboxChange('regulatoryCompliance', compliance.value, checked as boolean)} />
+                <Label htmlFor={compliance.value} className="text-sm">{compliance.label}</Label>
               </div>)}
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label>Quality Certifications</Label>
+          <Label>{t('compForm.qualityCerts')}</Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {['ISO 9001', 'ISO 14001', 'OHSAS 18001', 'Organic Certification', 'Fair Trade', 'Industry Specific'].map(cert => <div key={cert} className="flex items-center space-x-2">
-                <Checkbox id={cert} checked={businessData.qualityCertifications.includes(cert)} onCheckedChange={checked => handleCheckboxChange('qualityCertifications', cert, checked as boolean)} />
-                <Label htmlFor={cert} className="text-sm">{cert}</Label>
+            {certificationOptions.map(cert => <div key={cert.value} className="flex items-center space-x-2">
+                <Checkbox id={cert.value} checked={businessData.qualityCertifications.includes(cert.value)} onCheckedChange={checked => handleCheckboxChange('qualityCertifications', cert.value, checked as boolean)} />
+                <Label htmlFor={cert.value} className="text-sm">{cert.label}</Label>
               </div>)}
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label>Target Expansion Regions</Label>
+          <Label>{t('compForm.targetRegions')}</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {['UK', 'Europe', 'North America', 'Asia Pacific', 'Middle East', 'Global'].map(region => <div key={region} className="flex items-center space-x-2">
-                <Checkbox id={region} checked={businessData.targetRegions.includes(region)} onCheckedChange={checked => handleCheckboxChange('targetRegions', region, checked as boolean)} />
-                <Label htmlFor={region} className="text-sm">{region}</Label>
+            {regionOptions.map(region => <div key={region.value} className="flex items-center space-x-2">
+                <Checkbox id={region.value} checked={businessData.targetRegions.includes(region.value)} onCheckedChange={checked => handleCheckboxChange('targetRegions', region.value, checked as boolean)} />
+                <Label htmlFor={region.value} className="text-sm">{region.label}</Label>
               </div>)}
           </div>
         </div>
       </div>
     </div>;
+
   const renderStep4 = () => <div className="space-y-6">
       <div className="text-center mb-8">
         <Users className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -287,36 +331,36 @@ const ComprehensiveAnalysisForm = () => {
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="businessGoals">Business Goals *</Label>
-          <Textarea id="businessGoals" value={businessData.businessGoals} onChange={e => updateBusinessData('businessGoals', e.target.value)} placeholder="What are your main goals for business expansion? What do you hope to achieve?" rows={4} />
+          <Label htmlFor="businessGoals">{t('compForm.businessGoals')} *</Label>
+          <Textarea id="businessGoals" value={businessData.businessGoals} onChange={e => updateBusinessData('businessGoals', e.target.value)} placeholder={t('compForm.goalsPlaceholder')} rows={4} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="timeline">Expansion Timeline</Label>
+          <Label htmlFor="timeline">{t('compForm.timeline')}</Label>
           <Select value={businessData.timeline} onValueChange={value => updateBusinessData('timeline', value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select your timeline" />
+              <SelectValue placeholder={t('compForm.selectTimeline')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="3-6 months">3-6 months</SelectItem>
-              <SelectItem value="6-12 months">6-12 months</SelectItem>
-              <SelectItem value="1-2 years">1-2 years</SelectItem>
-              <SelectItem value="2+ years">2+ years</SelectItem>
+              <SelectItem value="3-6 months">{t('compForm.timeline3to6')}</SelectItem>
+              <SelectItem value="6-12 months">{t('compForm.timeline6to12')}</SelectItem>
+              <SelectItem value="1-2 years">{t('compForm.timeline1to2')}</SelectItem>
+              <SelectItem value="2+ years">{t('compForm.timeline2plus')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="budget">Investment Budget</Label>
+          <Label htmlFor="budget">{t('compForm.budget')}</Label>
           <Select value={businessData.budget} onValueChange={value => updateBusinessData('budget', value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select budget range" />
+              <SelectValue placeholder={t('compForm.selectBudget')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0-10k">$0 - $10k</SelectItem>
-              <SelectItem value="10k-50k">$10k - $50k</SelectItem>
-              <SelectItem value="50k-100k">$50k - $100k</SelectItem>
-              <SelectItem value="100k+">$100k+</SelectItem>
+              <SelectItem value="0-10k">{t('compForm.budget0to10k')}</SelectItem>
+              <SelectItem value="10k-50k">{t('compForm.budget10to50k')}</SelectItem>
+              <SelectItem value="50k-100k">{t('compForm.budget50to100k')}</SelectItem>
+              <SelectItem value="100k+">{t('compForm.budget100kplus')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
