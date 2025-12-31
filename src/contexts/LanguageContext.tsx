@@ -116,6 +116,13 @@ const translations = {
     'analysis.form.processing': 'Processing Analysis...',
     'analysis.form.required': 'Required Fields Missing',
     'analysis.form.requiredDesc': 'Please fill in all required fields.',
+    'analysis.form.sellsGoods': 'Does your business sell physical goods/products?',
+    'analysis.form.manufacturingStatus': 'What is your manufacturing status?',
+    'analysis.form.manufacturerSelf': 'We manufacture our own products',
+    'analysis.form.resellerOnly': 'We source/resell products from other manufacturers',
+    'analysis.form.manufacturerBoth': 'We do both - manufacture some and source others',
+    'analysis.form.manufacturingHelp': 'This helps us match you with appropriate UK partners',
+    'analysis.form.selectManufacturing': 'Select your manufacturing status',
 
     // Guest Analysis Page
     'analysis.page.backHome': 'Back to Home',
@@ -676,6 +683,13 @@ const translations = {
     'analysis.form.processing': 'Analiz İşleniyor...',
     'analysis.form.required': 'Gerekli Alanlar Eksik',
     'analysis.form.requiredDesc': 'Lütfen tüm gerekli alanları doldurun.',
+    'analysis.form.sellsGoods': 'İşletmeniz fiziksel ürün satıyor mu?',
+    'analysis.form.manufacturingStatus': 'Üretim durumunuz nedir?',
+    'analysis.form.manufacturerSelf': 'Ürünlerimizi kendimiz üretiyoruz',
+    'analysis.form.resellerOnly': 'Diğer üreticilerden ürün tedarik ediyoruz',
+    'analysis.form.manufacturerBoth': 'Her ikisi - bazı ürünleri üretiyoruz, bazılarını tedarik ediyoruz',
+    'analysis.form.manufacturingHelp': 'Bu, sizi uygun İngiltere ortaklarıyla eşleştirmemize yardımcı olur',
+    'analysis.form.selectManufacturing': 'Üretim durumunuzu seçin',
 
     // Guest Analysis Page
     'analysis.page.backHome': 'Ana Sayfaya Dön',
