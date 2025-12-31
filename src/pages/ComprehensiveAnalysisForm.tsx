@@ -42,7 +42,21 @@ interface BusinessData {
   businessGoals: string;
   timeline: string;
   budget: string;
+  // New conditional fields
+  customerType: 'b2b' | 'b2c' | 'both' | '';
+  exportExperience: 'none' | 'early' | 'experienced' | 'veteran' | '';
+  ukMarketStatus: 'exploring' | 'initial' | 'active' | 'established' | '';
+  teamEnglishCapability: 'fluent' | 'some' | 'limited' | 'none' | '';
+  businessSeasonality: 'consistent' | 'moderate' | 'highly' | '';
+  industryRegulatory: string;
 }
+
+// Industries that need specific regulatory questions
+const healthcareIndustries = ['healthcare'];
+const foodIndustries = ['food-beverage'];
+const financialIndustries = ['services']; // Financial services subset
+const seasonalIndustries = ['retail', 'food-beverage', 'tourism', 'agriculture'];
+const largeCompanySizes = ['11-50', '51-200', '200+'];
 const ComprehensiveAnalysisForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [businessData, setBusinessData] = useState<BusinessData>({
@@ -66,7 +80,13 @@ const ComprehensiveAnalysisForm = () => {
     targetRegions: [],
     businessGoals: "",
     timeline: "",
-    budget: ""
+    budget: "",
+    customerType: "",
+    exportExperience: "",
+    ukMarketStatus: "",
+    teamEnglishCapability: "",
+    businessSeasonality: "",
+    industryRegulatory: ""
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -171,6 +191,24 @@ const ComprehensiveAnalysisForm = () => {
           <Input id="yearEstablished" type="number" value={businessData.yearEstablished} onChange={e => updateBusinessData('yearEstablished', e.target.value)} placeholder={t('compForm.yearPlaceholder')} min="1900" max={new Date().getFullYear()} />
         </div>
 
+        {/* Conditional: Team English Capability - for larger companies */}
+        {largeCompanySizes.includes(businessData.companySize) && (
+          <div className="space-y-2 md:col-span-2 p-4 bg-muted/50 rounded-lg border border-border">
+            <Label>{t('analysis.form.teamEnglish')}</Label>
+            <Select value={businessData.teamEnglishCapability} onValueChange={value => updateBusinessData('teamEnglishCapability', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('analysis.form.selectTeamEnglish')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fluent">{t('analysis.form.teamEnglishFluent')}</SelectItem>
+                <SelectItem value="some">{t('analysis.form.teamEnglishSome')}</SelectItem>
+                <SelectItem value="limited">{t('analysis.form.teamEnglishLimited')}</SelectItem>
+                <SelectItem value="none">{t('analysis.form.teamEnglishNone')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="website">{t('compForm.websiteUrl')}</Label>
           <Input id="website" value={businessData.website} onChange={e => updateBusinessData('website', e.target.value)} placeholder={t('compForm.websitePlaceholder')} />
@@ -213,6 +251,21 @@ const ComprehensiveAnalysisForm = () => {
           <Textarea id="products" value={businessData.products} onChange={e => updateBusinessData('products', e.target.value)} placeholder={t('compForm.productsPlaceholder')} rows={3} />
         </div>
 
+        {/* B2B/B2C Customer Type - Always shown */}
+        <div className="space-y-2 p-4 bg-muted/50 rounded-lg border border-border">
+          <Label>{t('analysis.form.customerType')} *</Label>
+          <Select value={businessData.customerType} onValueChange={value => updateBusinessData('customerType', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder={t('analysis.form.selectCustomerType')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="b2b">{t('analysis.form.customerTypeB2B')}</SelectItem>
+              <SelectItem value="b2c">{t('analysis.form.customerTypeB2C')}</SelectItem>
+              <SelectItem value="both">{t('analysis.form.customerTypeBoth')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-2">
           <Label>{t('compForm.currentMarkets')}</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -222,6 +275,24 @@ const ComprehensiveAnalysisForm = () => {
               </div>)}
           </div>
         </div>
+
+        {/* Conditional: Export Experience - when international markets selected */}
+        {businessData.currentMarkets.some(m => ['Europe', 'North America', 'Asia', 'Middle East', 'Other'].includes(m)) && (
+          <div className="space-y-2 p-4 bg-muted/50 rounded-lg border border-border">
+            <Label>{t('analysis.form.exportExperience')}</Label>
+            <Select value={businessData.exportExperience} onValueChange={value => updateBusinessData('exportExperience', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('analysis.form.selectExportExperience')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t('analysis.form.exportNone')}</SelectItem>
+                <SelectItem value="early">{t('analysis.form.exportEarly')}</SelectItem>
+                <SelectItem value="experienced">{t('analysis.form.exportExperienced')}</SelectItem>
+                <SelectItem value="veteran">{t('analysis.form.exportVeteran')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="annualRevenue">{t('compForm.annualRevenue')}</Label>
@@ -300,6 +371,23 @@ const ComprehensiveAnalysisForm = () => {
                 </Select>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Conditional: Business Seasonality - for seasonal industries */}
+        {seasonalIndustries.includes(businessData.industry) && (
+          <div className="space-y-2 p-4 bg-muted/50 rounded-lg border border-border">
+            <Label>{t('analysis.form.seasonality')}</Label>
+            <Select value={businessData.businessSeasonality} onValueChange={value => updateBusinessData('businessSeasonality', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('analysis.form.selectSeasonality')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="consistent">{t('analysis.form.seasonalityConsistent')}</SelectItem>
+                <SelectItem value="moderate">{t('analysis.form.seasonalityModerate')}</SelectItem>
+                <SelectItem value="highly">{t('analysis.form.seasonalityHigh')}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>

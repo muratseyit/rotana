@@ -54,7 +54,12 @@ interface GuestAnalysisData {
   email: string;
   sellsGoods?: boolean;
   manufacturingStatus?: 'manufacturer' | 'reseller' | 'both' | '';
+  customerType?: 'b2b' | 'b2c' | 'both' | '';
+  exportExperience?: 'none' | 'early' | 'experienced' | 'veteran' | '';
 }
+
+// Industries that need export experience question (international markets)
+const internationalMarkets = ['Europe', 'North America', 'Asia', 'Middle East'];
 
 export function GuestAnalysisForm() {
   const [formData, setFormData] = useState<GuestAnalysisData>({
@@ -65,7 +70,9 @@ export function GuestAnalysisForm() {
     websiteUrl: "",
     email: "",
     sellsGoods: false,
-    manufacturingStatus: ""
+    manufacturingStatus: "",
+    customerType: "",
+    exportExperience: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
@@ -285,6 +292,27 @@ export function GuestAnalysisForm() {
               )}
             </div>
           )}
+
+          {/* B2B/B2C Customer Type Question - Always shown */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              {t('analysis.form.customerType')} *
+            </Label>
+            <Select 
+              value={formData.customerType} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, customerType: value as 'b2b' | 'b2c' | 'both' }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('analysis.form.selectCustomerType')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="b2b">{t('analysis.form.customerTypeB2B')}</SelectItem>
+                <SelectItem value="b2c">{t('analysis.form.customerTypeB2C')}</SelectItem>
+                <SelectItem value="both">{t('analysis.form.customerTypeBoth')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="websiteUrl" className="flex items-center gap-2">

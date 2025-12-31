@@ -215,6 +215,36 @@ function calculateProductMarketFit(data: any): ScoreEvidence {
     });
   }
 
+  // Export experience bonus (0-20 points) - NEW
+  const exportExperience = data.exportExperience || '';
+  if (exportExperience) {
+    let points = 0;
+    if (exportExperience === 'veteran') {
+      points = 20;
+      factors.push({ factor: 'Veteran Exporter', impact: 'positive', points, evidence: 'Established international operations with 2+ years multi-market experience' });
+    } else if (exportExperience === 'experienced') {
+      points = 15;
+      factors.push({ factor: 'Experienced Exporter', impact: 'positive', points, evidence: '2+ years international sales experience' });
+    } else if (exportExperience === 'early') {
+      points = 8;
+      factors.push({ factor: 'Early Exporter', impact: 'neutral', points, evidence: 'Building international trade experience' });
+    }
+    score += points;
+  }
+
+  // B2B/B2C customer type (0-10 points) - NEW
+  const customerType = data.customerType || '';
+  if (customerType) {
+    const points = 10;
+    score += points;
+    factors.push({
+      factor: 'Customer Type Defined',
+      impact: 'positive',
+      points,
+      evidence: customerType === 'both' ? 'Serving both B2B and B2C markets' : `Focused ${customerType.toUpperCase()} business model`
+    });
+  }
+
   // Target regions with UK prioritization (0-15 points)
   const targetRegions = data.targetRegions || [];
   if (targetRegions.length > 0) {
