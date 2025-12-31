@@ -12,6 +12,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+// Industries that typically sell physical goods
+const goodsSellingIndustries = [
+  "retail",
+  "manufacturing",
+  "food-beverage",
+  "automotive"
+];
+
 interface BusinessData {
   companyName: string;
   industry: string;
@@ -26,6 +34,8 @@ interface BusinessData {
   hasOnlineStore: boolean;
   hasEcommercePlatform: boolean;
   hasEnglishWebsite: boolean;
+  sellsGoods: boolean;
+  manufacturingStatus: 'manufacturer' | 'reseller' | 'both' | '';
   regulatoryCompliance: string[];
   qualityCertifications: string[];
   targetRegions: string[];
@@ -49,6 +59,8 @@ const ComprehensiveAnalysisForm = () => {
     hasOnlineStore: false,
     hasEcommercePlatform: false,
     hasEnglishWebsite: false,
+    sellsGoods: false,
+    manufacturingStatus: "",
     regulatoryCompliance: [],
     qualityCertifications: [],
     targetRegions: [],
@@ -253,6 +265,43 @@ const ComprehensiveAnalysisForm = () => {
             <Label htmlFor="hasEnglishWebsite">{t('compForm.hasEnglishWebsite')}</Label>
           </div>
         </div>
+
+        {/* Conditional Manufacturing Status Question */}
+        {goodsSellingIndustries.includes(businessData.industry) && (
+          <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="sellsGoods" 
+                checked={businessData.sellsGoods} 
+                onCheckedChange={checked => {
+                  updateBusinessData('sellsGoods', checked);
+                  if (!checked) updateBusinessData('manufacturingStatus', '');
+                }}
+              />
+              <Label htmlFor="sellsGoods">{t('analysis.form.sellsGoods')}</Label>
+            </div>
+
+            {businessData.sellsGoods && (
+              <div className="space-y-3 ml-6">
+                <Label className="text-sm font-medium">{t('analysis.form.manufacturingStatus')}</Label>
+                <p className="text-xs text-muted-foreground">{t('analysis.form.manufacturingHelp')}</p>
+                <Select 
+                  value={businessData.manufacturingStatus} 
+                  onValueChange={value => updateBusinessData('manufacturingStatus', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('analysis.form.selectManufacturing')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manufacturer">{t('analysis.form.manufacturerSelf')}</SelectItem>
+                    <SelectItem value="reseller">{t('analysis.form.resellerOnly')}</SelectItem>
+                    <SelectItem value="both">{t('analysis.form.manufacturerBoth')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>;
   const complianceOptions = [

@@ -5,9 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Building, FileText, Globe, Users, Briefcase, Loader2, ArrowRight } from "lucide-react";
+import { Building, FileText, Globe, Users, Briefcase, Loader2, ArrowRight, Factory } from "lucide-react";
 import { trackFunnel, trackEvent } from "@/utils/analytics";
 
 const industries = [
@@ -34,6 +36,15 @@ const companySizes = [
   "500+ employees"
 ];
 
+// Industries that typically sell physical goods
+const goodsSellingIndustries = [
+  "E-commerce & Retail",
+  "Manufacturing",
+  "Fashion & Textiles",
+  "Food & Beverage",
+  "Agriculture"
+];
+
 interface GuestAnalysisData {
   companyName: string;
   businessDescription: string;
@@ -41,6 +52,8 @@ interface GuestAnalysisData {
   companySize: string;
   websiteUrl: string;
   email: string;
+  sellsGoods?: boolean;
+  manufacturingStatus?: 'manufacturer' | 'reseller' | 'both' | '';
 }
 
 export function GuestAnalysisForm() {
@@ -50,7 +63,9 @@ export function GuestAnalysisForm() {
     industry: "",
     companySize: "",
     websiteUrl: "",
-    email: ""
+    email: "",
+    sellsGoods: false,
+    manufacturingStatus: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
@@ -215,6 +230,61 @@ export function GuestAnalysisForm() {
               </Select>
             </div>
           </div>
+
+          {/* Conditional Manufacturing Status Question */}
+          {goodsSellingIndustries.includes(formData.industry) && (
+            <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="sellsGoods" 
+                  checked={formData.sellsGoods} 
+                  onCheckedChange={(checked) => setFormData(prev => ({ 
+                    ...prev, 
+                    sellsGoods: checked as boolean,
+                    manufacturingStatus: checked ? prev.manufacturingStatus : ""
+                  }))}
+                />
+                <Label htmlFor="sellsGoods" className="flex items-center gap-2">
+                  <Factory className="h-4 w-4" />
+                  {t('analysis.form.sellsGoods')}
+                </Label>
+              </div>
+
+              {formData.sellsGoods && (
+                <div className="space-y-3 ml-6">
+                  <Label className="text-sm font-medium">{t('analysis.form.manufacturingStatus')}</Label>
+                  <p className="text-xs text-muted-foreground">{t('analysis.form.manufacturingHelp')}</p>
+                  <RadioGroup 
+                    value={formData.manufacturingStatus} 
+                    onValueChange={(value) => setFormData(prev => ({ 
+                      ...prev, 
+                      manufacturingStatus: value as 'manufacturer' | 'reseller' | 'both' 
+                    }))}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="manufacturer" id="manufacturer" />
+                      <Label htmlFor="manufacturer" className="text-sm font-normal cursor-pointer">
+                        {t('analysis.form.manufacturerSelf')}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="reseller" id="reseller" />
+                      <Label htmlFor="reseller" className="text-sm font-normal cursor-pointer">
+                        {t('analysis.form.resellerOnly')}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="both" id="both" />
+                      <Label htmlFor="both" className="text-sm font-normal cursor-pointer">
+                        {t('analysis.form.manufacturerBoth')}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="websiteUrl" className="flex items-center gap-2">
