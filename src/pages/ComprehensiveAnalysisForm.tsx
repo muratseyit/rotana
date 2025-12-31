@@ -54,9 +54,12 @@ interface BusinessData {
 // Industries that need specific regulatory questions
 const healthcareIndustries = ['healthcare'];
 const foodIndustries = ['food-beverage'];
-const financialIndustries = ['services']; // Financial services subset
+const financialIndustries = ['fintech', 'financial'];
 const seasonalIndustries = ['retail', 'food-beverage', 'tourism', 'agriculture'];
 const largeCompanySizes = ['11-50', '51-200', '200+'];
+
+// Industries requiring industry-specific regulatory status questions
+const regulatedIndustries = ['healthcare', 'food-beverage', 'fintech', 'financial', 'manufacturing'];
 const ComprehensiveAnalysisForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [businessData, setBusinessData] = useState<BusinessData>({
@@ -456,6 +459,86 @@ const ComprehensiveAnalysisForm = () => {
               </div>)}
           </div>
         </div>
+
+        {/* Conditional: Industry-Specific Regulatory Status */}
+        {regulatedIndustries.includes(businessData.industry) && (
+          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border border-border">
+            <Label className="font-medium">{t('analysis.form.industryRegulatory')}</Label>
+            
+            {/* Healthcare - MHRA/CE Marking */}
+            {healthcareIndustries.includes(businessData.industry) && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">{t('analysis.form.mhraApproval')}</p>
+                <Select value={businessData.industryRegulatory} onValueChange={value => updateBusinessData('industryRegulatory', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('analysis.form.selectUkStatus')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mhra_approved">{t('analysis.form.mhraApproved')}</SelectItem>
+                    <SelectItem value="mhra_in_progress">{t('analysis.form.mhraInProgress')}</SelectItem>
+                    <SelectItem value="mhra_not_started">{t('analysis.form.mhraNotStarted')}</SelectItem>
+                    <SelectItem value="mhra_na">{t('analysis.form.mhraNA')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {/* Food & Beverage - Food Safety Certifications */}
+            {foodIndustries.includes(businessData.industry) && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">{t('analysis.form.foodSafety')}</p>
+                <Select value={businessData.industryRegulatory} onValueChange={value => updateBusinessData('industryRegulatory', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('analysis.form.selectUkStatus')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="food_haccp">{t('analysis.form.foodHACCP')}</SelectItem>
+                    <SelectItem value="food_brc">{t('analysis.form.foodBRC')}</SelectItem>
+                    <SelectItem value="food_salsa">{t('analysis.form.foodSALSA')}</SelectItem>
+                    <SelectItem value="food_multiple">{t('analysis.form.foodMultiple')}</SelectItem>
+                    <SelectItem value="food_none">{t('analysis.form.foodNone')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {/* Financial Services - FCA Registration */}
+            {financialIndustries.includes(businessData.industry) && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">{t('analysis.form.fcaStatus')}</p>
+                <Select value={businessData.industryRegulatory} onValueChange={value => updateBusinessData('industryRegulatory', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('analysis.form.selectUkStatus')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fca_registered">{t('analysis.form.fcaRegistered')}</SelectItem>
+                    <SelectItem value="fca_in_progress">{t('analysis.form.fcaInProgress')}</SelectItem>
+                    <SelectItem value="fca_planning">{t('analysis.form.fcaPlanning')}</SelectItem>
+                    <SelectItem value="fca_na">{t('analysis.form.fcaNA')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {/* Manufacturing - CE/UKCA Marking */}
+            {businessData.industry === 'manufacturing' && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">{t('analysis.form.mhraApproval')}</p>
+                <Select value={businessData.industryRegulatory} onValueChange={value => updateBusinessData('industryRegulatory', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('analysis.form.selectUkStatus')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ce_approved">{t('analysis.form.mhraApproved')}</SelectItem>
+                    <SelectItem value="ce_in_progress">{t('analysis.form.mhraInProgress')}</SelectItem>
+                    <SelectItem value="ce_not_started">{t('analysis.form.mhraNotStarted')}</SelectItem>
+                    <SelectItem value="ce_na">{t('analysis.form.mhraNA')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>;
 
@@ -467,6 +550,24 @@ const ComprehensiveAnalysisForm = () => {
       </div>
 
       <div className="space-y-6">
+        {/* Conditional: UK Market Status - only if UK is a target region */}
+        {businessData.targetRegions.includes('UK') && (
+          <div className="space-y-2 p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <Label className="font-medium">{t('analysis.form.ukMarketStatus')}</Label>
+            <Select value={businessData.ukMarketStatus} onValueChange={value => updateBusinessData('ukMarketStatus', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('analysis.form.selectUkStatus')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="exploring">{t('analysis.form.ukExploring')}</SelectItem>
+                <SelectItem value="initial">{t('analysis.form.ukInitial')}</SelectItem>
+                <SelectItem value="active">{t('analysis.form.ukActive')}</SelectItem>
+                <SelectItem value="established">{t('analysis.form.ukEstablished')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="businessGoals">{t('compForm.businessGoals')} *</Label>
           <Textarea id="businessGoals" value={businessData.businessGoals} onChange={e => updateBusinessData('businessGoals', e.target.value)} placeholder={t('compForm.goalsPlaceholder')} rows={4} />
