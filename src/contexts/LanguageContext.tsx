@@ -124,6 +124,60 @@ const translations = {
     'analysis.form.manufacturingHelp': 'This helps us match you with appropriate UK partners',
     'analysis.form.selectManufacturing': 'Select your manufacturing status',
 
+    // New Conditional Questions
+    'analysis.form.customerType': 'What is your primary customer type?',
+    'analysis.form.customerTypeB2B': 'B2B (Business to Business)',
+    'analysis.form.customerTypeB2C': 'B2C (Direct to Consumer)',
+    'analysis.form.customerTypeBoth': 'Both B2B and B2C',
+    'analysis.form.selectCustomerType': 'Select customer type',
+    
+    'analysis.form.exportExperience': 'What is your international trade experience?',
+    'analysis.form.exportNone': 'First time exporter - no international sales yet',
+    'analysis.form.exportEarly': 'Early exporter - less than 2 years international sales',
+    'analysis.form.exportExperienced': 'Experienced exporter - 2+ years with multiple markets',
+    'analysis.form.exportVeteran': 'Veteran exporter - established international operations',
+    'analysis.form.selectExportExperience': 'Select your export experience',
+    
+    'analysis.form.ukMarketStatus': 'What is your current UK market status?',
+    'analysis.form.ukExploring': 'Exploring - no UK activity yet',
+    'analysis.form.ukInitial': 'Initial contact - speaking with potential partners/customers',
+    'analysis.form.ukActive': 'Active sales - already selling to UK customers',
+    'analysis.form.ukEstablished': 'Established presence - UK entity, office, or team',
+    'analysis.form.selectUkStatus': 'Select your UK market status',
+    
+    'analysis.form.teamEnglish': 'Does your team include English-speaking staff?',
+    'analysis.form.teamEnglishFluent': 'Yes - fluent English speakers in leadership',
+    'analysis.form.teamEnglishSome': 'Yes - some English capability in team',
+    'analysis.form.teamEnglishLimited': 'Limited - basic English only',
+    'analysis.form.teamEnglishNone': 'No - will need language support',
+    'analysis.form.selectTeamEnglish': 'Select team English capability',
+    
+    'analysis.form.seasonality': 'Is your business seasonal?',
+    'analysis.form.seasonalityConsistent': 'Year-round consistent demand',
+    'analysis.form.seasonalityModerate': 'Moderate seasonality - some peak periods',
+    'analysis.form.seasonalityHigh': 'Highly seasonal - major peaks and troughs',
+    'analysis.form.selectSeasonality': 'Select business seasonality',
+
+    'analysis.form.industryRegulatory': 'Industry-specific regulatory status',
+    'analysis.form.mhraApproval': 'Do you have UK MHRA approval or CE marking for medical devices?',
+    'analysis.form.mhraApproved': 'Yes - approved',
+    'analysis.form.mhraInProgress': 'In progress',
+    'analysis.form.mhraNotStarted': 'Not yet started',
+    'analysis.form.mhraNA': 'Not applicable',
+    
+    'analysis.form.foodSafety': 'Do you have food safety certifications (HACCP, BRC, SALSA)?',
+    'analysis.form.foodHACCP': 'HACCP certified',
+    'analysis.form.foodBRC': 'BRC certified',
+    'analysis.form.foodSALSA': 'SALSA certified',
+    'analysis.form.foodMultiple': 'Multiple certifications',
+    'analysis.form.foodNone': 'None yet',
+    
+    'analysis.form.fcaStatus': 'Are you FCA registered or preparing for registration?',
+    'analysis.form.fcaRegistered': 'FCA registered',
+    'analysis.form.fcaInProgress': 'Application in progress',
+    'analysis.form.fcaPlanning': 'Planning to apply',
+    'analysis.form.fcaNA': 'Not applicable',
+
     // Guest Analysis Page
     'analysis.page.backHome': 'Back to Home',
     'analysis.page.title': 'Get Your AI Business Analysis',
@@ -690,6 +744,60 @@ const translations = {
     'analysis.form.manufacturerBoth': 'Her ikisi - bazı ürünleri üretiyoruz, bazılarını tedarik ediyoruz',
     'analysis.form.manufacturingHelp': 'Bu, sizi uygun İngiltere ortaklarıyla eşleştirmemize yardımcı olur',
     'analysis.form.selectManufacturing': 'Üretim durumunuzu seçin',
+
+    // New Conditional Questions
+    'analysis.form.customerType': 'Birincil müşteri tipiniz nedir?',
+    'analysis.form.customerTypeB2B': 'B2B (İşletmeden İşletmeye)',
+    'analysis.form.customerTypeB2C': 'B2C (Doğrudan Tüketiciye)',
+    'analysis.form.customerTypeBoth': 'Hem B2B hem B2C',
+    'analysis.form.selectCustomerType': 'Müşteri tipini seçin',
+    
+    'analysis.form.exportExperience': 'Uluslararası ticaret deneyiminiz nedir?',
+    'analysis.form.exportNone': 'İlk kez ihracatçı - henüz uluslararası satış yok',
+    'analysis.form.exportEarly': 'Erken ihracatçı - 2 yıldan az uluslararası satış',
+    'analysis.form.exportExperienced': 'Deneyimli ihracatçı - birden fazla pazarda 2+ yıl',
+    'analysis.form.exportVeteran': 'Kıdemli ihracatçı - yerleşik uluslararası operasyonlar',
+    'analysis.form.selectExportExperience': 'İhracat deneyiminizi seçin',
+    
+    'analysis.form.ukMarketStatus': 'Mevcut UK pazar durumunuz nedir?',
+    'analysis.form.ukExploring': 'Keşfediyor - henüz UK faaliyeti yok',
+    'analysis.form.ukInitial': 'İlk temas - potansiyel ortaklar/müşterilerle görüşüyor',
+    'analysis.form.ukActive': 'Aktif satışlar - UK müşterilerine satış yapıyor',
+    'analysis.form.ukEstablished': 'Yerleşik varlık - UK şirketi, ofisi veya ekibi var',
+    'analysis.form.selectUkStatus': 'UK pazar durumunuzu seçin',
+    
+    'analysis.form.teamEnglish': 'Ekibinizde İngilizce konuşan personel var mı?',
+    'analysis.form.teamEnglishFluent': 'Evet - liderlikte akıcı İngilizce konuşanlar var',
+    'analysis.form.teamEnglishSome': 'Evet - ekipte biraz İngilizce kapasitesi var',
+    'analysis.form.teamEnglishLimited': 'Sınırlı - sadece temel İngilizce',
+    'analysis.form.teamEnglishNone': 'Hayır - dil desteğine ihtiyaç olacak',
+    'analysis.form.selectTeamEnglish': 'Ekip İngilizce kapasitesini seçin',
+    
+    'analysis.form.seasonality': 'İşletmeniz mevsimsel mi?',
+    'analysis.form.seasonalityConsistent': 'Yıl boyunca tutarlı talep',
+    'analysis.form.seasonalityModerate': 'Orta mevsimsellik - bazı yoğun dönemler',
+    'analysis.form.seasonalityHigh': 'Yüksek mevsimsellik - büyük iniş çıkışlar',
+    'analysis.form.selectSeasonality': 'İşletme mevsimselliğini seçin',
+
+    'analysis.form.industryRegulatory': 'Sektöre özel düzenleyici durum',
+    'analysis.form.mhraApproval': 'Tıbbi cihazlar için UK MHRA onayı veya CE işareti var mı?',
+    'analysis.form.mhraApproved': 'Evet - onaylı',
+    'analysis.form.mhraInProgress': 'Süreçte',
+    'analysis.form.mhraNotStarted': 'Henüz başlamadı',
+    'analysis.form.mhraNA': 'Uygulanmaz',
+    
+    'analysis.form.foodSafety': 'Gıda güvenliği sertifikalarınız var mı (HACCP, BRC, SALSA)?',
+    'analysis.form.foodHACCP': 'HACCP sertifikalı',
+    'analysis.form.foodBRC': 'BRC sertifikalı',
+    'analysis.form.foodSALSA': 'SALSA sertifikalı',
+    'analysis.form.foodMultiple': 'Birden fazla sertifika',
+    'analysis.form.foodNone': 'Henüz yok',
+    
+    'analysis.form.fcaStatus': 'FCA kayıtlı mısınız veya kayıt için hazırlanıyor musunuz?',
+    'analysis.form.fcaRegistered': 'FCA kayıtlı',
+    'analysis.form.fcaInProgress': 'Başvuru sürecinde',
+    'analysis.form.fcaPlanning': 'Başvurmayı planlıyor',
+    'analysis.form.fcaNA': 'Uygulanmaz',
 
     // Guest Analysis Page
     'analysis.page.backHome': 'Ana Sayfaya Dön',
