@@ -80,7 +80,7 @@ const translations = {
     'cta.leadFormDesc': 'Discover your UK market potential with AI-powered insights and verified partner recommendations',
 
     // Footer
-    'footer.description': 'Empowering businesses with AI-driven insights and strategic guidance for sustainable growth',
+    'footer.description': 'Providing businesses with AI-driven insights and strategic guidance to support their expansion in the UK',
     'footer.platform': 'Platform',
     'footer.support': 'Support',
     'footer.legal': 'Legal',
@@ -701,7 +701,7 @@ const translations = {
     'cta.leadFormDesc': 'AI destekli içgörüler ve doğrulanmış partner önerileriyle UK pazar potansiyelinizi keşfedin',
 
     // Footer
-    'footer.description': 'İşletmeleri AI destekli içgörüler ve stratejik rehberlikle sürdürülebilir büyüme için güçlendiriyoruz',
+    'footer.description': 'İşletmelere İngiltere\'de genişlemelerini desteklemek için yapay zeka destekli içgörüler ve stratejik rehberlik sunuyoruz',
     'footer.platform': 'Platform',
     'footer.support': 'Destek',
     'footer.legal': 'Yasal',
