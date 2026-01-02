@@ -22,7 +22,7 @@ const translations = {
 
     // Hero Section
     'hero.badge': 'AI-Powered Business Intelligence',
-    'hero.title': 'Accelerate the UK Market Entry with AI Analytics',
+    'hero.title': 'Expand Your Business into the UK Market',
     'hero.description': 'Get comprehensive analysis of your business with AI-powered insights. Understand your market position, identify opportunities, and make data-driven decisions.',
     'hero.startJourney': 'Start Your Analysis',
     'hero.watchDemo': 'Watch Demo',
@@ -643,7 +643,7 @@ const translations = {
 
     // Hero Section
     'hero.badge': 'AI Destekli İş Zekası',
-    'hero.title': 'Yapay Zeka Analitiğiyle İngiltere Pazarına Girişinizi Hızlandırın',
+    'hero.title': 'İşinizi İngiltere Pazarına Genişletin',
     'hero.description': 'AI destekli içgörülerle işinizin kapsamlı analizini alın. Pazar konumunuzu anlayın, fırsatları belirleyin ve veriye dayalı kararlar alın.',
     'hero.startJourney': 'Analizinizi Başlatın',
     'hero.watchDemo': 'Demo İzleyin',
