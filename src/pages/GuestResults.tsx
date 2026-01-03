@@ -10,7 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { PricingSection } from "@/components/PricingSection";
 import { SaveReportDialog } from "@/components/SaveReportDialog";
-import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle, TrendingUp, Zap, Lock, ArrowRight } from "lucide-react";
+import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle, TrendingUp, Zap, Lock, ArrowRight, ClipboardList, Ship, Package } from "lucide-react";
 import { trackEvent, trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 interface GuestAnalysisResult {
@@ -309,6 +309,125 @@ export default function GuestResults() {
             </CardContent>
           </Card>
         )}
+
+        {/* UK Trade Requirements - Essential Info */}
+        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Ship className="h-5 w-5 text-blue-600" />
+              Essential UK Trade Requirements
+            </CardTitle>
+            <CardDescription>
+              Key requirements for exporting goods to the UK market
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* EORI Number */}
+            <div className="p-4 bg-white rounded-lg border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Package className="h-5 w-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm">EORI Number</p>
+                    <Badge variant="destructive" className="text-xs">Required</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Economic Operator Registration and Identification – mandatory for all customs declarations when importing/exporting to/from the UK.
+                  </p>
+                  <p className="text-xs text-blue-700 font-medium">
+                    ⏱ Processing time: 1-3 business days • 💰 Cost: Free
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* HS Codes */}
+            <div className="p-4 bg-white rounded-lg border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm">HS Code Classification</p>
+                    <Badge variant="destructive" className="text-xs">Required</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Harmonized System codes determine duty rates and required documentation. Incorrect classification can result in delays and penalties.
+                  </p>
+                  <p className="text-xs text-indigo-700 font-medium">
+                    📋 Use UK Trade Tariff tool for classification
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* VAT Threshold */}
+            <div className="p-4 bg-white rounded-lg border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">💷</span>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm">UK VAT Registration</p>
+                    <Badge variant="outline" className="text-xs border-orange-400 text-orange-700">Conditional</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Required if UK taxable turnover exceeds £90,000 (2025 threshold) or if you store goods in the UK.
+                  </p>
+                  <p className="text-xs text-green-700 font-medium">
+                    📊 Threshold: £90,000 • 💰 Registration: Free
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Upsell to full compliance checklist */}
+            <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border-2 border-primary/30">
+              <div className="flex items-start gap-3">
+                <Lock className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-semibold text-sm mb-1">Unlock Full Compliance Checklist</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Get 40+ industry-specific requirements including UKCA marking, customs documentation, UK Responsible Person, origin certificates, and more.
+                  </p>
+                  <ul className="text-xs space-y-1 mb-3">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>CDS Customs Declarations setup</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>UKCA/CE marking requirements for your products</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>UK Responsible Person obligations</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>Incoterms & origin documentation</span>
+                    </li>
+                  </ul>
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      trackFunnel('upgrade_click', { location: 'trade_requirements_upsell' });
+                      trackEvent('upgrade_clicked', { source: 'trade_requirements', score: analysisResult?.overallScore });
+                      navigate('/comprehensive-analysis-form');
+                    }}
+                  >
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    Get Full Compliance Checklist
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Key Findings */}
