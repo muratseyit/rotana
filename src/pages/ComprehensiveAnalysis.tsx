@@ -36,6 +36,24 @@ import {
   MapPin
 } from "lucide-react";
 
+interface MarketIntelligenceData {
+  marketSizeGBP: number;
+  growthRate: number;
+  saturationLevel: number;
+  entryOpportunity: string;
+  tradeVolumeGBP: number;
+  ftaBenefit: boolean;
+  timelineMin: number;
+  timelineMax: number;
+  turkishExporterCount: number;
+  suggestedHSCode?: string;
+  hsCodeDescription?: string;
+  tariffRate?: number;
+  ftaTariffRate?: number;
+  nichePotential?: string[];
+  marketGaps?: string[];
+}
+
 interface ComprehensiveAnalysisResult {
   overallScore: number;
   scoreBreakdown: {
@@ -46,6 +64,7 @@ interface ComprehensiveAnalysisResult {
     scalabilityAutomation: number;
     founderTeamStrength: number;
     investmentReadiness: number;
+    marketOpportunity?: number;
   };
   summary: string;
   detailedInsights: Array<{
@@ -93,6 +112,7 @@ interface ComprehensiveAnalysisResult {
       insights?: any;
     };
     dataSourcesUsed?: string[];
+    marketIntelligence?: MarketIntelligenceData;
   };
 }
 
