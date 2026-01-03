@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 
 import { ScoreInfluenceCard } from "./ScoreInfluenceCard";
+import { formatMarketSize, formatTradeVolume, getCompetitionLabel, formatTimelineRange, formatTariffRate } from "@/utils/marketIntelligence";
 
 interface PartnerRecommendation {
   category: string;
@@ -126,6 +127,23 @@ interface AnalysisResult {
     industryBenchmark?: any;
     regulatoryRequirements?: any[];
     dataSourcesUsed?: string[];
+    marketIntelligence?: {
+      marketSizeGBP: number;
+      growthRate: number;
+      saturationLevel: number;
+      entryOpportunity: string;
+      tradeVolumeGBP: number;
+      ftaBenefit: boolean;
+      timelineMin: number;
+      timelineMax: number;
+      turkishExporterCount: number;
+      suggestedHSCode?: string;
+      hsCodeDescription?: string;
+      tariffRate?: number;
+      ftaTariffRate?: number;
+      nichePotential?: string[];
+      marketGaps?: string[];
+    };
   };
 }
 
@@ -177,6 +195,12 @@ const scoreCategories = [
     label: 'Investment Readiness',
     icon: Building,
     description: 'Financial preparedness for UK expansion'
+  },
+  {
+    key: 'marketOpportunity' as keyof ScoreBreakdown,
+    label: 'Market Opportunity',
+    icon: Lightbulb,
+    description: 'UK market potential and trade opportunity'
   }
 ];
 
@@ -439,10 +463,10 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
         </CardContent>
       </Card>
 
-      {/* Detailed Analysis Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="market">Market Intel</TabsTrigger>
           <TabsTrigger value="partners">Partners</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
@@ -587,6 +611,205 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Market Intelligence Tab - NEW */}
+        <TabsContent value="market" className="space-y-6">
+          {analysis.metadata?.marketIntelligence ? (
+            <>
+              {/* Market Opportunity Overview */}
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-blue-600" />
+                    UK Market Opportunity
+                  </CardTitle>
+                  <CardDescription>
+                    Converta Market Intelligence analysis for your industry
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 bg-white dark:bg-background rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-1">Addressable Market</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {formatMarketSize(analysis.metadata.marketIntelligence.marketSizeGBP)}
+                      </p>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-background rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-1">Annual Growth</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        {analysis.metadata.marketIntelligence.growthRate}%
+                      </p>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-background rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-1">Competition Level</p>
+                      <p className={`text-2xl font-bold ${
+                        getCompetitionLabel(analysis.metadata.marketIntelligence.saturationLevel) === 'Low' 
+                          ? 'text-green-600' 
+                          : getCompetitionLabel(analysis.metadata.marketIntelligence.saturationLevel) === 'Medium'
+                          ? 'text-yellow-600'
+                          : 'text-orange-600'
+                      }`}>
+                        {getCompetitionLabel(analysis.metadata.marketIntelligence.saturationLevel)}
+                      </p>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-background rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-1">Entry Opportunity</p>
+                      <Badge variant={
+                        analysis.metadata.marketIntelligence.entryOpportunity === 'excellent' ? 'default' :
+                        analysis.metadata.marketIntelligence.entryOpportunity === 'good' ? 'secondary' : 'outline'
+                      } className="text-lg px-3 py-1 capitalize">
+                        {analysis.metadata.marketIntelligence.entryOpportunity}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Trade Intelligence */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      Turkey-UK Trade Flow
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <span className="text-sm">Annual Trade Volume</span>
+                      <span className="text-xl font-bold text-primary">
+                        {formatTradeVolume(analysis.metadata.marketIntelligence.tradeVolumeGBP)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <span className="text-sm">Active Turkish Exporters</span>
+                      <span className="text-xl font-bold">
+                        ~{analysis.metadata.marketIntelligence.turkishExporterCount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <span className="text-sm font-medium text-green-700 dark:text-green-400">UK-Turkey FTA Benefit</span>
+                      <Badge variant="default" className="bg-green-600">
+                        {analysis.metadata.marketIntelligence.ftaBenefit ? 'Eligible' : 'Check Requirements'}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Clock className="h-5 w-5 text-purple-600" />
+                      Entry Timeline Estimate
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                      <p className="text-3xl font-bold text-purple-600">
+                        {formatTimelineRange(
+                          analysis.metadata.marketIntelligence.timelineMin,
+                          analysis.metadata.marketIntelligence.timelineMax
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">Estimated market entry timeline</p>
+                    </div>
+                    
+                    {analysis.metadata.marketIntelligence.suggestedHSCode && (
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Suggested HS Code Classification</p>
+                        <p className="font-mono font-bold">Chapter {analysis.metadata.marketIntelligence.suggestedHSCode}</p>
+                        <p className="text-xs text-muted-foreground">{analysis.metadata.marketIntelligence.hsCodeDescription}</p>
+                        {analysis.metadata.marketIntelligence.tariffRate !== undefined && (
+                          <p className="text-xs mt-2 text-green-600 font-medium">
+                            {formatTariffRate(
+                              analysis.metadata.marketIntelligence.tariffRate,
+                              analysis.metadata.marketIntelligence.ftaTariffRate || 0
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Niche Opportunities */}
+              {(analysis.metadata.marketIntelligence.nichePotential?.length > 0 || 
+                analysis.metadata.marketIntelligence.marketGaps?.length > 0) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-orange-600" />
+                      Competitive Positioning Insights
+                    </CardTitle>
+                    <CardDescription>
+                      Market opportunities and niche potentials identified by Converta Intelligence
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {analysis.metadata.marketIntelligence.nichePotential && 
+                       analysis.metadata.marketIntelligence.nichePotential.length > 0 && (
+                        <div>
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <Lightbulb className="h-4 w-4 text-yellow-500" />
+                            Niche Opportunities
+                          </h4>
+                          <ul className="space-y-2">
+                            {analysis.metadata.marketIntelligence.nichePotential.map((niche, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-sm">
+                                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                <span>{niche}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {analysis.metadata.marketIntelligence.marketGaps && 
+                       analysis.metadata.marketIntelligence.marketGaps.length > 0 && (
+                        <div>
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <ArrowUpRight className="h-4 w-4 text-blue-500" />
+                            Market Gaps to Exploit
+                          </h4>
+                          <ul className="space-y-2">
+                            {analysis.metadata.marketIntelligence.marketGaps.map((gap, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-sm">
+                                <ArrowUpRight className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                                <span>{gap}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Data Source Attribution */}
+              <Alert className="border-primary/20 bg-primary/5">
+                <Database className="h-4 w-4" />
+                <AlertTitle>Converta Market Intelligence</AlertTitle>
+                <AlertDescription>
+                  This analysis is powered by Converta's proprietary market intelligence engine, incorporating UK government statistics, 
+                  trade flow data, industry benchmarks, and competitive analysis. Data is refreshed regularly to ensure accuracy.
+                </AlertDescription>
+              </Alert>
+            </>
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  Market intelligence data is being compiled. Please run a new analysis to access full market insights.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="partners" className="space-y-6">
