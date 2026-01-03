@@ -255,14 +255,15 @@ serve(async (req) => {
               missingFields: [],
               completedSections: []
             },
-            analysisVersion: 'v2.1-evidence-based',
-            modelUsed: 'proprietary-scoring-engine',
+            analysisVersion: 'v2.2-market-intelligence',
+            modelUsed: 'proprietary-scoring-engine + market-intelligence',
             analysisDate: new Date().toISOString(),
             confidenceLevel: scoringResult.confidenceLevel,
             scoringMethod: 'evidence-based-algorithms',
             aiAnalysisError: `Lovable AI error: ${aiResponse.status}`,
             industryBenchmark,
-            regulatoryRequirements
+            regulatoryRequirements,
+            marketIntelligence: scoringResult.marketIntelligence
           }
         }),
         { 

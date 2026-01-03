@@ -188,8 +188,8 @@ export function PartnerRecommendationCard({
                     
                     {partner.specialties && partner.specialties.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {partner.specialties.slice(0, 3).map((specialty) => (
-                          <Badge key={specialty} variant="outline" className="text-xs px-1.5 py-0.5">
+                        {partner.specialties.slice(0, 3).map((specialty, specIdx) => (
+                          <Badge key={`${partner.id}-specialty-${specIdx}`} variant="outline" className="text-xs px-1.5 py-0.5">
                             {specialty}
                           </Badge>
                         ))}
