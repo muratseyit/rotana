@@ -1,5 +1,37 @@
 // UK Market Research Data and Industry Benchmarks
 // Based on latest UK government statistics, industry reports, and market analysis
+// Enhanced with Market Intelligence data for comprehensive analysis
+
+import {
+  getMarketSizeData,
+  getTurkeyUKTradeData,
+  suggestHSCode,
+  getCompetitionIndex,
+  calculateMarketOpportunityScore,
+  estimateMarketEntryTimeline,
+  type MarketSizeData,
+  type TurkeyUKTradeData,
+  type HSCodeInfo,
+  type CompetitionIndex
+} from '../_shared/market-intelligence.ts';
+
+// Re-export market intelligence functions for use in other modules
+export {
+  getMarketSizeData,
+  getTurkeyUKTradeData,
+  suggestHSCode,
+  getCompetitionIndex,
+  calculateMarketOpportunityScore,
+  estimateMarketEntryTimeline
+};
+
+// Re-export types
+export type {
+  MarketSizeData,
+  TurkeyUKTradeData,
+  HSCodeInfo,
+  CompetitionIndex
+};
 
 export interface IndustryBenchmark {
   industry: string;

@@ -1,7 +1,17 @@
 /**
  * Comprehensive Business Scoring Engine
  * Research-based algorithms for UK market entry assessment
+ * Enhanced with Market Intelligence integration
  */
+
+import {
+  getMarketSizeData,
+  getTurkeyUKTradeData,
+  getCompetitionIndex,
+  calculateMarketOpportunityScore,
+  estimateMarketEntryTimeline,
+  suggestHSCode
+} from '../_shared/market-intelligence.ts';
 
 export interface ScoringWeights {
   productMarketFit: number;
@@ -11,6 +21,7 @@ export interface ScoringWeights {
   scalabilityAutomation: number;
   founderTeamStrength: number;
   investmentReadiness: number;
+  marketOpportunity: number; // NEW
 }
 
 export interface ScoreBreakdown {
@@ -21,6 +32,7 @@ export interface ScoreBreakdown {
   scalabilityAutomation: number;
   founderTeamStrength: number;
   investmentReadiness: number;
+  marketOpportunity?: number; // NEW
 }
 
 export interface ScoreEvidence {
@@ -34,12 +46,31 @@ export interface ScoreEvidence {
   }>;
 }
 
+export interface MarketIntelligenceData {
+  marketSizeGBP: number;
+  growthRate: number;
+  saturationLevel: number;
+  entryOpportunity: string;
+  tradeVolumeGBP: number;
+  ftaBenefit: boolean;
+  timelineMin: number;
+  timelineMax: number;
+  turkishExporterCount: number;
+  suggestedHSCode?: string;
+  hsCodeDescription?: string;
+  tariffRate?: number;
+  ftaTariffRate?: number;
+  nichePotential: string[];
+  marketGaps: string[];
+}
+
 export interface ScoringResult {
   overallScore: number;
   scoreBreakdown: ScoreBreakdown;
   scoreEvidence: ScoreEvidence[];
   confidenceLevel: 'high' | 'medium' | 'low';
   dataCompleteness: number;
+  marketIntelligence: MarketIntelligenceData; // NEW
 }
 
 // Industry-specific weights based on market research
@@ -76,7 +107,8 @@ const DEFAULT_WEIGHTS: ScoringWeights = {
   logisticsPotential: 1.0,
   scalabilityAutomation: 1.0,
   founderTeamStrength: 1.0,
-  investmentReadiness: 1.0
+  investmentReadiness: 1.0,
+  marketOpportunity: 1.0
 };
 
 export function calculateComprehensiveScore(businessData: any, companyVerification?: any, websiteAnalysis?: any): ScoringResult {
@@ -90,6 +122,9 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
   const scalabilityResult = calculateScalabilityAutomation(businessData);
   const founderResult = calculateFounderTeamStrength(businessData);
   const investmentResult = calculateInvestmentReadiness(businessData);
+  
+  // NEW: Calculate Market Opportunity Score using embedded intelligence
+  const marketOpportunityResult = calculateMarketOpportunity(businessData);
 
   // Apply industry-specific weights
   const scoreBreakdown: ScoreBreakdown = {
@@ -99,21 +134,26 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
     logisticsPotential: Math.min(100, Math.round(logisticsResult.score * weights.logisticsPotential)),
     scalabilityAutomation: Math.min(100, Math.round(scalabilityResult.score * weights.scalabilityAutomation)),
     founderTeamStrength: Math.min(100, Math.round(founderResult.score * weights.founderTeamStrength)),
-    investmentReadiness: Math.min(100, Math.round(investmentResult.score * weights.investmentReadiness))
+    investmentReadiness: Math.min(100, Math.round(investmentResult.score * weights.investmentReadiness)),
+    marketOpportunity: Math.min(100, Math.round(marketOpportunityResult.score * weights.marketOpportunity))
   };
 
-  // Calculate weighted overall score
+  // Calculate weighted overall score (adjusted weights to include market opportunity)
   const overallScore = Math.round(
-    (scoreBreakdown.productMarketFit * 0.20 +
-     scoreBreakdown.regulatoryCompatibility * 0.18 +
-     scoreBreakdown.digitalReadiness * 0.15 +
-     scoreBreakdown.logisticsPotential * 0.12 +
-     scoreBreakdown.scalabilityAutomation * 0.12 +
-     scoreBreakdown.founderTeamStrength * 0.13 +
-     scoreBreakdown.investmentReadiness * 0.10)
+    (scoreBreakdown.productMarketFit * 0.17 +
+     scoreBreakdown.regulatoryCompatibility * 0.16 +
+     scoreBreakdown.digitalReadiness * 0.14 +
+     scoreBreakdown.logisticsPotential * 0.10 +
+     scoreBreakdown.scalabilityAutomation * 0.10 +
+     scoreBreakdown.founderTeamStrength * 0.11 +
+     scoreBreakdown.investmentReadiness * 0.10 +
+     (scoreBreakdown.marketOpportunity || 0) * 0.12)
   );
 
   const dataCompleteness = calculateDataCompletenessScore(businessData);
+  
+  // Build Market Intelligence data from embedded sources
+  const marketIntelligence = buildMarketIntelligence(businessData);
   
   return {
     overallScore,
@@ -125,10 +165,60 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
       logisticsResult,
       scalabilityResult,
       founderResult,
-      investmentResult
+      investmentResult,
+      marketOpportunityResult
     ],
     confidenceLevel: determineConfidenceLevel(dataCompleteness, overallScore),
-    dataCompleteness
+    dataCompleteness,
+    marketIntelligence
+  };
+}
+
+// NEW: Calculate Market Opportunity Score using embedded market intelligence
+function calculateMarketOpportunity(data: any): ScoreEvidence {
+  const industry = data.industry || '';
+  const businessSize = data.companySize || '';
+  const exportExperience = data.exportExperience || '';
+  
+  const opportunityResult = calculateMarketOpportunityScore(industry, businessSize, exportExperience);
+  
+  return {
+    category: 'Market Opportunity',
+    score: opportunityResult.score,
+    factors: opportunityResult.factors
+  };
+}
+
+// NEW: Build comprehensive market intelligence data
+function buildMarketIntelligence(data: any): MarketIntelligenceData {
+  const industry = data.industry || '';
+  const productDescription = data.businessDescription || '';
+  const hasUKReg = data.ukRegistered === 'yes';
+  const compliance = data.complianceCompleted || [];
+  const overallReadiness = 60; // Default estimate
+  
+  const marketData = getMarketSizeData(industry);
+  const tradeData = getTurkeyUKTradeData(industry);
+  const competitionData = getCompetitionIndex(industry);
+  const hsCodeInfo = suggestHSCode(industry, productDescription);
+  const timeline = estimateMarketEntryTimeline(industry, hasUKReg, compliance, overallReadiness);
+  
+  return {
+    marketSizeGBP: marketData.marketSizeGBP,
+    growthRate: marketData.growthRate,
+    saturationLevel: competitionData.saturationLevel,
+    entryOpportunity: competitionData.entryOpportunity,
+    tradeVolumeGBP: tradeData.annualVolumeGBP,
+    ftaBenefit: tradeData.ftaBenefit,
+    timelineMin: timeline.estimatedMonths.min,
+    timelineMax: timeline.estimatedMonths.max,
+    turkishExporterCount: marketData.turkishExporterCount,
+    suggestedHSCode: hsCodeInfo?.chapter,
+    hsCodeDescription: hsCodeInfo?.description,
+    tariffRate: hsCodeInfo?.tariffRate,
+    ftaTariffRate: hsCodeInfo?.ftaTariffRate,
+    nichePotential: competitionData.nichePotential,
+    marketGaps: competitionData.marketGaps
   };
 }
 

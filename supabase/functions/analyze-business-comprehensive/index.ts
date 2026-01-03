@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.4';
 import { calculateComprehensiveScore } from './scoring-engine.ts';
-import { getIndustryBenchmark, getRegulatoryRequirements } from './market-data.ts';
+import { getIndustryBenchmark, getRegulatoryRequirements, getMarketSizeData, getTurkeyUKTradeData, getCompetitionIndex } from './market-data.ts';
 import { generateEnhancedPartnerRecommendations } from './partner-matching.ts';
 import { scrapeWebsite } from '../_shared/website-scraper.ts';
 
@@ -123,8 +123,14 @@ serve(async (req) => {
     const industryBenchmark = getIndustryBenchmark(businessData.industry || '');
     const regulatoryRequirements = getRegulatoryRequirements(businessData.industry || '');
     
+    // Get market intelligence data
+    const marketSizeData = getMarketSizeData(businessData.industry || '');
+    const tradeData = getTurkeyUKTradeData(businessData.industry || '');
+    const competitionData = getCompetitionIndex(businessData.industry || '');
+    
     console.log('Industry benchmark data:', industryBenchmark);
     console.log('Regulatory requirements:', regulatoryRequirements.length);
+    console.log('Market intelligence loaded:', { marketSize: marketSizeData.marketSizeGBP, tradeVolume: tradeData.annualVolumeGBP });
     
     // Build AI prompt in smaller chunks to avoid memory issues
     console.log('Building AI analysis prompt...');
@@ -161,9 +167,23 @@ serve(async (req) => {
     promptParts.push(`- Growth rate: ${industryBenchmark.averageGrowthRate}%\n`);
     promptParts.push(`- Competition: ${industryBenchmark.competitionLevel}\n\n`);
     
+    // Add market intelligence context
+    promptParts.push('CONVERTA MARKET INTELLIGENCE:\n');
+    promptParts.push(`- UK addressable market: £${marketSizeData.marketSizeGBP}B\n`);
+    promptParts.push(`- Market growth forecast: ${marketSizeData.growthRate}% annually\n`);
+    promptParts.push(`- Turkey-UK trade volume: £${tradeData.annualVolumeGBP}M (${tradeData.growthTrend})\n`);
+    promptParts.push(`- Trade trend: ${tradeData.yearOverYearChange > 0 ? '+' : ''}${tradeData.yearOverYearChange}% YoY\n`);
+    promptParts.push(`- Competition saturation: ${competitionData.saturationLevel}%\n`);
+    promptParts.push(`- Entry opportunity: ${competitionData.entryOpportunity}\n`);
+    promptParts.push(`- Active Turkish exporters: ~${marketSizeData.turkishExporterCount}\n`);
+    if (competitionData.nichePotential.length > 0) {
+      promptParts.push(`- Niche opportunities: ${competitionData.nichePotential.slice(0, 3).join(', ')}\n`);
+    }
+    promptParts.push(`- UK-Turkey FTA benefit: ${tradeData.ftaBenefit ? 'Yes' : 'No'}\n\n`);
+    
     promptParts.push('TASK: Provide JSON with:\n');
-    promptParts.push('1. "summary": 2-3 sentence executive summary\n');
-    promptParts.push('2. "detailedInsights": array of 7 categories (Product-Market Fit, Regulatory Compatibility, Digital Readiness, Logistics Potential, Scalability, Team, Investment), each with:\n');
+    promptParts.push('1. "summary": 2-3 sentence executive summary incorporating market opportunity insights\n');
+    promptParts.push('2. "detailedInsights": array of 8 categories (Product-Market Fit, Regulatory Compatibility, Digital Readiness, Logistics Potential, Scalability, Team, Investment, Market Opportunity), each with:\n');
     promptParts.push('   - "category": name\n');
     promptParts.push('   - "score": use the calculated score above\n');
     promptParts.push('   - "strengths": array of 2-3 strengths\n');
@@ -171,7 +191,7 @@ serve(async (req) => {
     promptParts.push('   - "actionItems": array of 2-3 actions with "action", "priority" (high/medium/low), "timeframe" (immediate/1-3 months/3-6 months)\n');
     promptParts.push('3. "recommendations": object with "immediate", "shortTerm", "longTerm" arrays (2-3 items each)\n');
     promptParts.push('4. "risks": array of 3-5 key risks with "risk", "severity" (high/medium/low), "mitigation"\n');
-    promptParts.push('5. "opportunities": array of 3-5 opportunities with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
+    promptParts.push('5. "opportunities": array of 3-5 opportunities based on market intelligence with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
     promptParts.push('Keep insights specific to UK market entry. Focus on actionable recommendations.');
     
     const prompt = promptParts.join('');
@@ -310,8 +330,8 @@ serve(async (req) => {
           missingFields: [],
           completedSections: []
         },
-        analysisVersion: 'v2.1-evidence-based',
-        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine',
+        analysisVersion: 'v2.2-market-intelligence',
+        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine + market-intelligence',
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
         scoringMethod: 'evidence-based-algorithms',
@@ -322,12 +342,16 @@ serve(async (req) => {
         } : { verified: false },
         industryBenchmark,
         regulatoryRequirements,
+        marketIntelligence: scoringResult.marketIntelligence,
         dataSourcesUsed: [
           'Evidence-Based Scoring Algorithms',
           'Business Form Data',
           companyVerification?.verified ? 'Companies House API (Verified)' : null,
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
+          'Converta Market Intelligence',
+          'Turkey-UK Trade Flow Data',
+          'HS Code Classification Database',
           'Supabase Partner Database',
           'Gemini 2.5 Pro AI Analysis'
         ].filter(Boolean)

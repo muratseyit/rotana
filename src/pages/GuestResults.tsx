@@ -429,6 +429,73 @@ export default function GuestResults() {
           </CardContent>
         </Card>
 
+        {/* Market Intelligence Teaser - Quick Analysis */}
+        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
+              Market Intelligence Preview
+            </CardTitle>
+            <CardDescription>
+              Data-driven insights for {analysisResult.customerData.industry || 'your industry'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 bg-white rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">UK Market Size</p>
+                <p className="text-lg font-bold text-purple-600">£100B+</p>
+              </div>
+              <div className="p-3 bg-white rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">Competition</p>
+                <p className="text-lg font-bold text-yellow-600">Medium</p>
+              </div>
+              <div className="p-3 bg-white rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">FTA Benefit</p>
+                <p className="text-lg font-bold text-green-600">Yes</p>
+              </div>
+            </div>
+            
+            <div className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border-2 border-primary/30">
+              <div className="flex items-start gap-3">
+                <Lock className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-semibold text-sm mb-1">Unlock Full Market Intelligence</p>
+                  <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>Precise market size & growth data</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>Turkey-UK trade flow analysis</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>HS Code classification & tariff rates</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                      <span>Market entry timeline estimation</span>
+                    </li>
+                  </ul>
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      trackFunnel('upgrade_click', { location: 'market_intelligence_teaser' });
+                      trackEvent('upgrade_clicked', { source: 'market_intel', score: analysisResult?.overallScore });
+                      navigate('/comprehensive-analysis-form');
+                    }}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Get Market Intelligence Report
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid md:grid-cols-3 gap-6">
           {/* Key Findings */}
           <Card>
