@@ -216,6 +216,17 @@ export interface RegulatoryRequirement {
 
 export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]> = {
   'all': [
+    // Legal and Regulatory Essentials
+    {
+      name: 'UK EORI Number',
+      authority: 'HMRC',
+      required: true,
+      urgency: 'immediate',
+      estimatedCost: '£0 (free)',
+      timeToComplete: '1-5 working days',
+      description: 'Economic Operator Registration and Identification number required for all customs declarations when importing/exporting goods',
+      link: 'https://www.gov.uk/eori'
+    },
     {
       name: 'Companies House Registration',
       authority: 'Companies House',
@@ -233,7 +244,7 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       urgency: 'immediate',
       estimatedCost: '£0 (free)',
       timeToComplete: '1-2 weeks',
-      description: 'Register for Corporation Tax, PAYE (if employing), and VAT (if turnover >£90k)',
+      description: 'Register for Corporation Tax, PAYE (if employing), and VAT (if turnover >£90k or storing goods in UK)',
       link: 'https://www.gov.uk/government/organisations/hm-revenue-customs'
     },
     {
@@ -243,7 +254,7 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       urgency: 'high',
       estimatedCost: '£40-£2,900/year',
       timeToComplete: '1-4 weeks',
-      description: 'Register with ICO if processing personal data and ensure GDPR compliance',
+      description: 'Register with ICO if processing personal data and ensure UK GDPR compliance',
       link: 'https://ico.org.uk/'
     },
     {
@@ -255,6 +266,69 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       timeToComplete: '2-6 weeks',
       description: 'Open a UK business bank account for company finances',
       link: 'https://www.gov.uk/business-bank-account'
+    },
+    // Customs and Trade
+    {
+      name: 'Trade Tariff Classification (HS Codes)',
+      authority: 'HMRC',
+      required: true,
+      urgency: 'immediate',
+      estimatedCost: '£0-£500 (if professional help needed)',
+      timeToComplete: '1-7 days',
+      description: 'Classify your products using the correct HS codes to determine duty rates and import documentation',
+      link: 'https://www.gov.uk/trade-tariff'
+    },
+    {
+      name: 'Customs Declaration Service (CDS) Registration',
+      authority: 'HMRC',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£0 (free)',
+      timeToComplete: '1-2 weeks',
+      description: 'Register for the Customs Declaration Service for all import/export declarations',
+      link: 'https://www.gov.uk/guidance/customs-declaration-service'
+    }
+  ],
+  'goods': [
+    {
+      name: 'UK Responsible Person / Importer of Record',
+      authority: 'Various (OPSS, MHRA, etc.)',
+      required: true,
+      urgency: 'immediate',
+      estimatedCost: '£500-£5,000/year',
+      timeToComplete: '1-4 weeks',
+      description: 'Mandatory UK-based entity for products requiring regulatory compliance (cosmetics, electronics, medical devices)',
+      link: 'https://www.gov.uk/guidance/placing-manufactured-goods-on-the-uk-market'
+    },
+    {
+      name: 'UKCA Marking',
+      authority: 'OPSS',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£500-£10,000',
+      timeToComplete: '1-6 months',
+      description: 'UK Conformity Assessed marking required for most manufactured goods sold in Great Britain',
+      link: 'https://www.gov.uk/guidance/using-the-ukca-marking'
+    },
+    {
+      name: 'Product Labelling Compliance',
+      authority: 'Trading Standards',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£200-£2,000',
+      timeToComplete: '2-4 weeks',
+      description: 'Ensure products display country of origin, manufacturer details, safety warnings, and conformity marks',
+      link: 'https://www.gov.uk/product-safety-for-businesses'
+    },
+    {
+      name: 'Origin Documentation (EUR.1 / CoO)',
+      authority: 'Chamber of Commerce / HMRC',
+      required: false,
+      urgency: 'medium',
+      estimatedCost: '£20-£50 per certificate',
+      timeToComplete: '1-3 days',
+      description: 'Certificates of Origin for preferential tariff rates under UK-Turkey FTA and other trade agreements',
+      link: 'https://www.gov.uk/guidance/get-proof-of-origin-for-your-goods'
     }
   ],
   'food': [
@@ -264,7 +338,7 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       required: true,
       urgency: 'immediate',
       estimatedCost: '£0 (free)',
-      timeToComplete: '1 week',
+      timeToComplete: '1 week (register 28 days before trading)',
       description: 'Register your food business with local authority at least 28 days before trading',
       link: 'https://www.food.gov.uk/business-guidance/register-a-food-business'
     },
@@ -277,6 +351,16 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       timeToComplete: '2-4 weeks',
       description: 'Obtain food hygiene rating through FSA inspection',
       link: 'https://www.food.gov.uk/safety-hygiene/food-hygiene-rating-scheme'
+    },
+    {
+      name: 'Food Import Notifications',
+      authority: 'APHA / Port Health',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£50-£500 per shipment',
+      timeToComplete: 'Per shipment',
+      description: 'Pre-notify imports of animal products, high-risk foods, and organic goods',
+      link: 'https://www.gov.uk/guidance/importing-food'
     }
   ],
   'financial': [
@@ -311,6 +395,16 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       timeToComplete: '3-6 months',
       description: 'Register with CQC to provide healthcare or social care services',
       link: 'https://www.cqc.org.uk/guidance-providers/registration'
+    },
+    {
+      name: 'MHRA Registration',
+      authority: 'MHRA',
+      required: true,
+      urgency: 'immediate',
+      estimatedCost: '£500-£10,000',
+      timeToComplete: '2-6 months',
+      description: 'Register medical devices and pharmaceuticals with MHRA',
+      link: 'https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency'
     }
   ],
   'retail': [
@@ -323,6 +417,38 @@ export const UK_REGULATORY_REQUIREMENTS: Record<string, RegulatoryRequirement[]>
       timeToComplete: '1-3 months',
       description: 'Ensure products meet UK safety standards and UKCA marking requirements',
       link: 'https://www.gov.uk/product-safety-for-businesses'
+    },
+    {
+      name: 'Distance Selling Regulations',
+      authority: 'CMA / Trading Standards',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£0-£500 (legal review)',
+      timeToComplete: '1-2 weeks',
+      description: 'Comply with Consumer Contracts Regulations for online and distance selling',
+      link: 'https://www.gov.uk/online-and-distance-selling-for-businesses'
+    }
+  ],
+  'manufacturing': [
+    {
+      name: 'UK REACH Registration',
+      authority: 'HSE',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£1,000-£50,000',
+      timeToComplete: '3-12 months',
+      description: 'Register chemicals under UK REACH if manufacturing or importing chemicals >1 tonne/year',
+      link: 'https://www.hse.gov.uk/reach/'
+    },
+    {
+      name: 'RoHS Compliance',
+      authority: 'OPSS',
+      required: true,
+      urgency: 'high',
+      estimatedCost: '£500-£5,000',
+      timeToComplete: '1-3 months',
+      description: 'Ensure electrical/electronic equipment complies with Restriction of Hazardous Substances',
+      link: 'https://www.gov.uk/guidance/rohs-compliance-and-guidance'
     }
   ]
 };
@@ -331,8 +457,14 @@ export function getRegulatoryRequirements(industry: string): RegulatoryRequireme
   const normalizedIndustry = industry.toLowerCase();
   const requirements = [...UK_REGULATORY_REQUIREMENTS['all']];
   
+  // Always include goods requirements for physical products
+  const goodsIndustries = ['manufacturing', 'retail', 'food', 'e-commerce', 'textile', 'electronics', 'cosmetics'];
+  if (goodsIndustries.some(g => normalizedIndustry.includes(g))) {
+    requirements.push(...(UK_REGULATORY_REQUIREMENTS['goods'] || []));
+  }
+  
   for (const [key, reqs] of Object.entries(UK_REGULATORY_REQUIREMENTS)) {
-    if (key !== 'all' && normalizedIndustry.includes(key)) {
+    if (key !== 'all' && key !== 'goods' && normalizedIndustry.includes(key)) {
       requirements.push(...reqs);
     }
   }

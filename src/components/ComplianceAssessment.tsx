@@ -237,11 +237,22 @@ const industrySpecificCompliance: Record<string, ComplianceItem[]> = {
 
 // Common compliance items that apply to all industries
 const commonComplianceItems: ComplianceItem[] = [
+  // Legal and Regulatory Essentials
+  {
+    id: "uk-eori",
+    category: "Customs & Trade",
+    requirement: "UK EORI Number",
+    description: "Economic Operator Registration and Identification number required for customs declarations when importing/exporting goods to/from the UK",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/eori"],
+    industries: ["all"]
+  },
   {
     id: "company-registration",
     category: "Legal Structure",
     requirement: "UK Company Registration",
-    description: "Register company with Companies House or establish UK subsidiary",
+    description: "Register company with Companies House or establish UK subsidiary/branch",
     priority: "high",
     completed: false,
     resources: ["https://www.gov.uk/government/organisations/companies-house"],
@@ -251,10 +262,114 @@ const commonComplianceItems: ComplianceItem[] = [
     id: "vat-registration",
     category: "Tax Compliance",
     requirement: "VAT Registration",
-    description: "Register for VAT if turnover exceeds £85,000",
+    description: "Required if UK taxable turnover exceeds £90,000 (2025 threshold) or if storing goods in the UK",
     priority: "high",
     completed: false,
     resources: ["https://www.gov.uk/vat-registration"],
+    industries: ["all"]
+  },
+  {
+    id: "responsible-person",
+    category: "Product Compliance",
+    requirement: "UK Responsible Person / Importer of Record",
+    description: "Mandatory for products requiring regulatory compliance (cosmetics, electronics, medical devices). Must be UK-based.",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/guidance/placing-manufactured-goods-on-the-uk-market"],
+    industries: ["all"]
+  },
+  {
+    id: "hs-code",
+    category: "Customs & Trade",
+    requirement: "Trade Tariff Classification (HS Code)",
+    description: "Determine correct Harmonised System codes for your products - determines duty rates and import documentation",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/trade-tariff"],
+    industries: ["all"]
+  },
+  // Customs and Logistics
+  {
+    id: "customs-declarations",
+    category: "Customs & Trade",
+    requirement: "Customs Declarations (CDS)",
+    description: "Register for Customs Declaration Service and set up process for import/export declarations",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/guidance/customs-declaration-service"],
+    industries: ["all"]
+  },
+  {
+    id: "origin-documentation",
+    category: "Customs & Trade",
+    requirement: "Origin Documentation (EUR.1 / Certificate of Origin)",
+    description: "Obtain certificates for preferential tariffs under UK-Turkey FTA and other trade agreements",
+    priority: "medium",
+    completed: false,
+    resources: ["https://www.gov.uk/guidance/get-proof-of-origin-for-your-goods"],
+    industries: ["all"]
+  },
+  {
+    id: "incoterms",
+    category: "Customs & Trade",
+    requirement: "Incoterms Agreement",
+    description: "Define responsibility for transport, insurance, and duties in all trade contracts",
+    priority: "medium",
+    completed: false,
+    resources: ["https://iccwbo.org/business-solutions/incoterms-rules/"],
+    industries: ["all"]
+  },
+  // Product Standards
+  {
+    id: "ukca-marking",
+    category: "Product Compliance",
+    requirement: "UKCA Marking",
+    description: "UK Conformity Assessed marking required for most manufactured goods sold in Great Britain",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/guidance/using-the-ukca-marking"],
+    industries: ["all"]
+  },
+  {
+    id: "labelling-compliance",
+    category: "Product Compliance",
+    requirement: "UK Labelling Requirements",
+    description: "Country of origin, manufacturer details, safety warnings, and conformity marks must be displayed",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/product-safety-for-businesses"],
+    industries: ["all"]
+  },
+  // Financial Setup
+  {
+    id: "uk-bank-account",
+    category: "Financial Setup",
+    requirement: "UK Bank Account or Payment Gateway",
+    description: "Set up UK banking for transactions, refunds, and marketplace payouts",
+    priority: "medium",
+    completed: false,
+    resources: ["https://www.gov.uk/business-bank-account"],
+    industries: ["all"]
+  },
+  {
+    id: "customs-duty-vat",
+    category: "Tax Compliance",
+    requirement: "Customs Duty & Import VAT Setup",
+    description: "Understand duty rates based on HS codes and origin. Set up deferment account if needed.",
+    priority: "high",
+    completed: false,
+    resources: ["https://www.gov.uk/guidance/customs-duties-and-taxes-on-imports"],
+    industries: ["all"]
+  },
+  // General
+  {
+    id: "gdpr-compliance",
+    category: "Data Protection",
+    requirement: "GDPR & UK Data Protection",
+    description: "Register with ICO and implement UK GDPR requirements for data processing",
+    priority: "high",
+    completed: false,
+    resources: ["https://ico.org.uk/for-organisations/guide-to-data-protection/"],
     industries: ["all"]
   },
   {
@@ -400,14 +515,26 @@ export function ComplianceAssessment({ complianceStatus, onUpdate, isLoading, se
   const completedCount = items.filter(item => item.completed).length;
   
   const categoryIcons = {
-    "Data Protection": Lock,
+    "Customs & Trade": Globe,
     "Legal Structure": FileText,
     "Tax Compliance": Globe,
+    "Product Compliance": CheckCircle,
+    "Financial Setup": Shield,
+    "Data Protection": Lock,
     "Consumer Protection": Shield,
     "Product Standards": CheckCircle,
     "Employment": Users,
     "Marketing": Globe,
-    "Financial Services": Shield
+    "Financial Services": Shield,
+    "Financial Regulation": Shield,
+    "Medical Regulation": Shield,
+    "Quality Standards": CheckCircle,
+    "Food Safety": Shield,
+    "Licensing": FileText,
+    "Intellectual Property": FileText,
+    "Security": Lock,
+    "Health & Safety": Shield,
+    "Payment Compliance": Lock
   };
 
   const getPriorityColor = (priority: string) => {
