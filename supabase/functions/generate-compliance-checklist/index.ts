@@ -1,20 +1,39 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface GenerateRequest {
-  business: {
-    companyName: string;
-    businessDescription: string;
-    industry?: string;
-    websiteUrl?: string | null;
-  };
-  catalogText?: string;
-}
+// Input validation schema for compliance checklist generation
+const businessSchema = z.object({
+  companyName: z.string()
+    .trim()
+    .min(1, "Company name is required")
+    .max(200, "Company name must be less than 200 characters"),
+  businessDescription: z.string()
+    .trim()
+    .min(1, "Business description is required")
+    .max(5000, "Business description must be less than 5000 characters"),
+  industry: z.string()
+    .trim()
+    .max(100, "Industry must be less than 100 characters")
+    .optional(),
+  websiteUrl: z.string()
+    .url("Invalid website URL")
+    .max(500, "Website URL must be less than 500 characters")
+    .nullable()
+    .optional()
+});
+
+const requestSchema = z.object({
+  business: businessSchema,
+  catalogText: z.string()
+    .max(10000, "Catalog text must be less than 10000 characters")
+    .optional()
+});
 
 interface Partner {
   id: string;
@@ -95,7 +114,25 @@ serve(async (req) => {
   }
 
   try {
-    const { business, catalogText }: GenerateRequest = await req.json();
+    // Parse and validate input
+    const rawBody = await req.json();
+    const validationResult = requestSchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error.errors);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input", 
+          details: validationResult.error.errors.map(e => e.message) 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
+
+    const { business, catalogText } = validationResult.data;
 
     const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
     if (!openAIApiKey) {
