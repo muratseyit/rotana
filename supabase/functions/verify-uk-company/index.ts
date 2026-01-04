@@ -1,10 +1,26 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema for UK company verification
+const verifySchema = z.object({
+  companyName: z.string()
+    .trim()
+    .max(200, "Company name must be less than 200 characters")
+    .optional(),
+  companyNumber: z.string()
+    .trim()
+    .regex(/^[A-Z0-9]{1,10}$/, "Invalid company number format")
+    .optional()
+}).refine(
+  (data) => data.companyName || data.companyNumber,
+  { message: "Either companyName or companyNumber is required" }
+);
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +28,27 @@ serve(async (req) => {
   }
 
   try {
-    const { companyName, companyNumber } = await req.json();
+    // Parse and validate input
+    const rawBody = await req.json();
+    const validationResult = verifySchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error.errors);
+      return new Response(
+        JSON.stringify({ 
+          verified: false,
+          reason: 'Invalid input',
+          errors: validationResult.error.errors.map(e => e.message),
+          data: null 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+
+    const { companyName, companyNumber } = validationResult.data;
     
     const companiesHouseApiKey = Deno.env.get('COMPANIES_HOUSE_API_KEY');
     
