@@ -30,3 +30,7 @@ verify_jwt = false
 
 [functions.verify-uk-company]
 verify_jwt = true
+
+[functions.market-research]
+verify_jwt = false
+request_timeout_ms = 60000
