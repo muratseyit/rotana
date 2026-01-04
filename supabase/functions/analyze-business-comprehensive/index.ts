@@ -34,9 +34,9 @@ serve(async (req) => {
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
     // Run independent operations in parallel for better performance
-    console.log('Starting parallel operations: website scraping, company verification, partner fetching...');
+    console.log('Starting parallel operations: website scraping, company verification, partner fetching, real-time market research...');
     
-    const [websiteAnalysis, companyVerification, partnersResult] = await Promise.all([
+    const [websiteAnalysis, companyVerification, partnersResult, liveMarketResearch] = await Promise.all([
       // 1. Scrape website if URL provided
       (async () => {
         if (!businessData.websiteUrl) return null;
@@ -105,6 +105,42 @@ serve(async (req) => {
         
         console.log('Partners fetched:', partners?.length || 0);
         return partners;
+      })(),
+      
+      // 4. Fetch real-time market research via Perplexity
+      (async () => {
+        try {
+          console.log('Fetching real-time market intelligence via Perplexity...');
+          const researchResponse = await fetch(`${supabaseUrl}/functions/v1/market-research`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              industry: businessData.industry || 'general',
+              productDescription: businessData.description || businessData.businessDescription,
+              targetMarket: 'UK',
+              researchType: 'comprehensive'
+            })
+          });
+          
+          if (researchResponse.ok) {
+            const research = await researchResponse.json();
+            if (research.success) {
+              console.log('Real-time market research successful:', {
+                marketSize: research.data?.marketSize?.valueGBP,
+                tradeVolume: research.data?.tradeFlow?.turkeyUKVolume,
+                confidence: research.data?.marketSize?.confidence
+              });
+              return research.data;
+            }
+          }
+          console.log('Real-time research unavailable, will use embedded data');
+          return null;
+        } catch (researchError) {
+          console.log('Real-time market research failed:', researchError);
+          return null;
+        }
       })()
     ]);
 
@@ -123,14 +159,48 @@ serve(async (req) => {
     const industryBenchmark = getIndustryBenchmark(businessData.industry || '');
     const regulatoryRequirements = getRegulatoryRequirements(businessData.industry || '');
     
-    // Get market intelligence data
+    // Get market intelligence data - prefer real-time Perplexity data, fallback to embedded
     const marketSizeData = getMarketSizeData(businessData.industry || '');
     const tradeData = getTurkeyUKTradeData(businessData.industry || '');
     const competitionData = getCompetitionIndex(businessData.industry || '');
     
+    // Merge real-time research with embedded data for best accuracy
+    const effectiveMarketData = {
+      marketSizeGBP: liveMarketResearch?.marketSize?.valueGBP || marketSizeData.marketSizeGBP,
+      growthRate: liveMarketResearch?.marketSize?.growthRate || marketSizeData.growthRate,
+      forecast2027: liveMarketResearch?.marketSize?.forecast2027 || marketSizeData.forecast2027,
+      turkishExporterCount: marketSizeData.turkishExporterCount,
+      dataSource: liveMarketResearch?.marketSize?.source || 'Converta Embedded Data',
+      confidence: liveMarketResearch?.marketSize?.confidence || 'medium',
+      lastUpdated: liveMarketResearch?.lastUpdated || null
+    };
+    
+    const effectiveTradeData = {
+      annualVolumeGBP: liveMarketResearch?.tradeFlow?.turkeyUKVolume || tradeData.annualVolumeGBP,
+      growthTrend: liveMarketResearch?.tradeFlow?.trend || tradeData.growthTrend,
+      yearOverYearChange: liveMarketResearch?.tradeFlow?.yoyChange || tradeData.yearOverYearChange,
+      topProducts: liveMarketResearch?.tradeFlow?.topProducts || tradeData.topProducts,
+      ftaBenefit: liveMarketResearch?.tradeFlow?.ftaBenefit ?? tradeData.ftaBenefit
+    };
+    
+    const effectiveCompetitionData = {
+      saturationLevel: liveMarketResearch?.competition?.saturationLevel || competitionData.saturationLevel,
+      entryOpportunity: liveMarketResearch?.competition?.entryOpportunity || competitionData.entryOpportunity,
+      nichePotential: liveMarketResearch?.competition?.nichePotential || competitionData.nichePotential,
+      majorPlayers: liveMarketResearch?.competition?.majorPlayers || [],
+      marketGaps: competitionData.marketGaps
+    };
+    
+    const effectiveRegulations = liveMarketResearch?.regulations || null;
+    
     console.log('Industry benchmark data:', industryBenchmark);
     console.log('Regulatory requirements:', regulatoryRequirements.length);
-    console.log('Market intelligence loaded:', { marketSize: marketSizeData.marketSizeGBP, tradeVolume: tradeData.annualVolumeGBP });
+    console.log('Market intelligence loaded:', { 
+      marketSize: effectiveMarketData.marketSizeGBP, 
+      tradeVolume: effectiveTradeData.annualVolumeGBP,
+      dataSource: effectiveMarketData.dataSource,
+      isRealTime: !!liveMarketResearch
+    });
     
     // Build AI prompt in smaller chunks to avoid memory issues
     console.log('Building AI analysis prompt...');
@@ -167,19 +237,30 @@ serve(async (req) => {
     promptParts.push(`- Growth rate: ${industryBenchmark.averageGrowthRate}%\n`);
     promptParts.push(`- Competition: ${industryBenchmark.competitionLevel}\n\n`);
     
-    // Add market intelligence context
-    promptParts.push('CONVERTA MARKET INTELLIGENCE:\n');
-    promptParts.push(`- UK addressable market: £${marketSizeData.marketSizeGBP}B\n`);
-    promptParts.push(`- Market growth forecast: ${marketSizeData.growthRate}% annually\n`);
-    promptParts.push(`- Turkey-UK trade volume: £${tradeData.annualVolumeGBP}M (${tradeData.growthTrend})\n`);
-    promptParts.push(`- Trade trend: ${tradeData.yearOverYearChange > 0 ? '+' : ''}${tradeData.yearOverYearChange}% YoY\n`);
-    promptParts.push(`- Competition saturation: ${competitionData.saturationLevel}%\n`);
-    promptParts.push(`- Entry opportunity: ${competitionData.entryOpportunity}\n`);
-    promptParts.push(`- Active Turkish exporters: ~${marketSizeData.turkishExporterCount}\n`);
-    if (competitionData.nichePotential.length > 0) {
-      promptParts.push(`- Niche opportunities: ${competitionData.nichePotential.slice(0, 3).join(', ')}\n`);
+    // Add market intelligence context with real-time data priority
+    promptParts.push(`CONVERTA MARKET INTELLIGENCE (${liveMarketResearch ? 'Real-Time via Perplexity' : 'Embedded Data'}):\n`);
+    promptParts.push(`- UK addressable market: £${effectiveMarketData.marketSizeGBP}B (${effectiveMarketData.confidence} confidence)\n`);
+    promptParts.push(`- Market growth forecast: ${effectiveMarketData.growthRate}% annually\n`);
+    promptParts.push(`- 2027 forecast: £${effectiveMarketData.forecast2027}B\n`);
+    promptParts.push(`- Turkey-UK trade volume: £${effectiveTradeData.annualVolumeGBP}M (${effectiveTradeData.growthTrend})\n`);
+    promptParts.push(`- Trade trend: ${effectiveTradeData.yearOverYearChange > 0 ? '+' : ''}${effectiveTradeData.yearOverYearChange}% YoY\n`);
+    promptParts.push(`- Top Turkish exports: ${effectiveTradeData.topProducts.slice(0, 4).join(', ')}\n`);
+    promptParts.push(`- Competition saturation: ${effectiveCompetitionData.saturationLevel}%\n`);
+    promptParts.push(`- Entry opportunity: ${effectiveCompetitionData.entryOpportunity}\n`);
+    if (effectiveCompetitionData.majorPlayers.length > 0) {
+      promptParts.push(`- Major players: ${effectiveCompetitionData.majorPlayers.slice(0, 3).join(', ')}\n`);
     }
-    promptParts.push(`- UK-Turkey FTA benefit: ${tradeData.ftaBenefit ? 'Yes' : 'No'}\n\n`);
+    promptParts.push(`- Active Turkish exporters: ~${effectiveMarketData.turkishExporterCount}\n`);
+    if (effectiveCompetitionData.nichePotential.length > 0) {
+      promptParts.push(`- Niche opportunities: ${effectiveCompetitionData.nichePotential.slice(0, 3).join(', ')}\n`);
+    }
+    promptParts.push(`- UK-Turkey FTA benefit: ${effectiveTradeData.ftaBenefit ? 'Yes' : 'No'}\n`);
+    if (effectiveRegulations) {
+      promptParts.push(`- Key regulations: ${effectiveRegulations.keyRequirements?.slice(0, 3).join(', ')}\n`);
+      promptParts.push(`- Required certifications: ${effectiveRegulations.certifications?.join(', ')}\n`);
+      promptParts.push(`- Compliance cost estimate: ${effectiveRegulations.estimatedComplianceCost}\n`);
+    }
+    promptParts.push('\n');
     
     promptParts.push('TASK: Provide JSON with:\n');
     promptParts.push('1. "summary": 2-3 sentence executive summary incorporating market opportunity insights\n');
@@ -331,8 +412,8 @@ serve(async (req) => {
           missingFields: [],
           completedSections: []
         },
-        analysisVersion: 'v2.2-market-intelligence',
-        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine + market-intelligence',
+        analysisVersion: 'v2.3-realtime-intelligence',
+        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine + perplexity-research',
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
         scoringMethod: 'evidence-based-algorithms',
@@ -343,14 +424,35 @@ serve(async (req) => {
         } : { verified: false },
         industryBenchmark,
         regulatoryRequirements,
-        marketIntelligence: scoringResult.marketIntelligence,
+        marketIntelligence: {
+          ...scoringResult.marketIntelligence,
+          // Enhanced with real-time data
+          marketSizeGBP: effectiveMarketData.marketSizeGBP,
+          growthRate: effectiveMarketData.growthRate,
+          forecast2027: effectiveMarketData.forecast2027,
+          tradeVolumeGBP: effectiveTradeData.annualVolumeGBP,
+          tradeGrowthTrend: effectiveTradeData.growthTrend,
+          yoyChange: effectiveTradeData.yearOverYearChange,
+          topExportProducts: effectiveTradeData.topProducts,
+          saturationLevel: effectiveCompetitionData.saturationLevel,
+          entryOpportunity: effectiveCompetitionData.entryOpportunity,
+          nichePotential: effectiveCompetitionData.nichePotential,
+          majorPlayers: effectiveCompetitionData.majorPlayers,
+          ftaBenefit: effectiveTradeData.ftaBenefit,
+          dataSource: effectiveMarketData.dataSource,
+          dataConfidence: effectiveMarketData.confidence,
+          isRealTimeData: !!liveMarketResearch,
+          lastUpdated: effectiveMarketData.lastUpdated,
+          researchSources: liveMarketResearch?.sources || []
+        },
+        liveRegulations: effectiveRegulations,
         dataSourcesUsed: [
           'Evidence-Based Scoring Algorithms',
           'Business Form Data',
           companyVerification?.verified ? 'Companies House API (Verified)' : null,
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
-          'Converta Market Intelligence',
+          liveMarketResearch ? 'Perplexity Real-Time Research (2024-2025)' : 'Converta Embedded Market Data',
           'Turkey-UK Trade Flow Data',
           'HS Code Classification Database',
           'Supabase Partner Database',

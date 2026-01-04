@@ -65,6 +65,17 @@ interface MarketIntelligenceData {
   ftaTariffRate?: number;
   nichePotential?: string[];
   marketGaps?: string[];
+  // Real-time data fields
+  isRealTimeData?: boolean;
+  dataSource?: string;
+  dataConfidence?: 'high' | 'medium' | 'low';
+  lastUpdated?: string;
+  researchSources?: string[];
+  topExportProducts?: string[];
+  majorPlayers?: string[];
+  forecast2027?: number;
+  yoyChange?: number;
+  tradeGrowthTrend?: string;
 }
 
 interface ComprehensiveAnalysisResult {
@@ -564,8 +575,23 @@ export default function ComprehensiveAnalysis() {
               <CardTitle className="flex items-center gap-2">
                 <Landmark className="h-5 w-5 text-primary" />
                 UK Market Intelligence
-                <Badge variant="secondary" className="ml-auto">Converta Research</Badge>
+                {analysisResult.metadata.marketIntelligence.isRealTimeData ? (
+                  <Badge variant="default" className="ml-auto bg-green-600">
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    Real-Time Data
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="ml-auto">Converta Research</Badge>
+                )}
               </CardTitle>
+              {analysisResult.metadata.marketIntelligence.isRealTimeData && (
+                <p className="text-xs text-muted-foreground">
+                  Data sourced via Perplexity AI • Confidence: {analysisResult.metadata.marketIntelligence.dataConfidence} 
+                  {analysisResult.metadata.marketIntelligence.lastUpdated && 
+                    ` • Updated: ${new Date(analysisResult.metadata.marketIntelligence.lastUpdated).toLocaleDateString()}`
+                  }
+                </p>
+              )}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
