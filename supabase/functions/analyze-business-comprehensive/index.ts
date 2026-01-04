@@ -34,9 +34,9 @@ serve(async (req) => {
     console.log('Processing comprehensive analysis for:', businessData.companyName);
 
     // Run independent operations in parallel for better performance
-    console.log('Starting parallel operations: website scraping, company verification, partner fetching, real-time market research...');
+    console.log('Starting parallel operations: website scraping, company verification, partner fetching, market research, competitor research...');
     
-    const [websiteAnalysis, companyVerification, partnersResult, liveMarketResearch] = await Promise.all([
+    const [websiteAnalysis, companyVerification, partnersResult, liveMarketResearch, competitorResearch] = await Promise.all([
       // 1. Scrape website if URL provided
       (async () => {
         if (!businessData.websiteUrl) return null;
@@ -139,6 +139,41 @@ serve(async (req) => {
           return null;
         } catch (researchError) {
           console.log('Real-time market research failed:', researchError);
+          return null;
+        }
+      })(),
+      
+      // 5. Fetch real-time competitor intelligence via Perplexity
+      (async () => {
+        try {
+          console.log('Fetching real-time competitor intelligence...');
+          const competitorResponse = await fetch(`${supabaseUrl}/functions/v1/competitor-research`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              industry: businessData.industry || 'general',
+              businessDescription: businessData.description || businessData.businessDescription,
+              productNiche: businessData.productNiche,
+              targetMarket: 'UK'
+            })
+          });
+          
+          if (competitorResponse.ok) {
+            const competitors = await competitorResponse.json();
+            if (competitors.success) {
+              console.log('Competitor research successful:', {
+                competitorCount: competitors.data?.competitors?.length || 0,
+                hasInsights: !!competitors.data?.marketInsights
+              });
+              return competitors.data;
+            }
+          }
+          console.log('Competitor research unavailable');
+          return null;
+        } catch (error) {
+          console.log('Competitor research failed:', error);
           return null;
         }
       })()
@@ -445,6 +480,13 @@ serve(async (req) => {
           lastUpdated: effectiveMarketData.lastUpdated,
           researchSources: liveMarketResearch?.sources || []
         },
+        competitorIntelligence: competitorResearch ? {
+          competitors: competitorResearch.competitors || [],
+          marketInsights: competitorResearch.marketInsights || null,
+          sources: competitorResearch.sources || [],
+          researchedAt: competitorResearch.researchedAt,
+          isLiveData: true
+        } : null,
         liveRegulations: effectiveRegulations,
         dataSourcesUsed: [
           'Evidence-Based Scoring Algorithms',
@@ -453,6 +495,7 @@ serve(async (req) => {
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
           liveMarketResearch ? 'Perplexity Real-Time Research (2024-2025)' : 'Converta Embedded Market Data',
+          competitorResearch ? 'Perplexity Competitor Intelligence' : null,
           'Turkey-UK Trade Flow Data',
           'HS Code Classification Database',
           'Supabase Partner Database',
