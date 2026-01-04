@@ -528,30 +528,30 @@ export default function ComprehensiveAnalysis() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.entries(analysisResult.scoreBreakdown).map(([key, score]) => (
             <Card key={key}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2 rounded-lg ${score >= 80 ? 'bg-success/10' : score >= 60 ? 'bg-yellow-100' : 'bg-destructive/10'}`}>
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`p-1.5 rounded-lg ${score >= 80 ? 'bg-success/10' : score >= 60 ? 'bg-yellow-100' : 'bg-destructive/10'}`}>
                     {getCategoryIcon(key)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-xs font-medium truncate">
                       {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`text-2xl font-bold ${getScoreColor(score)}`}>{score}%</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className={`text-lg font-bold ${getScoreColor(score)}`}>{score}%</span>
                   {score >= 80 ? (
-                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    <CheckCircle2 className="h-4 w-4 text-success" />
                   ) : score >= 60 ? (
-                    <TrendingUp className="h-5 w-5 text-yellow-600" />
+                    <TrendingUp className="h-4 w-4 text-yellow-600" />
                   ) : (
-                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
                   )}
                 </div>
                 
-                <Progress value={score} className="h-2" />
+                <Progress value={score} className="h-1.5" />
               </CardContent>
             </Card>
           ))}
