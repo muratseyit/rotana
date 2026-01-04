@@ -234,11 +234,11 @@ serve(async (req) => {
 
     const { business, catalogText } = validationResult.data;
 
-    const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
     const perplexityApiKey = Deno.env.get("PERPLEXITY_API_KEY");
     
-    if (!openAIApiKey) {
-      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), 
+    if (!lovableApiKey) {
+      return new Response(JSON.stringify({ error: "Missing LOVABLE_API_KEY" }), 
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -302,21 +302,38 @@ JSON schema:
 }
 `;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openAIApiKey}`,
+        "Authorization": `Bearer ${lovableApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: system },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.2,
       }),
     });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted, please add funds." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const errText = await response.text();
+      console.error("Lovable AI Gateway error:", response.status, errText);
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
 
     const data = await response.json();
     if (!data?.choices?.[0]?.message?.content) {
