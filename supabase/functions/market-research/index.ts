@@ -158,6 +158,15 @@ function buildResearchQueries(
     );
   }
 
+  // NEW: Add tariff and trade agreement queries
+  if (researchType === 'comprehensive' || researchType === 'tariffs') {
+    queries.push(
+      `What are the current UK import tariff rates for ${industry} products from Turkey? ` +
+      `Include MFN rates, preferential rates under UK-Turkey FTA, recent changes, and any exemptions. ` +
+      `Also mention key HS codes for ${productContext || industry} products.`
+    );
+  }
+
   return queries;
 }
 

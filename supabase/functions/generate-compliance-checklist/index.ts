@@ -7,42 +7,36 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Input validation schema for compliance checklist generation
+// Input validation schema
 const businessSchema = z.object({
-  companyName: z.string()
-    .trim()
-    .min(1, "Company name is required")
-    .max(200, "Company name must be less than 200 characters"),
-  businessDescription: z.string()
-    .trim()
-    .min(1, "Business description is required")
-    .max(5000, "Business description must be less than 5000 characters"),
-  industry: z.string()
-    .trim()
-    .max(100, "Industry must be less than 100 characters")
-    .optional(),
-  websiteUrl: z.string()
-    .url("Invalid website URL")
-    .max(500, "Website URL must be less than 500 characters")
-    .nullable()
-    .optional()
+  companyName: z.string().trim().min(1).max(200),
+  businessDescription: z.string().trim().min(1).max(5000),
+  industry: z.string().trim().max(100).optional(),
+  websiteUrl: z.string().url().max(500).nullable().optional()
 });
 
 const requestSchema = z.object({
   business: businessSchema,
-  catalogText: z.string()
-    .max(10000, "Catalog text must be less than 10000 characters")
-    .optional()
+  catalogText: z.string().max(10000).optional()
 });
+
+interface RegulatoryUpdate {
+  title: string;
+  description: string;
+  effectiveDate?: string;
+  source: string;
+  relevance: 'high' | 'medium' | 'low';
+  category: string;
+}
 
 interface Partner {
   id: string;
   name: string;
   url: string;
-  specialty: string[]; // tags like ["GDPR","UKCA","MHRA","ICO","Cybersecurity"]
+  specialty: string[];
 }
 
-// MVP verified partner pool (mocked)
+// Embedded partner pool as fallback
 const verifiedPartnerPool: Partner[] = [
   { id: "p1", name: "Northstar Data Compliance", url: "https://example.com/northstar", specialty: ["GDPR","ICO","DPIA","Privacy Policies"] },
   { id: "p2", name: "Atlas Conformity Assessors", url: "https://example.com/atlas", specialty: ["UKCA","CE","Product Safety","Technical File"] },
@@ -51,16 +45,145 @@ const verifiedPartnerPool: Partner[] = [
   { id: "p5", name: "Crown Trade Compliance", url: "https://example.com/crown", specialty: ["Trading Standards","Consumer Contracts","ADR"] },
 ];
 
-// Enhanced partner matching with scoring
+// Fetch live regulatory updates using Perplexity
+async function fetchRegulatoryUpdates(
+  perplexityApiKey: string, 
+  industry: string, 
+  businessDescription: string
+): Promise<{ updates: RegulatoryUpdate[]; sources: string[] }> {
+  try {
+    console.log(`Fetching live regulatory updates for: ${industry}`);
+    
+    const query = `What are the most important UK regulatory changes and compliance updates in 2024-2025 for ${industry} businesses exporting to the UK? Include specific new requirements, deadline changes, enforcement actions, and official guidance updates. Focus on GDPR, UKCA, product safety, and sector-specific regulations.`;
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a UK regulatory compliance expert. Provide specific, recent regulatory updates with sources. Be precise about dates and requirements.'
+          },
+          { role: 'user', content: query }
+        ],
+        search_recency_filter: 'month',
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Perplexity API error for regulations:', response.status);
+      return { updates: [], sources: [] };
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    const citations = data.citations || [];
+
+    // Parse regulatory updates from response
+    const structurePrompt = `Extract regulatory updates from this text into JSON array format:
+${content}
+
+Return ONLY valid JSON (no markdown):
+[{"title": "string", "description": "string", "effectiveDate": "string or null", "source": "string", "relevance": "high|medium|low", "category": "string"}]`;
+
+    const structureResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [
+          { role: 'system', content: 'Extract data into JSON. Return ONLY valid JSON array.' },
+          { role: 'user', content: structurePrompt }
+        ],
+      }),
+    });
+
+    if (!structureResponse.ok) {
+      return { updates: [], sources: citations };
+    }
+
+    const structureData = await structureResponse.json();
+    let parsed = structureData.choices?.[0]?.message?.content || '[]';
+    
+    // Clean markdown if present
+    parsed = parsed.trim();
+    if (parsed.startsWith('```json')) parsed = parsed.slice(7);
+    if (parsed.startsWith('```')) parsed = parsed.slice(3);
+    if (parsed.endsWith('```')) parsed = parsed.slice(0, -3);
+    
+    const updates = JSON.parse(parsed.trim());
+    return { updates: Array.isArray(updates) ? updates.slice(0, 5) : [], sources: citations };
+    
+  } catch (error) {
+    console.error('Error fetching regulatory updates:', error);
+    return { updates: [], sources: [] };
+  }
+}
+
+// Discover real partners using Perplexity
+async function discoverPartners(
+  perplexityApiKey: string,
+  specialty: string,
+  industry: string
+): Promise<Partner | undefined> {
+  try {
+    const query = `What are the top UK-based ${specialty} consultants or firms that help Turkish businesses enter the UK market? Include company names and websites.`;
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [
+          { role: 'system', content: 'You are a business consultant. Return real UK service providers.' },
+          { role: 'user', content: query }
+        ],
+      }),
+    });
+
+    if (!response.ok) return undefined;
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Extract first company name and URL if mentioned
+    const urlMatch = content.match(/https?:\/\/[^\s)]+/);
+    const nameMatch = content.match(/([A-Z][a-zA-Z&\s]+(?:Ltd|LLP|Limited|Consultants|Advisory|Partners))/);
+    
+    if (nameMatch) {
+      return {
+        id: `live-${Date.now()}`,
+        name: nameMatch[1].trim(),
+        url: urlMatch?.[0] || '',
+        specialty: [specialty]
+      };
+    }
+    
+    return undefined;
+  } catch (error) {
+    console.error('Error discovering partners:', error);
+    return undefined;
+  }
+}
+
 function pickPartner(tags: string[], businessInfo?: any): { name: string; url: string; score: number } | undefined {
   const tagSet = new Set(tags.map(t => t.toUpperCase()));
   
-  // Score each partner based on specialty match and relevance
   const scoredPartners = verifiedPartnerPool.map(partner => {
     let score = 0;
     let matches = 0;
     
-    // Count direct tag matches
     partner.specialty.forEach(spec => {
       if (tagSet.has(spec.toUpperCase())) {
         matches++;
@@ -68,36 +191,20 @@ function pickPartner(tags: string[], businessInfo?: any): { name: string; url: s
       }
     });
     
-    // Bonus for multiple matches
-    if (matches > 1) {
-      score += matches * 5;
-    }
+    if (matches > 1) score += matches * 5;
     
-    // Industry-specific bonuses
     if (businessInfo?.industry) {
       const industry = businessInfo.industry.toLowerCase();
-      
-      if (industry.includes('health') && partner.specialty.some(s => s.includes('MHRA'))) {
-        score += 15;
-      }
-      if (industry.includes('data') && partner.specialty.some(s => s.includes('GDPR'))) {
-        score += 15;
-      }
-      if (industry.includes('finance') && partner.specialty.some(s => s.includes('PCI'))) {
-        score += 15;
-      }
+      if (industry.includes('health') && partner.specialty.some(s => s.includes('MHRA'))) score += 15;
+      if (industry.includes('data') && partner.specialty.some(s => s.includes('GDPR'))) score += 15;
+      if (industry.includes('finance') && partner.specialty.some(s => s.includes('PCI'))) score += 15;
     }
     
     return { ...partner, score };
   }).filter(p => p.score > 0);
   
-  // Return highest scoring partner
   const bestMatch = scoredPartners.sort((a, b) => b.score - a.score)[0];
-  return bestMatch ? { 
-    name: bestMatch.name, 
-    url: bestMatch.url, 
-    score: bestMatch.score 
-  } : undefined;
+  return bestMatch ? { name: bestMatch.name, url: bestMatch.url, score: bestMatch.score } : undefined;
 }
 
 function daysByPriority(priority: string): number {
@@ -114,32 +221,49 @@ serve(async (req) => {
   }
 
   try {
-    // Parse and validate input
     const rawBody = await req.json();
     const validationResult = requestSchema.safeParse(rawBody);
     
     if (!validationResult.success) {
       console.error("Validation error:", validationResult.error.errors);
       return new Response(
-        JSON.stringify({ 
-          error: "Invalid input", 
-          details: validationResult.error.errors.map(e => e.message) 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" } 
-        }
+        JSON.stringify({ error: "Invalid input", details: validationResult.error.errors.map(e => e.message) }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const { business, catalogText } = validationResult.data;
 
     const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+    const perplexityApiKey = Deno.env.get("PERPLEXITY_API_KEY");
+    
     if (!openAIApiKey) {
-      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), 
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Build prompt with clear JSON schema instruction
+    // Fetch live regulatory updates if Perplexity is available
+    let regulatoryUpdates: RegulatoryUpdate[] = [];
+    let regulatorySources: string[] = [];
+    
+    if (perplexityApiKey) {
+      const regData = await fetchRegulatoryUpdates(
+        perplexityApiKey, 
+        business.industry || 'general',
+        business.businessDescription
+      );
+      regulatoryUpdates = regData.updates;
+      regulatorySources = regData.sources;
+      console.log(`Fetched ${regulatoryUpdates.length} live regulatory updates`);
+    }
+
+    // Build enhanced prompt with live regulatory context
+    const regulatoryContext = regulatoryUpdates.length > 0 
+      ? `\n\nRecent UK Regulatory Updates (from live research):\n${regulatoryUpdates.map(u => 
+          `- ${u.title}: ${u.description} (${u.relevance} relevance, ${u.category})`
+        ).join('\n')}`
+      : '';
+
     const system = "You are a UK compliance expert generating actionable checklists for market entry.";
     const userPrompt = `
 Given this business profile and product catalog (if present), infer the precise UK industry and product types, then generate a concise, prioritized compliance checklist covering applicable UK regimes (GDPR/ICO, CE/UKCA, MHRA (if medical), Trading Standards/Consumer Contracts, PCI DSS, HSE, FCA (if financial), etc.).
@@ -152,11 +276,13 @@ Business:
 
 Catalog (free text, may be empty):
 ${catalogText ?? ""}
+${regulatoryContext}
 
 Rules:
 - Output MUST be valid JSON only and match the schema below.
 - Each item: include category, requirement, description, law, priority in {high|medium|low}, and 1-3 official resources URLs.
 - Focus strictly on UK context. If a regime is not relevant, omit it.
+- Incorporate any recent regulatory updates mentioned above.
 
 JSON schema:
 {
@@ -164,11 +290,11 @@ JSON schema:
   "inferredProductTypes": string[],
   "items": [
     {
-      "id": string, // slug-like unique id
+      "id": string,
       "category": string,
       "requirement": string,
       "description": string,
-      "law": string, // e.g., "GDPR", "UKCA", "MHRA", "Consumer Contracts Regulations"
+      "law": string,
       "priority": "high" | "medium" | "low",
       "resources": string[]
     }
@@ -198,22 +324,36 @@ JSON schema:
     }
 
     const content: string = data.choices[0].message.content;
-    // Extract JSON block
     const match = content.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("No JSON in model response");
     const parsed = JSON.parse(match[0]);
 
-    // Attach partner recommendations and default deadlines client can use
-    const enrichedItems = (parsed.items || []).map((item: any) => {
-      const partner = pickPartner([item.law, item.category]);
+    // Enrich items with partners (using live discovery if available)
+    const enrichedItems = await Promise.all((parsed.items || []).map(async (item: any) => {
+      let partner = pickPartner([item.law, item.category], business);
+      
+      // Try live partner discovery for high-priority items if no embedded match
+      if (!partner && perplexityApiKey && item.priority === 'high') {
+        const livePartner = await discoverPartners(perplexityApiKey, item.law, business.industry || '');
+        if (livePartner) {
+          partner = { name: livePartner.name, url: livePartner.url, score: 5 };
+        }
+      }
+      
       const deadlineDays = daysByPriority(item.priority);
       return { ...item, partner, deadlineDays };
-    });
+    }));
 
     const result = {
       inferredIndustry: parsed.inferredIndustry,
       inferredProductTypes: parsed.inferredProductTypes,
       items: enrichedItems,
+      regulatoryUpdates: regulatoryUpdates.length > 0 ? regulatoryUpdates : undefined,
+      metadata: {
+        hasLiveData: regulatoryUpdates.length > 0,
+        sources: regulatorySources,
+        generatedAt: new Date().toISOString()
+      }
     };
 
     return new Response(JSON.stringify(result), {

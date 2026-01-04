@@ -34,3 +34,7 @@ verify_jwt = true
 [functions.market-research]
 verify_jwt = false
 request_timeout_ms = 60000
+
+[functions.competitor-research]
+verify_jwt = false
+request_timeout_ms = 45000

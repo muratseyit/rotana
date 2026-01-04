@@ -78,6 +78,30 @@ interface MarketIntelligenceData {
   tradeGrowthTrend?: string;
 }
 
+interface Competitor {
+  name: string;
+  website?: string;
+  description: string;
+  positioning: string;
+  marketShare?: string;
+  strengths: string[];
+  weaknesses: string[];
+  relevanceScore: number;
+}
+
+interface CompetitorIntelligence {
+  competitors: Competitor[];
+  marketInsights: {
+    totalMarketPlayers: string;
+    marketConcentration: string;
+    entryBarriers: string[];
+    differentiationOpportunities: string[];
+  } | null;
+  sources: string[];
+  researchedAt: string;
+  isLiveData: boolean;
+}
+
 interface ComprehensiveAnalysisResult {
   overallScore: number;
   scoreBreakdown: {
@@ -137,6 +161,7 @@ interface ComprehensiveAnalysisResult {
     };
     dataSourcesUsed?: string[];
     marketIntelligence?: MarketIntelligenceData;
+    competitorIntelligence?: CompetitorIntelligence;
   };
 }
 
@@ -738,6 +763,131 @@ export default function ComprehensiveAnalysis() {
 
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 Data sourced from UK trade statistics and Converta market research. Not legal or financial advice.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Competitor Intelligence Section */}
+        {analysisResult.metadata?.competitorIntelligence && analysisResult.metadata.competitorIntelligence.competitors.length > 0 && (
+          <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 via-background to-amber-50/50 dark:from-orange-950/20 dark:to-amber-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-orange-600" />
+                UK Competitor Intelligence
+                <Badge variant="default" className="ml-auto bg-orange-600">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Live Research
+                </Badge>
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Real-time competitor analysis via Perplexity AI • 
+                Researched: {new Date(analysisResult.metadata.competitorIntelligence.researchedAt).toLocaleDateString()}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Market Overview */}
+              {analysisResult.metadata.competitorIntelligence.marketInsights && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Market Players</p>
+                    <p className="text-lg font-semibold">{analysisResult.metadata.competitorIntelligence.marketInsights.totalMarketPlayers}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Concentration</p>
+                    <p className="text-lg font-semibold capitalize">{analysisResult.metadata.competitorIntelligence.marketInsights.marketConcentration}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-muted-foreground mb-1">Differentiation Opportunities</p>
+                    <div className="flex flex-wrap gap-1">
+                      {analysisResult.metadata.competitorIntelligence.marketInsights.differentiationOpportunities.slice(0, 3).map((opp, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs bg-green-50 dark:bg-green-950/30 border-green-200">
+                          {opp}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Competitor Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {analysisResult.metadata.competitorIntelligence.competitors.slice(0, 6).map((competitor, idx) => (
+                  <div key={idx} className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="font-semibold text-sm">{competitor.name}</h4>
+                        {competitor.website && (
+                          <a 
+                            href={competitor.website.startsWith('http') ? competitor.website : `https://${competitor.website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline"
+                          >
+                            {competitor.website.replace(/^https?:\/\//, '').slice(0, 30)}
+                          </a>
+                        )}
+                      </div>
+                      <Badge variant={
+                        competitor.positioning === 'premium' ? 'default' : 
+                        competitor.positioning === 'mid-market' ? 'secondary' : 'outline'
+                      } className="text-xs">
+                        {competitor.positioning}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{competitor.description}</p>
+                    
+                    {competitor.strengths.length > 0 && (
+                      <div className="mb-2">
+                        <p className="text-xs font-medium text-success mb-1">Strengths</p>
+                        <ul className="text-xs text-muted-foreground">
+                          {competitor.strengths.slice(0, 2).map((s, i) => (
+                            <li key={i} className="flex items-start gap-1">
+                              <span className="text-success">•</span>
+                              <span className="line-clamp-1">{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {competitor.weaknesses.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-orange-600 mb-1">Gaps</p>
+                        <ul className="text-xs text-muted-foreground">
+                          {competitor.weaknesses.slice(0, 1).map((w, i) => (
+                            <li key={i} className="flex items-start gap-1">
+                              <span className="text-orange-600">•</span>
+                              <span className="line-clamp-1">{w}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Entry Barriers */}
+              {analysisResult.metadata.competitorIntelligence.marketInsights?.entryBarriers && 
+               analysisResult.metadata.competitorIntelligence.marketInsights.entryBarriers.length > 0 && (
+                <div className="p-4 bg-orange-50/50 dark:bg-orange-950/20 rounded-lg border border-orange-200/50">
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                    Entry Barriers to Consider
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {analysisResult.metadata.competitorIntelligence.marketInsights.entryBarriers.map((barrier, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs border-orange-300">
+                        {barrier}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <p className="text-xs text-muted-foreground text-center">
+                Competitor data researched in real-time. Market conditions may change. Not legal or financial advice.
               </p>
             </CardContent>
           </Card>
