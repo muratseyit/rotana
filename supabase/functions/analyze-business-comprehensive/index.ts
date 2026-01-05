@@ -259,10 +259,33 @@ serve(async (req) => {
     promptParts.push(`Investment: ${scoringResult.scoreBreakdown.investmentReadiness}/100\n\n`);
     
     if (websiteAnalysis) {
-      promptParts.push('WEBSITE ANALYSIS:\n');
-      promptParts.push(`- SSL: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes' : 'No'}\n`);
-      promptParts.push(`- E-commerce: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes' : 'No'}\n`);
-      promptParts.push(`- UK signals: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress ? 'Yes' : 'No'}\n\n`);
+      promptParts.push('WEBSITE ANALYSIS (Live Scraped Data):\n');
+      promptParts.push(`- Title: ${websiteAnalysis.title || 'Not found'}\n`);
+      promptParts.push(`- Description: ${websiteAnalysis.description || 'Not found'}\n`);
+      promptParts.push(`- Content Length: ${websiteAnalysis.content?.length || 0} characters\n`);
+      promptParts.push(`- SSL Security: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes (HTTPS)' : 'No (HTTP only - security risk)'}\n`);
+      promptParts.push(`- Professional Navigation: ${websiteAnalysis.structure.hasNavigation ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Contact Form: ${websiteAnalysis.structure.hasContactForm ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Social Media Links: ${websiteAnalysis.structure.hasSocialLinks ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Languages Detected: ${websiteAnalysis.structure.languages.join(', ') || 'Unknown'}\n`);
+      promptParts.push(`- E-commerce Cart: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Pricing Displayed: ${websiteAnalysis.ecommerce.hasPricing ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Payment Acceptance: ${websiteAnalysis.ecommerce.acceptsPayments ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Privacy Policy: ${websiteAnalysis.trustSignals.hasPrivacyPolicy ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- Terms of Service: ${websiteAnalysis.trustSignals.hasTermsOfService ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- UK Price Display (£GBP): ${websiteAnalysis.ukAlignment.hasPoundsGBP ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- UK Address Present: ${websiteAnalysis.ukAlignment.hasUKAddress ? 'Yes' : 'No'}\n`);
+      promptParts.push(`- UK Phone Number: ${websiteAnalysis.ukAlignment.hasUKPhone ? 'Yes' : 'No'}\n`);
+      // Include first 500 chars of website content for context
+      if (websiteAnalysis.content && websiteAnalysis.content.length > 0) {
+        const contentPreview = websiteAnalysis.content.substring(0, 500).replace(/\s+/g, ' ').trim();
+        promptParts.push(`- Content Preview: "${contentPreview}..."\n`);
+      }
+      promptParts.push('\n');
+    } else if (businessData.websiteUrl) {
+      promptParts.push('WEBSITE: URL provided but could not be analyzed (may be inaccessible or blocked)\n\n');
+    } else {
+      promptParts.push('WEBSITE: No website URL provided - this is a significant gap for UK market credibility\n\n');
     }
     
     if (companyVerification?.verified) {
@@ -300,16 +323,22 @@ serve(async (req) => {
     promptParts.push('\n');
     
     promptParts.push('TASK: Provide JSON with:\n');
-    promptParts.push('1. "summary": 2-3 sentence executive summary incorporating market opportunity insights\n');
+    promptParts.push('1. "summary": 2-3 sentence executive summary incorporating market opportunity insights AND website assessment\n');
     promptParts.push('2. "detailedInsights": array of 8 categories (Product-Market Fit, Regulatory Compatibility, Digital Readiness, Logistics Potential, Scalability, Team, Investment, Market Opportunity), each with:\n');
     promptParts.push('   - "category": name\n');
     promptParts.push('   - "score": use the calculated score above\n');
-    promptParts.push('   - "strengths": array of 2-3 strengths\n');
-    promptParts.push('   - "weaknesses": array of 2-3 weaknesses\n');
+    promptParts.push('   - "strengths": array of 2-3 strengths (reference website findings where relevant)\n');
+    promptParts.push('   - "weaknesses": array of 2-3 weaknesses (reference website gaps where relevant)\n');
     promptParts.push('   - "actionItems": array of 2-3 actions with "action", "priority" (high/medium/low), "timeframe" (immediate/1-3 months/3-6 months)\n');
-    promptParts.push('3. "recommendations": object with "immediate", "shortTerm", "longTerm" arrays (2-3 items each)\n');
-    promptParts.push('4. "risks": array of 3-5 key risks with "risk", "severity" (high/medium/low), "mitigation"\n');
-    promptParts.push('5. "opportunities": array of 3-5 opportunities based on market intelligence with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
+    promptParts.push('3. "websiteInsights": object with website-specific analysis:\n');
+    promptParts.push('   - "overallAssessment": 1-2 sentence assessment of website readiness for UK market\n');
+    promptParts.push('   - "strengths": array of 2-3 website strengths based on scraped data\n');
+    promptParts.push('   - "improvements": array of 3-5 specific improvements needed for UK market (prioritized)\n');
+    promptParts.push('   - "ukReadinessScore": number 0-100 based on UK alignment signals\n');
+    promptParts.push('4. "recommendations": object with "immediate", "shortTerm", "longTerm" arrays (2-3 items each, include website-related actions)\n');
+    promptParts.push('5. "risks": array of 3-5 key risks with "risk", "severity" (high/medium/low), "mitigation"\n');
+    promptParts.push('6. "opportunities": array of 3-5 opportunities based on market intelligence with "opportunity", "impact" (high/medium/low), "timeline"\n\n');
+    promptParts.push('IMPORTANT: Base Digital Readiness insights heavily on the actual website analysis data. If website was not analyzed, note this as a critical gap.\n');
     promptParts.push('Keep insights specific to UK market entry. Focus on actionable recommendations.');
     
     const prompt = promptParts.join('');
@@ -531,9 +560,21 @@ serve(async (req) => {
           isLiveData: true
         } : null,
         liveRegulations: effectiveRegulations,
+        websiteAnalysis: websiteAnalysis ? {
+          url: businessData.websiteUrl,
+          title: websiteAnalysis.title,
+          description: websiteAnalysis.description,
+          contentLength: websiteAnalysis.content?.length || 0,
+          structure: websiteAnalysis.structure,
+          ecommerce: websiteAnalysis.ecommerce,
+          trustSignals: websiteAnalysis.trustSignals,
+          ukAlignment: websiteAnalysis.ukAlignment,
+          scrapedAt: new Date().toISOString()
+        } : null,
         dataSourcesUsed: [
           'Evidence-Based Scoring Algorithms',
           'Business Form Data',
+          websiteAnalysis ? 'Live Website Scraping & Analysis' : null,
           companyVerification?.verified ? 'Companies House API (Verified)' : null,
           'UK Industry Benchmarks (2024-2025)',
           'UK Government Regulatory Database',
@@ -542,7 +583,7 @@ serve(async (req) => {
           'Turkey-UK Trade Flow Data',
           'HS Code Classification Database',
           'Supabase Partner Database',
-          'Gemini 2.5 Pro AI Analysis'
+          `${usedProvider === 'openai' ? 'OpenAI GPT-4o-mini' : 'Google Gemini 2.5 Pro'} AI Analysis`
         ].filter(Boolean)
       }
     };
