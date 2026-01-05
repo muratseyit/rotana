@@ -20,11 +20,13 @@ serve(async (req) => {
     const businessData = await req.json();
     
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      console.error('LOVABLE_API_KEY not found in environment');
-      throw new Error('Lovable AI key not configured');
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    
+    if (!lovableApiKey && !openaiApiKey) {
+      console.error('Neither LOVABLE_API_KEY nor OPENAI_API_KEY found in environment');
+      throw new Error('AI key not configured');
     }
-    console.log('Lovable AI key loaded successfully');
+    console.log('AI keys loaded:', { lovable: !!lovableApiKey, openai: !!openaiApiKey });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -313,45 +315,83 @@ serve(async (req) => {
     const prompt = promptParts.join('');
     console.log('Prompt built successfully, length:', prompt.length);
 
-    // Call Lovable AI (Gemini) with timeout
-    console.log('Initiating Lovable AI call...');
+    // AI call helper function
+    const callAI = async (provider: 'lovable' | 'openai'): Promise<Response> => {
+      const isLovable = provider === 'lovable';
+      const apiKey = isLovable ? lovableApiKey : openaiApiKey;
+      const endpoint = isLovable 
+        ? 'https://ai.gateway.lovable.dev/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
+      const model = isLovable ? 'google/gemini-2.5-pro' : 'gpt-4o-mini';
+      
+      console.log(`Calling ${provider} AI with model ${model}...`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { 
+                role: 'system', 
+                content: 'You are a senior UK market entry analyst. Provide concise, actionable JSON analysis with specific evidence for each score. Respond ONLY with valid JSON, no markdown or extra text.' 
+              },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 5000,
+            ...(isLovable ? { response_format: { type: "json_object" } } : {})
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        console.log(`${provider} AI responded with status:`, response.status);
+        return response;
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        console.error(`${provider} AI fetch error:`, fetchError);
+        throw fetchError;
+      }
+    };
+
+    // Try Lovable AI first, fallback to OpenAI if it fails with 401/402/429
+    let aiResponse: Response | null = null;
+    let usedProvider = 'lovable';
     
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
-    
-    let aiResponse;
-    try {
-      aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${lovableApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-pro',
-          messages: [
-            { 
-              role: 'system', 
-              content: 'You are a senior UK market entry analyst. Provide concise, actionable JSON analysis with specific evidence for each score. Respond ONLY with valid JSON, no markdown or extra text.' 
-            },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 5000,
-          response_format: { type: "json_object" }
-        }),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      console.log('Lovable AI responded with status:', aiResponse.status);
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-      console.error('Lovable AI fetch error:', fetchError);
-      throw new Error(`Failed to connect to Lovable AI: ${fetchError.message}`);
+    if (lovableApiKey) {
+      try {
+        aiResponse = await callAI('lovable');
+        
+        // If Lovable returns auth/rate limit error and we have OpenAI, try fallback
+        if (!aiResponse.ok && [401, 402, 429].includes(aiResponse.status) && openaiApiKey) {
+          console.log(`Lovable AI returned ${aiResponse.status}, falling back to OpenAI...`);
+          aiResponse = await callAI('openai');
+          usedProvider = 'openai';
+        }
+      } catch (lovableError) {
+        console.error('Lovable AI failed:', lovableError);
+        if (openaiApiKey) {
+          console.log('Falling back to OpenAI...');
+          aiResponse = await callAI('openai');
+          usedProvider = 'openai';
+        }
+      }
+    } else if (openaiApiKey) {
+      // Only OpenAI available
+      aiResponse = await callAI('openai');
+      usedProvider = 'openai';
     }
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('Lovable AI error:', aiResponse.status, errorText);
+    if (!aiResponse || !aiResponse.ok) {
+      const errorText = aiResponse ? await aiResponse.text() : 'No AI response';
+      const errorStatus = aiResponse?.status || 500;
+      console.error('All AI providers failed:', errorStatus, errorText);
       
       // Return calculated scores even if AI analysis fails
       return new Response(
@@ -376,7 +416,7 @@ serve(async (req) => {
             analysisDate: new Date().toISOString(),
             confidenceLevel: scoringResult.confidenceLevel,
             scoringMethod: 'evidence-based-algorithms',
-            aiAnalysisError: `Lovable AI error: ${aiResponse.status}`,
+            aiAnalysisError: `AI error: ${errorStatus}`,
             industryBenchmark,
             regulatoryRequirements,
             marketIntelligence: scoringResult.marketIntelligence
@@ -388,6 +428,8 @@ serve(async (req) => {
         }
       );
     }
+    
+    console.log(`AI analysis successful using ${usedProvider}`);
 
     const aiData = await aiResponse.json();
     console.log('Lovable AI response received, structure check...');
@@ -448,9 +490,10 @@ serve(async (req) => {
           completedSections: []
         },
         analysisVersion: 'v2.3-realtime-intelligence',
-        modelUsed: 'gemini-2.5-pro + proprietary-scoring-engine + perplexity-research',
+        modelUsed: `${usedProvider === 'openai' ? 'gpt-4o-mini' : 'gemini-2.5-pro'} + proprietary-scoring-engine + perplexity-research`,
         analysisDate: new Date().toISOString(),
         confidenceLevel: scoringResult.confidenceLevel,
+        aiProvider: usedProvider,
         scoringMethod: 'evidence-based-algorithms',
         companyVerification: companyVerification ? {
           verified: companyVerification.verified,
