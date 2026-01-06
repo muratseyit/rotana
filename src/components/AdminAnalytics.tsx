@@ -36,38 +36,54 @@ export function AdminAnalytics() {
   const fetchAnalytics = async () => {
     setIsLoading(true);
     try {
-      // Get basic counts
-      const [partnersResult, analysesResult] = await Promise.all([
+      // Get real data from database
+      const [partnersResult, analysesResult, subscribersResult] = await Promise.all([
         supabase.from("partners").select("*", { count: 'exact' }),
-        supabase.from("business_analysis_history").select("*", { count: 'exact' }).order('created_at', { ascending: false }).limit(100)
+        supabase.from("business_analysis_history").select("*", { count: 'exact' }).order('created_at', { ascending: false }).limit(100),
+        supabase.from("subscribers").select("id", { count: 'exact', head: true })
       ]);
 
-      // Simulate additional analytics data
-      const mockAnalysisOverTime = Array.from({ length: 7 }, (_, i) => ({
-        date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        analyses: Math.floor(Math.random() * 50) + 10
-      }));
+      // Calculate real analysis trends from actual data
+      const analysesData = analysesResult.data || [];
+      const analysisOverTime = calculateAnalysisTrend(analysesData, timeRange);
 
+      // Calculate partner category distribution from real data
       const partnerData = partnersResult.data || [];
-      const categoryStats = partnerData.reduce((acc: any, partner: any) => {
+      const categoryStats = partnerData.reduce((acc: Record<string, number>, partner: any) => {
         acc[partner.category] = (acc[partner.category] || 0) + 1;
         return acc;
       }, {});
 
+      const categoryColors: Record<string, string> = {
+        accounting: '#8884d8',
+        marketing: '#82ca9d',
+        business_development: '#ffc658',
+        compliance: '#ff7300',
+        legal: '#00C49F',
+        logistics: '#FFBB28'
+      };
+
       const partnersByCategory = Object.entries(categoryStats).map(([category, count]) => ({
-        category,
+        category: formatCategoryName(category),
         count,
-        color: getRandomColor()
+        color: categoryColors[category] || '#8884d8'
       }));
 
+      // Calculate real conversion rate (analyses / subscribers)
+      const totalSubscribers = subscribersResult.count || 0;
+      const totalAnalyses = analysesResult.count || 0;
+      const conversionRate = totalSubscribers > 0 
+        ? Math.round((totalAnalyses / totalSubscribers) * 1000) / 10 
+        : 0;
+
       setData({
-        totalUsers: Math.floor(Math.random() * 1000) + 500, // Mock data
-        totalAnalyses: analysesResult.count || 0,
+        totalUsers: totalSubscribers,
+        totalAnalyses,
         totalPartners: partnersResult.count || 0,
-        recentAnalyses: analysesResult.data?.slice(0, 10) || [],
-        analysisOverTime: mockAnalysisOverTime,
+        recentAnalyses: analysesData.slice(0, 10),
+        analysisOverTime,
         partnersByCategory,
-        conversionRate: Math.random() * 15 + 5 // 5-20%
+        conversionRate
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -76,10 +92,30 @@ export function AdminAnalytics() {
     }
   };
 
-  const getRandomColor = () => {
-    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88', '#ff6b6b'];
-    return colors[Math.floor(Math.random() * colors.length)];
+  // Calculate real analysis trend from database records
+  const calculateAnalysisTrend = (analyses: any[], range: string) => {
+    const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    const result: { date: string; analyses: number }[] = [];
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toISOString().split('T')[0];
+      const count = analyses.filter(a => 
+        a.created_at && a.created_at.split('T')[0] === dateStr
+      ).length;
+      result.push({ date: dateStr, analyses: count });
+    }
+    
+    return result;
   };
+
+  const formatCategoryName = (category: string) => {
+    return category
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
 
   if (isLoading) {
     return (

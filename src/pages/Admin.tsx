@@ -89,22 +89,24 @@ export default function Admin() {
   // Real admin statistics from database
   const [stats, setStats] = useState({
     totalUsers: 0,
-    activeUsers: 0,
     totalPartners: 0,
     pendingPartners: 0,
     totalAnalyses: 0,
-    conversionRate: 0,
-    systemHealth: 98.2
+    conversionRate: 0
   });
+
+  const [recentActivity, setRecentActivity] = useState<{ type: string; message: string; time: string }[]>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [partnersRes, pendingRes, analysesRes, subscribersRes] = await Promise.all([
+        const [partnersRes, pendingRes, analysesRes, subscribersRes, recentAnalysesRes, recentPartnersRes] = await Promise.all([
           supabase.from('partners').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
           supabase.from('partners').select('id', { count: 'exact', head: true }).eq('verification_status', 'pending'),
           supabase.from('business_analysis_history').select('id', { count: 'exact', head: true }),
-          supabase.from('subscribers').select('id', { count: 'exact', head: true })
+          supabase.from('subscribers').select('id', { count: 'exact', head: true }),
+          supabase.from('business_analysis_history').select('created_at').order('created_at', { ascending: false }).limit(5),
+          supabase.from('partners').select('name, created_at, verification_status').order('created_at', { ascending: false }).limit(5)
         ]);
 
         const totalPartners = partnersRes.count || 0;
@@ -114,13 +116,36 @@ export default function Admin() {
 
         setStats({
           totalUsers,
-          activeUsers: Math.round(totalUsers * 0.72),
           totalPartners,
           pendingPartners,
           totalAnalyses,
-          conversionRate: totalUsers > 0 ? Math.round((totalAnalyses / totalUsers) * 100) / 10 : 0,
-          systemHealth: 98.2
+          conversionRate: totalUsers > 0 ? Math.round((totalAnalyses / totalUsers) * 100) / 10 : 0
         });
+
+        // Build real recent activity from database
+        const activity: { type: string; message: string; time: string }[] = [];
+        
+        (recentPartnersRes.data || []).forEach((partner: any) => {
+          const status = partner.verification_status === 'pending' ? 'New partner application' : 'Partner verified';
+          activity.push({
+            type: 'partner',
+            message: `${status}: ${partner.name}`,
+            time: formatTimeAgo(partner.created_at)
+          });
+        });
+
+        (recentAnalysesRes.data || []).forEach((analysis: any) => {
+          activity.push({
+            type: 'analysis',
+            message: 'Business analysis completed',
+            time: formatTimeAgo(analysis.created_at)
+          });
+        });
+
+        // Sort by time and take top 5
+        activity.sort((a, b) => parseTimeAgo(a.time) - parseTimeAgo(b.time));
+        setRecentActivity(activity.slice(0, 5));
+
       } catch (error) {
         console.error('Error fetching stats:', error);
       }
@@ -130,6 +155,30 @@ export default function Admin() {
       fetchStats();
     }
   }, [isAuthorized]);
+
+  const formatTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    return `${diffDays} days ago`;
+  };
+
+  const parseTimeAgo = (timeStr: string): number => {
+    if (timeStr === 'Just now') return 0;
+    const match = timeStr.match(/(\d+)/);
+    if (!match) return 999;
+    const num = parseInt(match[1]);
+    if (timeStr.includes('minute')) return num;
+    if (timeStr.includes('hour')) return num * 60;
+    return num * 1440;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -159,7 +208,7 @@ export default function Admin() {
             </div>
             <Badge variant="default" className="gap-2">
               <Activity className="h-3 w-3" />
-              System Health: {stats.systemHealth}%
+              {stats.totalAnalyses} Analyses
             </Badge>
           </div>
         </div>
@@ -217,13 +266,13 @@ export default function Admin() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                    <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Total Analyses</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.activeUsers.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{stats.totalAnalyses.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
-                      {((stats.activeUsers / stats.totalUsers) * 100).toFixed(1)}% active rate
+                      Business readiness reports
                     </p>
                   </CardContent>
                 </Card>
@@ -325,26 +374,26 @@ export default function Admin() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[
-                      { type: 'partner', message: 'New partner application from TechConsult UK', time: '2 minutes ago' },
-                      { type: 'user', message: '15 new user registrations today', time: '1 hour ago' },
-                      { type: 'analysis', message: '47 business analyses completed', time: '3 hours ago' },
-                      { type: 'system', message: 'Weekly backup completed successfully', time: '6 hours ago' },
-                      { type: 'partner', message: 'Partner verification completed for Legal Advisors Ltd', time: '1 day ago' },
-                    ].map((activity, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${
-                            activity.type === 'partner' ? 'bg-blue-500' :
-                            activity.type === 'user' ? 'bg-green-500' :
-                            activity.type === 'analysis' ? 'bg-purple-500' :
-                            'bg-gray-500'
-                          }`} />
-                          <span className="text-sm">{activity.message}</span>
+                    {recentActivity.length > 0 ? (
+                      recentActivity.map((activity, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${
+                              activity.type === 'partner' ? 'bg-blue-500' :
+                              activity.type === 'user' ? 'bg-green-500' :
+                              activity.type === 'analysis' ? 'bg-purple-500' :
+                              'bg-gray-500'
+                            }`} />
+                            <span className="text-sm">{activity.message}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{activity.time}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground">{activity.time}</span>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No recent activity
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
