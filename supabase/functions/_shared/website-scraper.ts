@@ -329,3 +329,103 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
     };
   }
 }
+
+// Fallback scraper using Firecrawl API
+export async function scrapeWithFirecrawlFallback(url: string): Promise<WebsiteAnalysis | null> {
+  // First try native scraper
+  console.log('Attempting native scraping for:', url);
+  const nativeResult = await scrapeWebsite(url);
+  
+  if (nativeResult && nativeResult.scrapingStatus === 'success') {
+    console.log('Native scraping succeeded');
+    return nativeResult;
+  }
+  
+  // Try Firecrawl as fallback
+  console.log('Native scraping failed, attempting Firecrawl fallback...');
+  
+  const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
+  if (!firecrawlApiKey) {
+    console.log('Firecrawl API key not configured, skipping fallback');
+    return nativeResult; // Return failed native result
+  }
+  
+  try {
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+    
+    const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${firecrawlApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: formattedUrl,
+        formats: ['markdown', 'html', 'links'],
+        onlyMainContent: true,
+        waitFor: 3000,
+      }),
+    });
+    
+    if (!response.ok) {
+      console.log('Firecrawl request failed with status:', response.status);
+      return nativeResult;
+    }
+    
+    const data = await response.json();
+    const firecrawlData = data.data || data;
+    
+    if (!firecrawlData.markdown && !firecrawlData.html) {
+      console.log('Firecrawl returned no content');
+      return nativeResult;
+    }
+    
+    console.log('Firecrawl scraping succeeded');
+    
+    const content = firecrawlData.markdown || firecrawlData.html || '';
+    const contentText = content.substring(0, 3000);
+    const links = firecrawlData.links || [];
+    
+    // Analyze the Firecrawl content
+    const socialDomains = ['facebook.com', 'twitter.com', 'linkedin.com', 'instagram.com', 'youtube.com', 'x.com'];
+    const hasSocialLinks = links.some((link: string) => socialDomains.some(domain => link.includes(domain)));
+    
+    const hasPrivacyPolicy = links.some((link: string) => link.toLowerCase().includes('privacy'));
+    const hasTermsOfService = links.some((link: string) => link.toLowerCase().includes('terms'));
+    
+    return {
+      title: firecrawlData.metadata?.title || '',
+      description: firecrawlData.metadata?.description || '',
+      content: contentText,
+      structure: {
+        hasNavigation: true, // Assume true since page loaded
+        hasContactForm: contentText.toLowerCase().includes('contact') || contentText.toLowerCase().includes('email'),
+        hasSocialLinks,
+        languages: [firecrawlData.metadata?.language || 'en']
+      },
+      ecommerce: {
+        hasShoppingCart: /cart|basket|shop/i.test(contentText),
+        hasPricing: /£\d+|\$\d+|€\d+|TL\s?\d+|₺\d+/.test(contentText),
+        acceptsPayments: /checkout|payment|pay now/i.test(contentText)
+      },
+      trustSignals: {
+        hasSSL: url.startsWith('https://'),
+        hasPrivacyPolicy,
+        hasTermsOfService
+      },
+      ukAlignment: {
+        hasPoundsGBP: /£\s?\d+|gbp|pound/i.test(contentText),
+        hasUKAddress: /[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}|united kingdom|, uk/i.test(contentText),
+        hasUKPhone: /(\+44|0044)\s?\d{3,4}\s?\d{3,4}\s?\d{3,4}/.test(contentText)
+      },
+      scrapingStatus: 'success'
+    };
+    
+  } catch (error) {
+    console.error('Firecrawl fallback error:', error);
+    return nativeResult;
+  }
+}

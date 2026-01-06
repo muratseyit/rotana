@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-import { scrapeWebsite } from '../_shared/website-scraper.ts';
+import { scrapeWithFirecrawlFallback } from '../_shared/website-scraper.ts';
 
 // Industry benchmarks for UK market comparison
 interface IndustryBenchmark {
@@ -141,8 +141,8 @@ serve(async (req) => {
     let websiteScrapingStatus: 'success' | 'failed' | 'not_provided' = 'not_provided';
     
     if (websiteUrl && isSafeUrl(websiteUrl)) {
-      console.log('Scraping website content for:', websiteUrl);
-      websiteAnalysis = await scrapeWebsite(websiteUrl);
+      console.log('Scraping website content with Firecrawl fallback for:', websiteUrl);
+      websiteAnalysis = await scrapeWithFirecrawlFallback(websiteUrl);
       if (websiteAnalysis && websiteAnalysis.scrapingStatus === 'success') {
         console.log('Website scraping successful');
         websiteScrapingStatus = 'success';

@@ -38,3 +38,6 @@ request_timeout_ms = 60000
 [functions.competitor-research]
 verify_jwt = false
 request_timeout_ms = 45000
+
+[functions.firecrawl-scrape]
+verify_jwt = false

@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.4';
 import { calculateComprehensiveScore } from './scoring-engine.ts';
 import { getIndustryBenchmark, getRegulatoryRequirements, getMarketSizeData, getTurkeyUKTradeData, getCompetitionIndex } from './market-data.ts';
 import { generateEnhancedPartnerRecommendations } from './partner-matching.ts';
-import { scrapeWebsite } from '../_shared/website-scraper.ts';
+import { scrapeWithFirecrawlFallback } from '../_shared/website-scraper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,9 +43,9 @@ serve(async (req) => {
       (async () => {
         if (!businessData.websiteUrl) return null;
         
-        console.log('Scraping website content...');
+        console.log('Scraping website content with Firecrawl fallback...');
         try {
-          const analysis = await scrapeWebsite(businessData.websiteUrl);
+          const analysis = await scrapeWithFirecrawlFallback(businessData.websiteUrl);
           if (analysis) {
             console.log('Website scraping successful:', {
               title: analysis.title,
