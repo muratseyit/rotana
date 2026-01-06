@@ -570,8 +570,13 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
   let score = 0;
   const factors: ScoreEvidence['factors'] = [];
 
+  // Check if website was successfully scraped (has scrapingStatus = 'success' or has content)
+  const scrapedSuccessfully = websiteAnalysis && 
+    ((websiteAnalysis.scrapingStatus === 'success') || 
+     (websiteAnalysis.content && websiteAnalysis.content.length > 0));
+
   // Website presence and quality (0-30 points) - enhanced with actual content analysis
-  if (websiteAnalysis) {
+  if (scrapedSuccessfully) {
     // Base score for having a website
     let websitePoints = 5;
     let websiteEvidence = 'Website exists';
@@ -616,7 +621,7 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
     }
 
     // Multi-language support (0-2 points)
-    if (websiteAnalysis.structure.languages.length > 1) {
+    if (websiteAnalysis.structure.languages && websiteAnalysis.structure.languages.length > 1) {
       websitePoints += 2;
       websiteEvidence += `, ${websiteAnalysis.structure.languages.length} languages`;
     }
@@ -629,14 +634,15 @@ function calculateDigitalReadiness(data: any, websiteAnalysis?: any): ScoreEvide
       evidence: websiteEvidence
     });
   } else if (data.websiteUrl && data.websiteUrl !== 'Not provided') {
-    // Basic score for URL only (website not analyzed)
-    const points = 5;
+    // Website URL was provided but scraping failed - use NEUTRAL score (don't penalize)
+    // This is a technical limitation, not a business problem
+    const points = 15; // Average score - not penalizing for scraping failure
     score += points;
     factors.push({
-      factor: 'Website URL Provided',
+      factor: 'Website Present (Not Analyzed)',
       impact: 'neutral',
       points,
-      evidence: 'Website URL present but content not analyzed'
+      evidence: 'Website exists but automated analysis failed (bot protection or JavaScript required). This does not reflect poorly on the business.'
     });
   } else {
     factors.push({

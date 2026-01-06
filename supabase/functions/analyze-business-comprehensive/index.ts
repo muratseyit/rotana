@@ -258,8 +258,14 @@ serve(async (req) => {
     promptParts.push(`Team: ${scoringResult.scoreBreakdown.founderTeamStrength}/100\n`);
     promptParts.push(`Investment: ${scoringResult.scoreBreakdown.investmentReadiness}/100\n\n`);
     
-    if (websiteAnalysis) {
-      promptParts.push('WEBSITE ANALYSIS (Live Scraped Data):\n');
+    // Handle website analysis with proper scraping status detection
+    const websiteScrapedSuccessfully = websiteAnalysis && 
+      (websiteAnalysis as any).scrapingStatus === 'success' && 
+      websiteAnalysis.content && 
+      websiteAnalysis.content.length > 0;
+    
+    if (websiteScrapedSuccessfully) {
+      promptParts.push('WEBSITE ANALYSIS (Live Scraped Data - Successfully Retrieved):\n');
       promptParts.push(`- Title: ${websiteAnalysis.title || 'Not found'}\n`);
       promptParts.push(`- Description: ${websiteAnalysis.description || 'Not found'}\n`);
       promptParts.push(`- Content Length: ${websiteAnalysis.content?.length || 0} characters\n`);
@@ -283,7 +289,12 @@ serve(async (req) => {
       }
       promptParts.push('\n');
     } else if (businessData.websiteUrl) {
-      promptParts.push('WEBSITE: URL provided but could not be analyzed (may be inaccessible or blocked)\n\n');
+      promptParts.push(`WEBSITE: URL provided (${businessData.websiteUrl}) but automated scraping failed.\n`);
+      promptParts.push('IMPORTANT: This is a TECHNICAL LIMITATION of our scraper, NOT a reflection of the business.\n');
+      promptParts.push('The website likely exists and functions properly but may use bot protection or require JavaScript.\n');
+      promptParts.push('DO NOT penalize the business for this scraping failure.\n');
+      promptParts.push('For Digital Readiness scoring, assume AVERAGE performance (50-60/100) since we cannot verify.\n');
+      promptParts.push('Base your assessment on other available business data.\n\n');
     } else {
       promptParts.push('WEBSITE: No website URL provided - this is a significant gap for UK market credibility\n\n');
     }

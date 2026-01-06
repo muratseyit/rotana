@@ -138,14 +138,24 @@ serve(async (req) => {
 
     // Scrape website if URL provided
     let websiteAnalysis = null;
+    let websiteScrapingStatus: 'success' | 'failed' | 'not_provided' = 'not_provided';
+    
     if (websiteUrl && isSafeUrl(websiteUrl)) {
-      console.log('Scraping website content...');
+      console.log('Scraping website content for:', websiteUrl);
       websiteAnalysis = await scrapeWebsite(websiteUrl);
-      if (websiteAnalysis) {
+      if (websiteAnalysis && websiteAnalysis.scrapingStatus === 'success') {
         console.log('Website scraping successful');
+        websiteScrapingStatus = 'success';
+      } else if (websiteAnalysis) {
+        console.log('Website scraping failed but URL exists, status:', websiteAnalysis.scrapingStatus);
+        websiteScrapingStatus = 'failed';
       } else {
-        console.log('Website scraping failed, continuing with URL only');
+        console.log('Website scraping returned null');
+        websiteScrapingStatus = 'failed';
       }
+    } else if (websiteUrl) {
+      console.log('Website URL provided but failed safety check:', websiteUrl);
+      websiteScrapingStatus = 'failed';
     }
 
     // Get industry benchmark data for comparison
@@ -168,7 +178,8 @@ serve(async (req) => {
 
     // Calculate digital readiness based on website analysis
     let digitalReadinessScore = 0;
-    if (websiteAnalysis) {
+    
+    if (websiteAnalysis && websiteAnalysis.scrapingStatus === 'success') {
       // SSL Certificate (15 points)
       if (websiteAnalysis.trustSignals.hasSSL) digitalReadinessScore += 15;
       
@@ -191,6 +202,16 @@ serve(async (req) => {
       // Professional Structure (10 points)
       if (websiteAnalysis.structure.hasNavigation) digitalReadinessScore += 5;
       if (websiteAnalysis.structure.hasSocialLinks) digitalReadinessScore += 5;
+      
+      console.log('Digital readiness score from scraped data:', digitalReadinessScore);
+    } else if (websiteUrl) {
+      // Website exists but scraping failed - use neutral score (don't penalize)
+      digitalReadinessScore = 50;
+      console.log('Website exists but scraping failed, using neutral score:', digitalReadinessScore);
+    } else {
+      // No website provided
+      digitalReadinessScore = 0;
+      console.log('No website provided, digital readiness score:', digitalReadinessScore);
     }
 
     const avgUKScore = 72;
@@ -212,8 +233,8 @@ UK MARKET CONTEXT FOR ${industry}:
 - Average Profit Margins: ${industryBenchmark.averageMargins}%
 - **UK Industry Average Score: ${avgUKScore}/100** (use this as benchmark for comparison)
 
-${websiteUrl ? `Website: ${websiteUrl}` : 'No website provided'}
-${websiteAnalysis ? `
+${websiteUrl ? `Website URL: ${websiteUrl}` : 'No website provided'}
+${websiteAnalysis && websiteAnalysis.scrapingStatus === 'success' ? `
 Website Analysis (Pre-calculated Digital Readiness: ${digitalReadinessScore}/100):
 - Title: ${websiteAnalysis.title}
 - Description: ${websiteAnalysis.description}
@@ -223,7 +244,11 @@ Website Analysis (Pre-calculated Digital Readiness: ${digitalReadinessScore}/100
 - E-commerce Ready: ${websiteAnalysis.ecommerce.hasShoppingCart ? 'Yes ✓' : 'No ✗'}
 - SSL Secured: ${websiteAnalysis.trustSignals.hasSSL ? 'Yes ✓' : 'No ✗'}
 - UK Alignment: ${websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress ? 'Strong ✓' : 'Weak ✗'}
-` : 'Website not analyzed - Digital Readiness Score: 0/100 ✗'}
+` : websiteUrl ? `
+IMPORTANT: Website exists at ${websiteUrl} but automated scraping failed (site may block bots or require JavaScript).
+DO NOT penalize this business for scraping failure - the website exists and is functional.
+Assume average digital readiness (50/100) for scoring purposes since we cannot verify website quality.
+` : 'No website URL provided - this is a gap for UK market credibility'}
 
 SCORING INSTRUCTIONS:
 - **Market Fit Score** (0-100): How well does this business fit UK market needs?
@@ -352,28 +377,47 @@ Be specific, realistic, and actionable. Avoid generic advice.`;
                         finalOverallScore < 75 ? 'medium' : 
                         'low';
 
-    // Generate website insights
-    const websiteInsights = websiteAnalysis ? {
-      hasWebsite: true,
-      digitalScore: digitalReadinessScore,
-      strengths: [
-        websiteAnalysis.trustSignals.hasSSL && 'SSL Security',
-        websiteAnalysis.structure.hasContactForm && 'Contact Form',
-        websiteAnalysis.ecommerce.hasShoppingCart && 'E-commerce Ready',
-        (websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress) && 'UK-focused Content'
-      ].filter(Boolean),
-      improvements: [
-        !websiteAnalysis.trustSignals.hasSSL && 'Add SSL certificate for security',
-        !websiteAnalysis.structure.hasContactForm && 'Add contact form to capture leads',
-        websiteAnalysis.content.length < 1000 && 'Expand website content (currently under 1000 chars)',
-        !websiteAnalysis.ukAlignment.hasPoundsGBP && !websiteAnalysis.ukAlignment.hasUKAddress && 'Add UK-specific content (GBP pricing, UK address)',
-        !websiteAnalysis.ecommerce.hasShoppingCart && industry.toLowerCase().includes('retail') && 'Consider adding e-commerce functionality'
-      ].filter(Boolean)
-    } : {
-      hasWebsite: false,
-      digitalScore: 0,
-      criticalIssue: 'No website detected - essential for UK market credibility and partner trust'
-    };
+    // Generate website insights with proper scraping status handling
+    let websiteInsights;
+    
+    if (websiteAnalysis && websiteAnalysis.scrapingStatus === 'success') {
+      websiteInsights = {
+        hasWebsite: true,
+        scrapingStatus: 'success',
+        digitalScore: digitalReadinessScore,
+        strengths: [
+          websiteAnalysis.trustSignals.hasSSL && 'SSL Security',
+          websiteAnalysis.structure.hasContactForm && 'Contact Form',
+          websiteAnalysis.ecommerce.hasShoppingCart && 'E-commerce Ready',
+          (websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress) && 'UK-focused Content'
+        ].filter(Boolean),
+        improvements: [
+          !websiteAnalysis.trustSignals.hasSSL && 'Add SSL certificate for security',
+          !websiteAnalysis.structure.hasContactForm && 'Add contact form to capture leads',
+          websiteAnalysis.content.length < 1000 && 'Expand website content (currently under 1000 chars)',
+          !websiteAnalysis.ukAlignment.hasPoundsGBP && !websiteAnalysis.ukAlignment.hasUKAddress && 'Add UK-specific content (GBP pricing, UK address)',
+          !websiteAnalysis.ecommerce.hasShoppingCart && industry.toLowerCase().includes('retail') && 'Consider adding e-commerce functionality'
+        ].filter(Boolean)
+      };
+    } else if (websiteUrl) {
+      // Website URL was provided but scraping failed
+      websiteInsights = {
+        hasWebsite: true,
+        scrapingStatus: 'failed',
+        websiteUrl: websiteUrl,
+        digitalScore: 50, // Neutral score - don't penalize for scraping failure
+        message: 'Website exists but could not be automatically analyzed. Manual review recommended.',
+        note: 'Scraping may fail due to bot protection, JavaScript requirements, or temporary issues. This does not reflect poorly on the business.'
+      };
+    } else {
+      // No website provided
+      websiteInsights = {
+        hasWebsite: false,
+        scrapingStatus: 'not_provided',
+        digitalScore: 0,
+        criticalIssue: 'No website detected - essential for UK market credibility and partner trust'
+      };
+    }
 
     console.log('Analysis complete, returning enhanced results');
 
