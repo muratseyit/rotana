@@ -25,6 +25,7 @@ export interface WebsiteAnalysis {
     hasUKAddress: boolean;
     hasUKPhone: boolean;
   };
+  scrapingStatus: 'success' | 'failed' | 'timeout' | 'blocked';
 }
 
 const isSafeUrl = (url: string): boolean => {
@@ -43,6 +44,68 @@ const isSafeUrl = (url: string): boolean => {
   }
 };
 
+// Realistic browser User-Agent to avoid being blocked
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0'
+];
+
+const getRandomUserAgent = () => USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+
+async function fetchWithRetry(url: string, retries = 2, timeoutMs = 15000): Promise<Response | null> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': getRandomUserAgent(),
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Upgrade-Insecure-Requests': '1',
+          'Cache-Control': 'max-age=0'
+        }
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        return response;
+      }
+
+      console.log(`Fetch attempt ${attempt + 1} failed with status: ${response.status}`);
+      
+      // If blocked (403/401/429), don't retry
+      if ([401, 403, 429].includes(response.status)) {
+        console.log('Request blocked by server, not retrying');
+        return null;
+      }
+
+    } catch (error) {
+      const errorName = error instanceof Error ? error.name : 'Unknown';
+      console.log(`Fetch attempt ${attempt + 1} error: ${errorName}`);
+      
+      if (errorName === 'AbortError') {
+        console.log('Request timed out');
+      }
+      
+      // Wait before retry with exponential backoff
+      if (attempt < retries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.log(`Waiting ${delay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  return null;
+}
+
 export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null> {
   if (!url || !isSafeUrl(url)) {
     console.log('Invalid or unsafe URL provided for scraping:', url);
@@ -51,25 +114,41 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
 
   console.log('Starting website scraping for:', url);
 
+  const response = await fetchWithRetry(url);
+  
+  if (!response) {
+    console.log('All fetch attempts failed for:', url);
+    // Return a minimal result indicating scraping failed but URL exists
+    return {
+      title: '',
+      description: '',
+      content: '',
+      structure: {
+        hasNavigation: false,
+        hasContactForm: false,
+        hasSocialLinks: false,
+        languages: []
+      },
+      ecommerce: {
+        hasShoppingCart: false,
+        hasPricing: false,
+        acceptsPayments: false
+      },
+      trustSignals: {
+        hasSSL: url.startsWith('https://'),
+        hasPrivacyPolicy: false,
+        hasTermsOfService: false
+      },
+      ukAlignment: {
+        hasPoundsGBP: false,
+        hasUKAddress: false,
+        hasUKPhone: false
+      },
+      scrapingStatus: 'failed'
+    };
+  }
+
   try {
-    // Fetch with 10 second timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Converta Business Analyzer Bot/1.0'
-      }
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      console.log(`Failed to fetch website: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
     const html = await response.text();
     console.log(`Fetched HTML content: ${html.length} characters`);
 
@@ -77,7 +156,16 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
     const doc = new DOMParser().parseFromString(html, 'text/html');
     if (!doc) {
       console.log('Failed to parse HTML');
-      return null;
+      return {
+        title: '',
+        description: '',
+        content: '',
+        structure: { hasNavigation: false, hasContactForm: false, hasSocialLinks: false, languages: [] },
+        ecommerce: { hasShoppingCart: false, hasPricing: false, acceptsPayments: false },
+        trustSignals: { hasSSL: url.startsWith('https://'), hasPrivacyPolicy: false, hasTermsOfService: false },
+        ukAlignment: { hasPoundsGBP: false, hasUKAddress: false, hasUKPhone: false },
+        scrapingStatus: 'failed'
+      };
     }
 
     // Extract page title
@@ -97,18 +185,21 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
       doc.querySelector('nav') ||
       doc.querySelector('[role="navigation"]') ||
       doc.querySelector('.nav') ||
-      doc.querySelector('.navigation')
+      doc.querySelector('.navigation') ||
+      doc.querySelector('header')
     );
 
     // Check for contact form
     const hasContactForm = !!(
       doc.querySelector('form[name*="contact" i]') ||
       doc.querySelector('form[id*="contact" i]') ||
-      doc.querySelector('form input[type="email"]')
+      doc.querySelector('form[class*="contact" i]') ||
+      doc.querySelector('form input[type="email"]') ||
+      doc.querySelector('form textarea')
     );
 
     // Check for social media links
-    const socialDomains = ['facebook.com', 'twitter.com', 'linkedin.com', 'instagram.com', 'youtube.com'];
+    const socialDomains = ['facebook.com', 'twitter.com', 'linkedin.com', 'instagram.com', 'youtube.com', 'x.com'];
     const links = Array.from(doc.querySelectorAll('a[href]'));
     const hasSocialLinks = links.some(link => {
       const href = link.getAttribute('href') || '';
@@ -130,21 +221,25 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
     const hasShoppingCart = !!(
       doc.querySelector('[class*="cart" i]') ||
       doc.querySelector('[id*="cart" i]') ||
+      doc.querySelector('[class*="basket" i]') ||
       bodyText.toLowerCase().includes('add to cart') ||
+      bodyText.toLowerCase().includes('add to basket') ||
       bodyText.toLowerCase().includes('shopping cart')
     );
 
     const hasPricing = !!(
       doc.querySelector('[class*="price" i]') ||
       doc.querySelector('[id*="price" i]') ||
-      /£\d+|\$\d+|€\d+/.test(bodyText)
+      /£\d+|\$\d+|€\d+|TL\s?\d+|₺\d+/.test(bodyText)
     );
 
     const acceptsPayments = !!(
       bodyText.toLowerCase().includes('checkout') ||
       bodyText.toLowerCase().includes('payment') ||
+      bodyText.toLowerCase().includes('pay now') ||
       doc.querySelector('form[action*="checkout" i]') ||
-      doc.querySelector('[class*="checkout" i]')
+      doc.querySelector('[class*="checkout" i]') ||
+      doc.querySelector('[class*="payment" i]')
     );
 
     // Trust signals
@@ -153,24 +248,29 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
     const hasPrivacyPolicy = links.some(link => {
       const href = link.getAttribute('href') || '';
       const text = link.textContent?.toLowerCase() || '';
-      return text.includes('privacy') || href.includes('privacy');
+      return text.includes('privacy') || href.includes('privacy') || 
+             text.includes('gizlilik') || href.includes('gizlilik');
     });
 
     const hasTermsOfService = links.some(link => {
       const href = link.getAttribute('href') || '';
       const text = link.textContent?.toLowerCase() || '';
-      return text.includes('terms') || href.includes('terms');
+      return text.includes('terms') || href.includes('terms') ||
+             text.includes('koşul') || href.includes('kosul');
     });
 
     // UK alignment indicators
-    const hasPoundsGBP = /£\s?\d+/.test(bodyText) || bodyText.toLowerCase().includes('gbp');
+    const hasPoundsGBP = /£\s?\d+/.test(bodyText) || 
+                         bodyText.toLowerCase().includes('gbp') ||
+                         bodyText.toLowerCase().includes('pound');
 
     const ukPostcodePattern = /[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}/i;
     const hasUKAddress = ukPostcodePattern.test(bodyText) || 
                          bodyText.toLowerCase().includes('united kingdom') ||
-                         bodyText.toLowerCase().includes('uk address');
+                         bodyText.toLowerCase().includes('uk address') ||
+                         bodyText.toLowerCase().includes(', uk');
 
-    const ukPhonePattern = /(\+44|0)\s?\d{3,4}\s?\d{3,4}\s?\d{3,4}/;
+    const ukPhonePattern = /(\+44|0044)\s?\d{3,4}\s?\d{3,4}\s?\d{3,4}/;
     const hasUKPhone = ukPhonePattern.test(bodyText);
 
     const analysis: WebsiteAnalysis = {
@@ -197,7 +297,8 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
         hasPoundsGBP,
         hasUKAddress,
         hasUKPhone
-      }
+      },
+      scrapingStatus: 'success'
     };
 
     console.log('Website scraping successful:', {
@@ -208,17 +309,23 @@ export async function scrapeWebsite(url: string): Promise<WebsiteAnalysis | null
       hasSocialLinks,
       hasShoppingCart,
       hasSSL,
-      hasPoundsGBP
+      hasPoundsGBP,
+      scrapingStatus: 'success'
     });
 
     return analysis;
 
   } catch (error) {
-    if (error.name === 'AbortError') {
-      console.log('Website scraping timed out after 10 seconds');
-    } else {
-      console.error('Error scraping website:', error);
-    }
-    return null;
+    console.error('Error parsing website content:', error);
+    return {
+      title: '',
+      description: '',
+      content: '',
+      structure: { hasNavigation: false, hasContactForm: false, hasSocialLinks: false, languages: [] },
+      ecommerce: { hasShoppingCart: false, hasPricing: false, acceptsPayments: false },
+      trustSignals: { hasSSL: url.startsWith('https://'), hasPrivacyPolicy: false, hasTermsOfService: false },
+      ukAlignment: { hasPoundsGBP: false, hasUKAddress: false, hasUKPhone: false },
+      scrapingStatus: 'failed'
+    };
   }
 }
