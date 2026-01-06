@@ -216,15 +216,21 @@ export default function GuestResults() {
       </header>
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* Success Banner */}
+        {/* Success Banner with Export Action */}
         <Card className="border-success bg-success/5">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-success" />
-              <div>
-                <h2 className="text-xl font-semibold text-success">{t('results.complete')}</h2>
-                <p className="text-muted-foreground">{t('results.ready')}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-8 w-8 text-success" />
+                <div>
+                  <h2 className="text-xl font-semibold text-success">{t('results.complete')}</h2>
+                  <p className="text-muted-foreground">{t('results.ready')}</p>
+                </div>
               </div>
+              <Button onClick={handleDownloadReport} variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export Report
+              </Button>
             </div>
           </CardContent>
         </Card>
