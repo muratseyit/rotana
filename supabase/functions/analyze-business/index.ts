@@ -306,25 +306,150 @@ Be specific, realistic, and actionable. Avoid generic advice.`;
       }),
     });
 
+    // Helper function to generate fallback results when AI is unavailable
+    const generateFallbackResults = () => {
+      console.log('Generating fallback results without AI...');
+      
+      // Calculate scores based on available data
+      const marketFitScore = industryBenchmark.competitionLevel === 'high' ? 55 :
+                             industryBenchmark.competitionLevel === 'medium' ? 65 : 70;
+      const businessModelScore = companySize === '1-10' ? 50 : 
+                                  companySize === '11-50' ? 60 : 
+                                  companySize === '51-200' ? 70 : 65;
+      
+      const calculatedOverallScore = Math.round(
+        (marketFitScore * 0.35) + 
+        (businessModelScore * 0.35) + 
+        (digitalReadinessScore * 0.30)
+      );
+      
+      const scoreGap = calculatedOverallScore - avgUKScore;
+      const position = scoreGap >= 5 ? 'Above Average' : 
+                       scoreGap >= -5 ? 'Average' : 
+                       'Below Average';
+      
+      const urgencyLevel = calculatedOverallScore < 60 ? 'high' : 
+                          calculatedOverallScore < 75 ? 'medium' : 
+                          'low';
+
+      // Generate website insights
+      let websiteInsights;
+      if (websiteAnalysis && websiteAnalysis.scrapingStatus === 'success') {
+        websiteInsights = {
+          hasWebsite: true,
+          scrapingStatus: 'success',
+          digitalScore: digitalReadinessScore,
+          strengths: [
+            websiteAnalysis.trustSignals.hasSSL && 'SSL Security',
+            websiteAnalysis.structure.hasContactForm && 'Contact Form',
+            websiteAnalysis.ecommerce.hasShoppingCart && 'E-commerce Ready',
+            (websiteAnalysis.ukAlignment.hasPoundsGBP || websiteAnalysis.ukAlignment.hasUKAddress) && 'UK-focused Content'
+          ].filter(Boolean),
+          improvements: [
+            !websiteAnalysis.trustSignals.hasSSL && 'Add SSL certificate for security',
+            !websiteAnalysis.structure.hasContactForm && 'Add contact form to capture leads',
+            websiteAnalysis.content.length < 1000 && 'Expand website content',
+            !websiteAnalysis.ukAlignment.hasPoundsGBP && 'Add UK-specific content (GBP pricing)'
+          ].filter(Boolean)
+        };
+      } else if (websiteUrl) {
+        websiteInsights = {
+          hasWebsite: true,
+          scrapingStatus: 'failed',
+          websiteUrl: websiteUrl,
+          digitalScore: 50,
+          message: 'Website exists but could not be automatically analyzed.'
+        };
+      } else {
+        websiteInsights = {
+          hasWebsite: false,
+          scrapingStatus: 'not_provided',
+          digitalScore: 0,
+          criticalIssue: 'No website detected - essential for UK market credibility'
+        };
+      }
+
+      return {
+        overallScore: calculatedOverallScore,
+        categoryScores: {
+          marketFit: marketFitScore,
+          businessModel: businessModelScore,
+          digitalReadiness: digitalReadinessScore
+        },
+        summary: `${companyName} in ${industry} scores ${calculatedOverallScore}/100 for UK market readiness, ${position.toLowerCase()} compared to the industry average of ${avgUKScore}. This assessment is based on company profile and available data.`,
+        keyInsight: `Focus on building UK-specific presence and compliance to improve market positioning.`,
+        strengths: [
+          `Operating in ${industry} with UK market size of ${industryBenchmark.marketSize}`,
+          `${companySize} employee company with established operations`,
+          digitalReadinessScore >= 50 ? 'Functional digital presence' : 'Room for digital growth'
+        ],
+        challenges: [
+          `${industryBenchmark.competitionLevel} competition level in UK ${industry} sector`,
+          'UK compliance requirements (GDPR, Companies House registration)',
+          'Building UK customer trust and brand recognition'
+        ],
+        priorityActions: [
+          'Complete UK compliance checklist with verified partners',
+          'Develop UK-focused marketing strategy',
+          'Consider UK entity establishment for credibility'
+        ],
+        riskAssessment: `Main risks include navigating ${industryBenchmark.competitionLevel} competition and UK regulatory requirements. A comprehensive analysis is recommended for detailed guidance.`,
+        industryComparison: {
+          industry: industry,
+          averageUKScore: avgUKScore,
+          yourPosition: position,
+          scoreGap: Math.abs(scoreGap),
+          percentile: calculatedOverallScore > avgUKScore ? 
+            Math.min(75, Math.round(50 + (scoreGap * 2))) : 
+            Math.max(25, Math.round(50 + (scoreGap * 2)))
+        },
+        websiteInsights: websiteInsights,
+        urgencyLevel: urgencyLevel,
+        upgradeMessage: urgencyLevel === 'high' 
+          ? "⚠️ Your score indicates significant gaps. Get the Comprehensive Analysis to identify exactly what to fix."
+          : urgencyLevel === 'medium'
+          ? "📊 You're close to being market-ready. Comprehensive Analysis shows the exact steps to get there."
+          : "✅ Good foundation! Comprehensive Analysis helps you optimize and find the right UK partners.",
+        missingInsights: [
+          "🔍 Detailed compliance checklist with timelines and costs",
+          "🤝 3 verified UK partner matches for your specific industry",
+          "📋 12-month market entry roadmap with milestones",
+          "💰 Complete cost breakdown for UK market entry",
+          "⚖️ Legal structure recommendations (Ltd, Branch, etc.)",
+          "📞 Expert review session to validate your strategy"
+        ],
+        disclaimer: "AI-generated analysis results are for informational purposes only and do not constitute legal or financial advice.",
+        fallbackMode: true
+      };
+    };
+
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('Lovable AI Gateway error:', aiResponse.status, errorText);
       
-      // Handle rate limits and payment errors
-      if (aiResponse.status === 429) {
+      // Handle rate limits and payment errors with fallback
+      if (aiResponse.status === 429 || aiResponse.status === 401 || aiResponse.status === 402 || aiResponse.status === 503) {
+        console.log('AI service unavailable, returning fallback results');
+        const fallbackResults = generateFallbackResults();
         return new Response(
-          JSON.stringify({ error: 'AI service rate limit exceeded. Please try again in a few moments.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'AI service payment required. Please contact support.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify(fallbackResults),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
+          }
         );
       }
       
-      throw new Error(`AI Gateway error: ${aiResponse.statusText}`);
+      // For other errors, also return fallback instead of failing
+      console.log('Unexpected AI error, returning fallback results');
+      const fallbackResults = generateFallbackResults();
+      return new Response(
+        JSON.stringify(fallbackResults),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
     }
 
     const aiData = await aiResponse.json();
