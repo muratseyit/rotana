@@ -11,6 +11,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { PricingSection } from "@/components/PricingSection";
 import { SaveReportDialog } from "@/components/SaveReportDialog";
 import { CheckCircle, Download, UserPlus, BarChart3, FileText, Users, Crown, AlertTriangle, TrendingUp, Zap, Lock, ArrowRight, ClipboardList, Ship, Package } from "lucide-react";
+import { MobileNavigation } from "@/components/MobileNavigation";
 import { trackEvent, trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 interface GuestAnalysisResult {
@@ -201,33 +202,36 @@ export default function GuestResults() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <BarChart3 className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-slate-900">Converta</span>
+              <span className="text-xl sm:text-2xl font-bold text-slate-900">Converta</span>
             </div>
-            <Button onClick={() => navigate('/')} variant="ghost">
-              {t('analysis.page.backHome')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => navigate('/')} variant="ghost" className="hidden sm:inline-flex">
+                {t('analysis.page.backHome')}
+              </Button>
+              <MobileNavigation />
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Success Banner with Export Action */}
         <Card className="border-success bg-success/5">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-8 w-8 text-success" />
+                <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-success flex-shrink-0" />
                 <div>
-                  <h2 className="text-xl font-semibold text-success">{t('results.complete')}</h2>
-                  <p className="text-muted-foreground">{t('results.ready')}</p>
+                  <h2 className="text-lg sm:text-xl font-semibold text-success">{t('results.complete')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('results.ready')}</p>
                 </div>
               </div>
-              <Button onClick={handleDownloadReport} variant="outline" className="gap-2">
+              <Button onClick={handleDownloadReport} variant="outline" className="gap-2 w-full sm:w-auto">
                 <Download className="h-4 w-4" />
                 Export Report
               </Button>

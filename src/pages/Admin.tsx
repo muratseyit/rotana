@@ -184,65 +184,78 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="mx-auto max-w-7xl px-6 py-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="gap-2"
+                className="gap-2 hidden sm:inline-flex"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Site
               </Button>
-              <div className="flex items-center gap-3">
-                <Settings className="h-8 w-8 text-primary" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 <div>
-                  <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                  <p className="text-sm text-muted-foreground">
+                  <h1 className="text-lg sm:text-2xl font-bold">Admin Dashboard</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                     Converta Management Console
                   </p>
                 </div>
               </div>
             </div>
-            <Badge variant="default" className="gap-2">
-              <Activity className="h-3 w-3" />
-              {stats.totalAnalyses} Analyses
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="default" className="gap-1 sm:gap-2 text-xs">
+                <Activity className="h-3 w-3" />
+                <span className="hidden sm:inline">{stats.totalAnalyses} Analyses</span>
+                <span className="sm:hidden">{stats.totalAnalyses}</span>
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="sm:hidden"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Users</span>
-            </TabsTrigger>
-            <TabsTrigger value="partners" className="gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Partners</span>
-            </TabsTrigger>
-            <TabsTrigger value="performance" className="gap-2">
-              <Zap className="h-4 w-4" />
-              <span className="hidden sm:inline">Performance</span>
-            </TabsTrigger>
-            <TabsTrigger value="marketing" className="gap-2">
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">Marketing</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2">
+            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-6 h-auto">
+              <TabsTrigger value="overview" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden lg:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Activity className="h-4 w-4" />
+                <span className="hidden lg:inline">Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="users" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden lg:inline">Users</span>
+              </TabsTrigger>
+              <TabsTrigger value="partners" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden lg:inline">Partners</span>
+              </TabsTrigger>
+              <TabsTrigger value="performance" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Zap className="h-4 w-4" />
+                <span className="hidden lg:inline">Performance</span>
+              </TabsTrigger>
+              <TabsTrigger value="marketing" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Mail className="h-4 w-4" />
+                <span className="hidden lg:inline">Marketing</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="mt-6">
             <div className="space-y-6">

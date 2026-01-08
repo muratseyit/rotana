@@ -7,8 +7,9 @@ import { PartnerCard } from "@/components/PartnerCard";
 import { PartnerApplicationDialog } from "@/components/PartnerApplicationDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Users, Plus, Building2 } from "lucide-react";
+import { Users, Plus, Building2, ArrowLeft } from "lucide-react";
 import { SmartPartnerFilter } from "@/components/SmartPartnerFilter";
+import { MobileNavigation } from "@/components/MobileNavigation";
 
 interface Partner {
   id: string;
@@ -71,35 +72,37 @@ export default function Partners() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="mx-auto max-w-7xl px-6 py-4">
+      <header className="border-b bg-card sticky top-0 z-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Building2 className="h-8 w-8 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold">{t('partners.title')}</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-lg sm:text-2xl font-bold">{t('partners.title')}</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                   {t('partners.subtitle')}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {user && (
-                <Button onClick={() => setShowApplicationDialog(true)} className="gap-2">
+                <Button onClick={() => setShowApplicationDialog(true)} className="gap-2 hidden sm:inline-flex">
                   <Plus className="h-4 w-4" />
                   {t('partners.applyPartner')}
                 </Button>
               )}
-              <Button variant="outline" onClick={() => window.history.back()}>
+              <Button variant="outline" onClick={() => window.history.back()} size="sm" className="hidden sm:inline-flex">
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 {t('partners.back')}
               </Button>
+              <MobileNavigation />
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
