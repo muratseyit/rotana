@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, Building, Users, Globe, FileText } from "lucide-
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MobileNavigation } from "@/components/MobileNavigation";
 
 // Industries that typically sell physical goods
 const goodsSellingIndustries = [
@@ -606,15 +607,18 @@ const ComprehensiveAnalysisForm = () => {
     </div>;
   return <div className="min-h-screen bg-gradient-to-br from-background to-primary/5">
       {/* Header */}
-      <header className="bg-card/80 backdrop-blur-md border-b border-border">
+      <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-2">
               <Building className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">Converta</span>
+              <span className="text-lg sm:text-xl font-bold text-foreground">Converta</span>
             </Link>
-            <div className="text-sm text-muted-foreground">
-              {t('compForm.step')} {currentStep} {t('compForm.of')} {totalSteps}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                {t('compForm.step')} {currentStep} {t('compForm.of')} {totalSteps}
+              </div>
+              <MobileNavigation />
             </div>
           </div>
         </div>
@@ -625,28 +629,28 @@ const ComprehensiveAnalysisForm = () => {
         <Progress value={progress} className="h-2" />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Hero Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-3">{t('compForm.title')}</h1>
-          <p className="text-lg text-muted-foreground">{t('compForm.subtitle')}</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t('compForm.title')}</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">{t('compForm.subtitle')}</p>
         </div>
 
         <Card>
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-8">
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
             {currentStep === 3 && renderStep3()}
             {currentStep === 4 && renderStep4()}
 
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
-              <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="flex items-center space-x-2">
+            <div className="flex justify-between items-center mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border gap-4">
+              <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="flex items-center space-x-1 sm:space-x-2">
                 <ArrowLeft className="h-4 w-4" />
-                <span>{t('compForm.back')}</span>
+                <span className="hidden sm:inline">{t('compForm.back')}</span>
               </Button>
 
-              <Button onClick={handleNext} className="flex items-center space-x-2">
+              <Button onClick={handleNext} className="flex items-center space-x-1 sm:space-x-2">
                 <span>{currentStep === totalSteps ? t('compForm.complete') : t('compForm.next')}</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>

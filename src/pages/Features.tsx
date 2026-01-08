@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MobileNavigation } from "@/components/MobileNavigation";
 
 const Features = () => {
   const navigate = useNavigate();
@@ -41,9 +42,10 @@ const Features = () => {
               <Link to="/partners" className="text-slate-600 hover:text-slate-900 transition-colors">Partners</Link>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => navigate('/guest-analysis')}>
+              <Button variant="outline" onClick={() => navigate('/guest-analysis')} className="hidden md:inline-flex">
                 {t('nav.getStarted')}
               </Button>
+              <MobileNavigation />
             </div>
           </div>
         </div>

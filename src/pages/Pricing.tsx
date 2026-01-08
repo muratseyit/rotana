@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, CreditCard, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MobileNavigation } from "@/components/MobileNavigation";
 
 export default function Pricing() {
   const navigate = useNavigate();
@@ -92,20 +93,20 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-background/80 backdrop-blur">
+      <header className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate("/")}
-                className="gap-2"
+                className="gap-2 hidden sm:inline-flex"
               >
                 <ArrowLeft className="w-4 h-4" />
                 {t('pricing.backToDashboard')}
               </Button>
-              <h1 className="text-xl font-semibold">{t('pricing.title')}</h1>
+              <h1 className="text-lg sm:text-xl font-semibold">{t('pricing.title')}</h1>
             </div>
             
             <div className="flex items-center gap-2">
@@ -115,7 +116,7 @@ export default function Pricing() {
                   size="sm"
                   onClick={handleManageSubscription}
                   disabled={isLoading}
-                  className="gap-2"
+                  className="gap-2 hidden sm:inline-flex"
                 >
                   <CreditCard className="w-4 h-4" />
                   {t('pricing.manageSubscription')}
@@ -126,11 +127,12 @@ export default function Pricing() {
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate("/partners")}
-                className="gap-2"
+                className="gap-2 hidden sm:inline-flex"
               >
                 <Users className="w-4 h-4" />
                 {t('pricing.partnerDirectory')}
               </Button>
+              <MobileNavigation />
             </div>
           </div>
         </div>

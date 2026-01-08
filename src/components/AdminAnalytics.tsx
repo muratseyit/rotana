@@ -229,10 +229,10 @@ export function AdminAnalytics() {
 
         {/* Charts */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="partners">Partners</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm py-2">Overview</TabsTrigger>
+            <TabsTrigger value="partners" className="text-xs sm:text-sm py-2">Partners</TabsTrigger>
+            <TabsTrigger value="activity" className="text-xs sm:text-sm py-2">Activity</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
