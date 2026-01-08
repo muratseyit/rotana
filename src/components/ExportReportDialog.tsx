@@ -142,11 +142,28 @@ export function ExportReportDialog({ companyName, overallScore, analysis, trigge
     
     yPosition += 10;
     doc.setFontSize(10);
-    const recommendations = analysis?.recommendations?.slice(0, isSummary ? 3 : 5) || [
-      'Complete regulatory compliance requirements',
-      'Enhance digital presence for UK market',
-      'Establish partnerships with verified UK providers'
-    ];
+    
+    // Handle both array format and object format for recommendations
+    let recommendations: string[] = [];
+    if (analysis?.recommendations) {
+      if (Array.isArray(analysis.recommendations)) {
+        recommendations = analysis.recommendations.slice(0, isSummary ? 3 : 5);
+      } else if (typeof analysis.recommendations === 'object') {
+        // Comprehensive analysis format: { immediate: [], shortTerm: [], longTerm: [] }
+        const immediate = Array.isArray(analysis.recommendations.immediate) ? analysis.recommendations.immediate : [];
+        const shortTerm = Array.isArray(analysis.recommendations.shortTerm) ? analysis.recommendations.shortTerm : [];
+        const longTerm = Array.isArray(analysis.recommendations.longTerm) ? analysis.recommendations.longTerm : [];
+        recommendations = [...immediate, ...shortTerm, ...longTerm].slice(0, isSummary ? 3 : 8);
+      }
+    }
+    
+    if (recommendations.length === 0) {
+      recommendations = [
+        'Complete regulatory compliance requirements',
+        'Enhance digital presence for UK market',
+        'Establish partnerships with verified UK providers'
+      ];
+    }
 
     recommendations.forEach((rec: string, index: number) => {
       if (yPosition > pageHeight - 20) {
@@ -169,19 +186,41 @@ export function ExportReportDialog({ companyName, overallScore, analysis, trigge
       doc.text('Compliance Status', 15, yPosition);
       
       yPosition += 5;
-      const complianceData = analysis.complianceAssessment.map((item: any) => [
-        item.requirement || item.name,
-        item.status || item.completed ? 'Completed' : 'Pending'
-      ]);
+      
+      // Handle both array format and object format for compliance assessment
+      let complianceData: string[][] = [];
+      if (Array.isArray(analysis.complianceAssessment)) {
+        complianceData = analysis.complianceAssessment.map((item: any) => [
+          item.requirement || item.name,
+          item.status || (item.completed ? 'Completed' : 'Pending')
+        ]);
+      } else if (typeof analysis.complianceAssessment === 'object') {
+        // Comprehensive analysis format: { criticalRequirements: [], riskAreas: [], complianceScore: number }
+        const criticalReqs = Array.isArray(analysis.complianceAssessment.criticalRequirements) 
+          ? analysis.complianceAssessment.criticalRequirements 
+          : [];
+        const riskAreas = Array.isArray(analysis.complianceAssessment.riskAreas) 
+          ? analysis.complianceAssessment.riskAreas 
+          : [];
+        
+        criticalReqs.forEach((req: string) => {
+          complianceData.push([req, 'Required']);
+        });
+        riskAreas.forEach((risk: string) => {
+          complianceData.push([risk, 'Risk Area']);
+        });
+      }
 
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Requirement', 'Status']],
-        body: complianceData,
-        theme: 'striped',
-        headStyles: { fillColor: [189, 189, 189], textColor: [255, 255, 255] },
-        margin: { left: 15, right: 15 }
-      });
+      if (complianceData.length > 0) {
+        autoTable(doc, {
+          startY: yPosition,
+          head: [['Requirement', 'Status']],
+          body: complianceData,
+          theme: 'striped',
+          headStyles: { fillColor: [189, 189, 189], textColor: [255, 255, 255] },
+          margin: { left: 15, right: 15 }
+        });
+      }
     }
 
     // Footer
