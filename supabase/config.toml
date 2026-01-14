@@ -41,3 +41,15 @@ request_timeout_ms = 45000
 
 [functions.firecrawl-scrape]
 verify_jwt = false
+
+[functions.fetch-kolay-ihracat]
+verify_jwt = false
+request_timeout_ms = 60000
+
+[functions.fetch-govuk-regulations]
+verify_jwt = false
+request_timeout_ms = 60000
+
+[functions.refresh-market-data]
+verify_jwt = false
+request_timeout_ms = 120000

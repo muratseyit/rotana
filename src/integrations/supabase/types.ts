@@ -260,6 +260,122 @@ export type Database = {
           },
         ]
       }
+      market_data_sources: {
+        Row: {
+          auth_type: string | null
+          created_at: string
+          data_categories: string[] | null
+          description: string | null
+          fetch_frequency: string | null
+          id: string
+          is_active: boolean | null
+          last_fetch_status: string | null
+          last_fetched_at: string | null
+          reliability_score: number | null
+          requires_auth: boolean | null
+          source_name: string
+          source_type: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          auth_type?: string | null
+          created_at?: string
+          data_categories?: string[] | null
+          description?: string | null
+          fetch_frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_fetch_status?: string | null
+          last_fetched_at?: string | null
+          reliability_score?: number | null
+          requires_auth?: boolean | null
+          source_name: string
+          source_type: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auth_type?: string | null
+          created_at?: string
+          data_categories?: string[] | null
+          description?: string | null
+          fetch_frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_fetch_status?: string | null
+          last_fetched_at?: string | null
+          reliability_score?: number | null
+          requires_auth?: boolean | null
+          source_name?: string
+          source_type?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      market_intelligence_cache: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          currency: string | null
+          data_category: string
+          id: string
+          industry: string
+          metric_name: string
+          metric_text: string | null
+          metric_value: number | null
+          period: string | null
+          raw_data: Json | null
+          source_id: string | null
+          unit: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          currency?: string | null
+          data_category: string
+          id?: string
+          industry: string
+          metric_name: string
+          metric_text?: string | null
+          metric_value?: number | null
+          period?: string | null
+          raw_data?: Json | null
+          source_id?: string | null
+          unit?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          currency?: string | null
+          data_category?: string
+          id?: string
+          industry?: string
+          metric_name?: string
+          metric_text?: string | null
+          metric_value?: number | null
+          period?: string | null
+          raw_data?: Json | null
+          source_id?: string | null
+          unit?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_intelligence_cache_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestones: {
         Row: {
           amount: number
@@ -419,6 +535,68 @@ export type Database = {
         }
         Relationships: []
       }
+      regulatory_updates: {
+        Row: {
+          authority: string
+          compliance_deadline: string | null
+          created_at: string
+          description: string | null
+          effective_date: string | null
+          id: string
+          industry_sectors: string[] | null
+          is_active: boolean | null
+          last_verified_at: string | null
+          requirement_type: string
+          severity: string | null
+          source_id: string | null
+          source_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          authority: string
+          compliance_deadline?: string | null
+          created_at?: string
+          description?: string | null
+          effective_date?: string | null
+          id?: string
+          industry_sectors?: string[] | null
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          requirement_type: string
+          severity?: string | null
+          source_id?: string | null
+          source_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          authority?: string
+          compliance_deadline?: string | null
+          created_at?: string
+          description?: string | null
+          effective_date?: string | null
+          id?: string
+          industry_sectors?: string[] | null
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          requirement_type?: string
+          severity?: string | null
+          source_id?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regulatory_updates_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -454,6 +632,68 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      trade_statistics: {
+        Row: {
+          created_at: string
+          currency: string | null
+          destination_country: string
+          export_value: number | null
+          growth_rate_yoy: number | null
+          hs_code_chapter: string | null
+          id: string
+          import_value: number | null
+          origin_country: string
+          period: string | null
+          raw_data: Json | null
+          sector: string | null
+          source_id: string | null
+          top_products: string[] | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          destination_country?: string
+          export_value?: number | null
+          growth_rate_yoy?: number | null
+          hs_code_chapter?: string | null
+          id?: string
+          import_value?: number | null
+          origin_country?: string
+          period?: string | null
+          raw_data?: Json | null
+          sector?: string | null
+          source_id?: string | null
+          top_products?: string[] | null
+          year: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          destination_country?: string
+          export_value?: number | null
+          growth_rate_yoy?: number | null
+          hs_code_chapter?: string | null
+          id?: string
+          import_value?: number | null
+          origin_country?: string
+          period?: string | null
+          raw_data?: Json | null
+          sector?: string | null
+          source_id?: string | null
+          top_products?: string[] | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_statistics_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
