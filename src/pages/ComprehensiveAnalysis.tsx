@@ -217,21 +217,41 @@ export default function ComprehensiveAnalysis() {
     try {
       setLoading(true);
 
-      const { data: result, error } = await supabase.functions.invoke('analyze-business-comprehensive', {
-        body: data
+      // Use fetch directly with extended timeout (120 seconds) for long-running analysis
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/analyze-business-comprehensive`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify(data),
+        signal: controller.signal
       });
 
-      if (error) {
-        console.error('Analysis error:', error);
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Analysis error:', response.status, errorText);
         throw new Error('Failed to process comprehensive analysis');
       }
 
+      const result = await response.json();
       setAnalysisResult(result);
     } catch (error) {
       console.error("Error processing analysis:", error);
+      const isTimeout = error instanceof Error && error.name === 'AbortError';
       toast({
         title: "Analysis Failed",
-        description: "Failed to process your comprehensive analysis. Please try again.",
+        description: isTimeout 
+          ? "The analysis took too long. Please try again with simpler inputs."
+          : "Failed to process your comprehensive analysis. Please try again.",
         variant: "destructive"
       });
       navigate('/');
