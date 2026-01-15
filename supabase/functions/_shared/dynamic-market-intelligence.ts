@@ -5,12 +5,16 @@
 
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// Import static fallback data
+// Import static fallback data and types
 import {
   UK_MARKET_SIZE_DATA,
   TURKEY_UK_TRADE_DATA,
   HS_CODE_DATABASE,
   COMPETITION_DENSITY_INDEX,
+} from './market-intelligence.ts';
+
+// Re-import types explicitly
+import type {
   MarketSizeData,
   TurkeyUKTradeData,
   HSCodeInfo,
@@ -274,12 +278,16 @@ function getStaticTradeData(sector: string): TurkeyUKTradeData {
   return TURKEY_UK_TRADE_DATA['default'];
 }
 
-// Re-export static data and functions for compatibility
+// Re-export static data for compatibility
 export {
   UK_MARKET_SIZE_DATA,
   TURKEY_UK_TRADE_DATA,
   HS_CODE_DATABASE,
   COMPETITION_DENSITY_INDEX,
+};
+
+// Re-export types
+export type {
   MarketSizeData,
   TurkeyUKTradeData,
   HSCodeInfo,
