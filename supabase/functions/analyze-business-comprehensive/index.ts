@@ -402,32 +402,31 @@ serve(async (req) => {
       }
     };
 
-    // Try Lovable AI first, fallback to OpenAI if it fails with 401/402/429
+    // Try OpenAI first (primary), fallback to Lovable AI if it fails
     let aiResponse: Response | null = null;
-    let usedProvider = 'lovable';
+    let usedProvider = 'openai';
     
-    if (lovableApiKey) {
+    if (openaiApiKey) {
       try {
-        aiResponse = await callAI('lovable');
+        aiResponse = await callAI('openai');
         
-        // If Lovable returns auth/rate limit error and we have OpenAI, try fallback
-        if (!aiResponse.ok && [401, 402, 429].includes(aiResponse.status) && openaiApiKey) {
-          console.log(`Lovable AI returned ${aiResponse.status}, falling back to OpenAI...`);
-          aiResponse = await callAI('openai');
-          usedProvider = 'openai';
+        // If OpenAI fails and we have Lovable, try fallback
+        if (!aiResponse.ok && lovableApiKey) {
+          console.log(`OpenAI returned ${aiResponse.status}, falling back to Lovable AI...`);
+          aiResponse = await callAI('lovable');
+          usedProvider = 'lovable';
         }
-      } catch (lovableError) {
-        console.error('Lovable AI failed:', lovableError);
-        if (openaiApiKey) {
-          console.log('Falling back to OpenAI...');
-          aiResponse = await callAI('openai');
-          usedProvider = 'openai';
+      } catch (openaiError) {
+        if (lovableApiKey) {
+          console.log('Falling back to Lovable AI...');
+          aiResponse = await callAI('lovable');
+          usedProvider = 'lovable';
         }
       }
-    } else if (openaiApiKey) {
-      // Only OpenAI available
-      aiResponse = await callAI('openai');
-      usedProvider = 'openai';
+    } else if (lovableApiKey) {
+      // Only Lovable available
+      aiResponse = await callAI('lovable');
+      usedProvider = 'lovable';
     }
 
     if (!aiResponse || !aiResponse.ok) {
