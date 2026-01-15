@@ -24,7 +24,7 @@ function getSupabaseClient(): SupabaseClient {
   return createClient(url, key);
 }
 
-// ================== Dynamic Data Fetchers ==================
+// ================== Dynamic Data Interfaces ==================
 
 export interface DynamicMarketData extends MarketSizeData {
   source?: string;
@@ -37,6 +37,16 @@ export interface DynamicTradeData extends TurkeyUKTradeData {
   lastUpdated?: string;
   confidence?: number;
 }
+
+export interface DataSourceInfo {
+  name: string;
+  type: string;
+  lastFetched?: string;
+  status?: string;
+  reliability: number;
+}
+
+// ================== Dynamic Data Fetchers ==================
 
 /**
  * Get market size data - tries cache first, falls back to static
@@ -163,14 +173,21 @@ export async function getDynamicRegulatoryData(industry: string): Promise<{
     const { data: regData, error } = await supabase
       .from('regulatory_updates')
       .select('*')
-      .or(`industry_sectors.cs.{${normalizedIndustry}},industry_sectors.cs.{all}`)
       .eq('is_active', true)
       .order('severity', { ascending: false })
       .limit(10);
 
     if (!error && regData && regData.length > 0) {
+      // Filter for relevant industry sectors
+      const relevantRegs = regData.filter(r => {
+        const sectors = r.industry_sectors || [];
+        return sectors.includes('all') || 
+               sectors.some((s: string) => s.toLowerCase().includes(normalizedIndustry) || 
+                                           normalizedIndustry.includes(s.toLowerCase()));
+      });
+
       return {
-        requirements: regData.map(r => ({
+        requirements: relevantRegs.map(r => ({
           authority: r.authority,
           title: r.title,
           description: r.description || '',
@@ -178,7 +195,7 @@ export async function getDynamicRegulatoryData(industry: string): Promise<{
           sourceUrl: r.source_url,
         })),
         source: 'GOV.UK',
-        lastUpdated: regData[0].last_verified_at,
+        lastUpdated: relevantRegs[0]?.last_verified_at,
       };
     }
   } catch (err) {
@@ -195,13 +212,7 @@ export async function getDynamicRegulatoryData(industry: string): Promise<{
 /**
  * Get all data sources with their status
  */
-export async function getDataSourcesStatus(): Promise<Array<{
-  name: string;
-  type: string;
-  lastFetched?: string;
-  status?: string;
-  reliability: number;
-}>> {
+export async function getDataSourcesStatus(): Promise<DataSourceInfo[]> {
   const supabase = getSupabaseClient();
 
   try {

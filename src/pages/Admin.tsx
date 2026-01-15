@@ -8,6 +8,7 @@ import { AdminAnalytics } from "@/components/AdminAnalytics";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
 import AdminPartners from "@/pages/AdminPartners";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { AdminDataSources } from "@/components/AdminDataSources";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -21,7 +22,8 @@ import {
   UserCheck,
   Clock,
   TrendingUp,
-  Mail
+  Mail,
+  Database
 } from "lucide-react";
 import { EmailMarketingIntegration } from "@/components/EmailMarketingIntegration";
 
@@ -229,7 +231,7 @@ export default function Admin() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto pb-2">
-            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-6 h-auto">
+            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-7 h-auto">
               <TabsTrigger value="overview" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden lg:inline">Overview</span>
@@ -245,6 +247,10 @@ export default function Admin() {
               <TabsTrigger value="partners" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
                 <Shield className="h-4 w-4" />
                 <span className="hidden lg:inline">Partners</span>
+              </TabsTrigger>
+              <TabsTrigger value="data-sources" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <Database className="h-4 w-4" />
+                <span className="hidden lg:inline">Data</span>
               </TabsTrigger>
               <TabsTrigger value="performance" className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-2">
                 <Zap className="h-4 w-4" />
@@ -423,6 +429,10 @@ export default function Admin() {
 
           <TabsContent value="partners" className="mt-6">
             <AdminPartners />
+          </TabsContent>
+
+          <TabsContent value="data-sources" className="mt-6">
+            <AdminDataSources />
           </TabsContent>
 
           <TabsContent value="performance" className="mt-6">

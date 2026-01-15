@@ -53,13 +53,13 @@ export function AdminDataSources() {
     if (result.success) {
       toast({
         title: 'Data Refreshed',
-        description: result.message,
+        description: 'Market data updated successfully',
       });
       await loadData();
     } else {
       toast({
         title: 'Refresh Failed',
-        description: result.message,
+        description: result.error || 'Failed to refresh data',
         variant: 'destructive',
       });
     }
