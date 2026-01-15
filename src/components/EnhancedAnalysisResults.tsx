@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 import { ScoreInfluenceCard } from "./ScoreInfluenceCard";
-import { formatMarketSize, formatTradeVolume, getCompetitionLabel, formatTimelineRange, formatTariffRate } from "@/utils/marketIntelligence";
+import { formatMarketSize, formatTradeVolume, getCompetitionLabel, formatTimelineRange, formatTariffRate, getDataFreshnessInfo } from "@/utils/marketIntelligence";
 
 interface PartnerRecommendation {
   category: string;
@@ -127,6 +127,13 @@ interface AnalysisResult {
     industryBenchmark?: any;
     regulatoryRequirements?: any[];
     dataSourcesUsed?: string[];
+    dataSourcesAttribution?: Array<{
+      name: string;
+      type: string;
+      lastUpdated?: string;
+      confidence: number;
+      freshnessLabel?: string;
+    }>;
     marketIntelligence?: {
       marketSizeGBP: number;
       growthRate: number;
@@ -143,6 +150,10 @@ interface AnalysisResult {
       ftaTariffRate?: number;
       nichePotential?: string[];
       marketGaps?: string[];
+      dataSource?: string;
+      dataConfidence?: number | string;
+      isRealTimeData?: boolean;
+      lastUpdated?: string;
     };
   };
 }
@@ -223,6 +234,11 @@ const getPriorityColor = (priority: string) => {
     case "low": return "outline";
     default: return "outline";
   }
+};
+
+// Helper to get freshness label from timestamp
+const getDataFreshnessLabel = (lastUpdated: string): string => {
+  return getDataFreshnessInfo(lastUpdated).label;
 };
 
 export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress }: EnhancedAnalysisResultsProps) {
@@ -791,14 +807,80 @@ export function EnhancedAnalysisResults({ analysis, companyName, onViewProgress 
               )}
 
               {/* Data Source Attribution */}
-              <Alert className="border-primary/20 bg-primary/5">
-                <Database className="h-4 w-4" />
-                <AlertTitle>Converta Market Intelligence</AlertTitle>
-                <AlertDescription>
-                  This analysis is powered by Converta's proprietary market intelligence engine, incorporating UK government statistics, 
-                  trade flow data, industry benchmarks, and competitive analysis. Data is refreshed regularly to ensure accuracy.
-                </AlertDescription>
-              </Alert>
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Database className="h-4 w-4" />
+                    Data Sources & Freshness
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Live Data Indicator */}
+                  {analysis.metadata?.marketIntelligence?.isRealTimeData && (
+                    <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                        Real-Time Data Active
+                      </span>
+                      {analysis.metadata.marketIntelligence.lastUpdated && (
+                        <Badge variant="outline" className="ml-auto text-xs">
+                          {getDataFreshnessLabel(analysis.metadata.marketIntelligence.lastUpdated)}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Data Sources List */}
+                  {analysis.metadata?.dataSourcesAttribution && analysis.metadata.dataSourcesAttribution.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {analysis.metadata.dataSourcesAttribution.map((source, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2 bg-background rounded border">
+                          <div className="flex items-center gap-2">
+                            <div className={`h-2 w-2 rounded-full ${
+                              source.confidence >= 85 ? 'bg-green-500' :
+                              source.confidence >= 70 ? 'bg-yellow-500' : 'bg-orange-500'
+                            }`} />
+                            <span className="text-sm font-medium">{source.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {source.freshnessLabel || 'Unknown'}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {source.confidence}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Info className="h-4 w-4" />
+                      <span>
+                        Powered by Converta Market Intelligence with UK government statistics, 
+                        trade flow data, and industry benchmarks.
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Primary Source Badge */}
+                  {analysis.metadata?.marketIntelligence?.dataSource && (
+                    <div className="flex items-center gap-2 pt-2 border-t">
+                      <span className="text-xs text-muted-foreground">Primary source:</span>
+                      <Badge variant={
+                        analysis.metadata.marketIntelligence.dataSource !== 'Static Benchmark' ? 'default' : 'secondary'
+                      }>
+                        {analysis.metadata.marketIntelligence.dataSource}
+                      </Badge>
+                      {typeof analysis.metadata.marketIntelligence.dataConfidence === 'number' && (
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          Confidence: {analysis.metadata.marketIntelligence.dataConfidence}%
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </>
           ) : (
             <Card>
