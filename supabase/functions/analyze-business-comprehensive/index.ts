@@ -182,14 +182,16 @@ serve(async (req) => {
     ]);
 
     console.log('Parallel operations completed');
-    console.log('Calculating comprehensive scores...');
+    console.log('Calculating comprehensive scores with dynamic market intelligence...');
 
     // Calculate comprehensive scores using evidence-based algorithms with website data
-    const scoringResult = calculateComprehensiveScore(businessData, companyVerification, websiteAnalysis);
+    // NOTE: calculateComprehensiveScore is now async to support dynamic data fetching
+    const scoringResult = await calculateComprehensiveScore(businessData, companyVerification, websiteAnalysis);
     console.log('Calculated scores:', {
       overall: scoringResult.overallScore,
       confidence: scoringResult.confidenceLevel,
-      dataCompleteness: scoringResult.dataCompleteness
+      dataCompleteness: scoringResult.dataCompleteness,
+      dataSources: scoringResult.dataSources?.length || 0
     });
 
     // Get industry benchmarks and regulatory requirements
@@ -557,12 +559,20 @@ serve(async (req) => {
           nichePotential: effectiveCompetitionData.nichePotential,
           majorPlayers: effectiveCompetitionData.majorPlayers,
           ftaBenefit: effectiveTradeData.ftaBenefit,
-          dataSource: effectiveMarketData.dataSource,
-          dataConfidence: effectiveMarketData.confidence,
-          isRealTimeData: !!liveMarketResearch,
-          lastUpdated: effectiveMarketData.lastUpdated,
+          dataSource: scoringResult.marketIntelligence?.source || effectiveMarketData.dataSource,
+          dataConfidence: scoringResult.marketIntelligence?.confidence || effectiveMarketData.confidence,
+          isRealTimeData: !!liveMarketResearch || (scoringResult.marketIntelligence?.source !== 'Static Benchmark'),
+          lastUpdated: scoringResult.marketIntelligence?.lastUpdated || effectiveMarketData.lastUpdated,
           researchSources: liveMarketResearch?.sources || []
         },
+        // Add data sources attribution from scoring engine
+        dataSourcesAttribution: scoringResult.dataSources?.filter(ds => ds.isLive).map(ds => ({
+          name: ds.name,
+          type: ds.type,
+          lastUpdated: ds.lastUpdated,
+          confidence: ds.confidence,
+          freshnessLabel: ds.lastUpdated ? getDataFreshnessLabel(ds.lastUpdated) : 'Unknown'
+        })) || [],
         competitorIntelligence: competitorResearch ? {
           competitors: competitorResearch.competitors || [],
           marketInsights: competitorResearch.marketInsights || null,
@@ -623,6 +633,18 @@ serve(async (req) => {
     );
   }
 });
+
+// Helper function to get data freshness label
+function getDataFreshnessLabel(lastUpdated: string): string {
+  const age = Date.now() - new Date(lastUpdated).getTime();
+  const hoursOld = age / (1000 * 60 * 60);
+  const daysOld = Math.floor(hoursOld / 24);
+  
+  if (hoursOld < 24) return 'Just updated';
+  if (daysOld < 7) return `${daysOld} days ago`;
+  if (daysOld < 30) return `${Math.floor(daysOld / 7)} weeks ago`;
+  return `${Math.floor(daysOld / 30)} months ago`;
+}
 
 // Calculate data completeness score
 function calculateDataCompleteness(data: any): {

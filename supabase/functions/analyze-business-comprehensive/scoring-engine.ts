@@ -1,17 +1,23 @@
 /**
  * Comprehensive Business Scoring Engine
  * Research-based algorithms for UK market entry assessment
- * Enhanced with Market Intelligence integration
+ * Enhanced with Dynamic Market Intelligence integration
  */
 
 import {
+  getDynamicMarketSizeData,
+  getDynamicTradeData,
+  getDynamicRegulatoryData,
+  getDataSourcesStatus,
+  calculateDataFreshness,
+  // Re-exported static functions for backward compatibility
   getMarketSizeData,
   getTurkeyUKTradeData,
   getCompetitionIndex,
   calculateMarketOpportunityScore,
   estimateMarketEntryTimeline,
   suggestHSCode
-} from '../_shared/market-intelligence.ts';
+} from '../_shared/dynamic-market-intelligence.ts';
 
 export interface ScoringWeights {
   productMarketFit: number;
@@ -64,13 +70,22 @@ export interface MarketIntelligenceData {
   marketGaps: string[];
 }
 
+export interface DataSourceAttribution {
+  name: string;
+  type: string;
+  lastUpdated?: string;
+  confidence: number;
+  isLive: boolean;
+}
+
 export interface ScoringResult {
   overallScore: number;
   scoreBreakdown: ScoreBreakdown;
   scoreEvidence: ScoreEvidence[];
   confidenceLevel: 'high' | 'medium' | 'low';
   dataCompleteness: number;
-  marketIntelligence: MarketIntelligenceData; // NEW
+  marketIntelligence: MarketIntelligenceData;
+  dataSources: DataSourceAttribution[];
 }
 
 // Industry-specific weights based on market research
@@ -111,8 +126,16 @@ const DEFAULT_WEIGHTS: ScoringWeights = {
   marketOpportunity: 1.0
 };
 
-export function calculateComprehensiveScore(businessData: any, companyVerification?: any, websiteAnalysis?: any): ScoringResult {
+export async function calculateComprehensiveScore(businessData: any, companyVerification?: any, websiteAnalysis?: any): Promise<ScoringResult> {
   const weights = getIndustryWeights(businessData.industry);
+  
+  // Fetch dynamic market data in parallel
+  const [dynamicMarketData, dynamicTradeData, dynamicRegulatory, dataSourcesStatus] = await Promise.all([
+    getDynamicMarketSizeData(businessData.industry || ''),
+    getDynamicTradeData(businessData.industry || ''),
+    getDynamicRegulatoryData(businessData.industry || ''),
+    getDataSourcesStatus()
+  ]);
   
   // Calculate individual category scores with evidence
   const productMarketFitResult = calculateProductMarketFit(businessData);
@@ -123,8 +146,8 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
   const founderResult = calculateFounderTeamStrength(businessData);
   const investmentResult = calculateInvestmentReadiness(businessData);
   
-  // NEW: Calculate Market Opportunity Score using embedded intelligence
-  const marketOpportunityResult = calculateMarketOpportunity(businessData);
+  // Calculate Market Opportunity Score using dynamic intelligence
+  const marketOpportunityResult = calculateMarketOpportunity(businessData, dynamicMarketData, dynamicTradeData);
 
   // Apply industry-specific weights
   const scoreBreakdown: ScoreBreakdown = {
@@ -152,8 +175,40 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
 
   const dataCompleteness = calculateDataCompletenessScore(businessData);
   
-  // Build Market Intelligence data from embedded sources
-  const marketIntelligence = buildMarketIntelligence(businessData);
+  // Build Market Intelligence data from dynamic sources with fallback
+  const marketIntelligence = buildMarketIntelligence(businessData, dynamicMarketData, dynamicTradeData);
+  
+  // Build data source attributions
+  const dataSources: DataSourceAttribution[] = [
+    {
+      name: dynamicMarketData.source || 'Static Benchmark',
+      type: 'market_size',
+      lastUpdated: dynamicMarketData.lastUpdated,
+      confidence: dynamicMarketData.confidence || 70,
+      isLive: dynamicMarketData.source !== 'Static Benchmark'
+    },
+    {
+      name: dynamicTradeData.source || 'Static Benchmark',
+      type: 'trade_statistics',
+      lastUpdated: dynamicTradeData.lastUpdated,
+      confidence: dynamicTradeData.confidence || 70,
+      isLive: dynamicTradeData.source !== 'Static Benchmark'
+    },
+    {
+      name: dynamicRegulatory.source || 'Static',
+      type: 'regulatory',
+      lastUpdated: dynamicRegulatory.lastUpdated,
+      confidence: dynamicRegulatory.requirements.length > 0 ? 85 : 60,
+      isLive: dynamicRegulatory.source !== 'Static'
+    },
+    ...dataSourcesStatus.map(ds => ({
+      name: ds.name,
+      type: ds.type,
+      lastUpdated: ds.lastFetched,
+      confidence: ds.reliability,
+      isLive: ds.status === 'success'
+    }))
+  ];
   
   return {
     overallScore,
@@ -170,35 +225,56 @@ export function calculateComprehensiveScore(businessData: any, companyVerificati
     ],
     confidenceLevel: determineConfidenceLevel(dataCompleteness, overallScore),
     dataCompleteness,
-    marketIntelligence
+    marketIntelligence,
+    dataSources
   };
 }
 
-// NEW: Calculate Market Opportunity Score using embedded market intelligence
-function calculateMarketOpportunity(data: any): ScoreEvidence {
+// Calculate Market Opportunity Score using dynamic market intelligence
+function calculateMarketOpportunity(data: any, marketData?: any, tradeData?: any): ScoreEvidence {
   const industry = data.industry || '';
   const businessSize = data.companySize || '';
   const exportExperience = data.exportExperience || '';
   
   const opportunityResult = calculateMarketOpportunityScore(industry, businessSize, exportExperience);
   
+  // Boost score if we have live data
+  let score = opportunityResult.score;
+  const factors = [...opportunityResult.factors];
+  
+  if (marketData?.source && marketData.source !== 'Static Benchmark') {
+    const freshnessBonus = Math.min(5, calculateDataFreshness(marketData.lastUpdated) / 20);
+    score = Math.min(100, score + freshnessBonus);
+    factors.push({
+      factor: 'Live Market Data',
+      impact: 'positive' as const,
+      points: Math.round(freshnessBonus),
+      evidence: `Analysis enhanced with live data from ${marketData.source} (${calculateDataFreshness(marketData.lastUpdated)}% fresh)`
+    });
+  }
+  
   return {
     category: 'Market Opportunity',
-    score: opportunityResult.score,
-    factors: opportunityResult.factors
+    score,
+    factors
   };
 }
 
-// NEW: Build comprehensive market intelligence data
-function buildMarketIntelligence(data: any): MarketIntelligenceData {
+// Build comprehensive market intelligence data using dynamic sources
+function buildMarketIntelligence(data: any, dynamicMarketData?: any, dynamicTradeData?: any): MarketIntelligenceData & { 
+  source?: string; 
+  lastUpdated?: string; 
+  confidence?: number;
+} {
   const industry = data.industry || '';
   const productDescription = data.businessDescription || '';
   const hasUKReg = data.ukRegistered === 'yes';
   const compliance = data.complianceCompleted || [];
   const overallReadiness = 60; // Default estimate
   
-  const marketData = getMarketSizeData(industry);
-  const tradeData = getTurkeyUKTradeData(industry);
+  // Use dynamic data if available, otherwise fall back to static
+  const marketData = dynamicMarketData || getMarketSizeData(industry);
+  const tradeData = dynamicTradeData || getTurkeyUKTradeData(industry);
   const competitionData = getCompetitionIndex(industry);
   const hsCodeInfo = suggestHSCode(industry, productDescription);
   const timeline = estimateMarketEntryTimeline(industry, hasUKReg, compliance, overallReadiness);
@@ -218,7 +294,11 @@ function buildMarketIntelligence(data: any): MarketIntelligenceData {
     tariffRate: hsCodeInfo?.tariffRate,
     ftaTariffRate: hsCodeInfo?.ftaTariffRate,
     nichePotential: competitionData.nichePotential,
-    marketGaps: competitionData.marketGaps
+    marketGaps: competitionData.marketGaps,
+    // Add source attribution
+    source: dynamicMarketData?.source || 'Static Benchmark',
+    lastUpdated: dynamicMarketData?.lastUpdated || dynamicTradeData?.lastUpdated,
+    confidence: dynamicMarketData?.confidence || 70
   };
 }
 
