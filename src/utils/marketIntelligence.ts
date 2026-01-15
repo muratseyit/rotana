@@ -26,12 +26,12 @@ export function getCompetitionLabel(saturationLevel: number): 'Low' | 'Medium' |
   return 'Low';
 }
 
-// Get competition color class
+// Get competition color class using semantic tokens
 export function getCompetitionColorClass(level: 'Low' | 'Medium' | 'High'): string {
   switch (level) {
-    case 'Low': return 'text-green-600';
-    case 'Medium': return 'text-yellow-600';
-    case 'High': return 'text-orange-600';
+    case 'Low': return 'text-green-600 dark:text-green-400';
+    case 'Medium': return 'text-yellow-600 dark:text-yellow-400';
+    case 'High': return 'text-orange-600 dark:text-orange-400';
   }
 }
 
@@ -92,6 +92,32 @@ export function formatTariffRate(mfnRate: number, ftaRate: number): string {
   return `${ftaRate}% FTA / ${mfnRate}% MFN`;
 }
 
+// Get data freshness label and color
+export function getDataFreshnessInfo(lastUpdated?: string | null): {
+  label: string;
+  colorClass: string;
+  freshnessScore: number;
+} {
+  if (!lastUpdated) {
+    return { label: 'Unknown', colorClass: 'text-muted-foreground', freshnessScore: 50 };
+  }
+
+  const age = Date.now() - new Date(lastUpdated).getTime();
+  const hoursOld = age / (1000 * 60 * 60);
+  const daysOld = Math.floor(hoursOld / 24);
+
+  if (hoursOld < 24) {
+    return { label: 'Just updated', colorClass: 'text-green-600', freshnessScore: 100 };
+  } else if (daysOld < 7) {
+    return { label: `${daysOld} days ago`, colorClass: 'text-green-600', freshnessScore: 90 };
+  } else if (daysOld < 30) {
+    return { label: `${daysOld} days ago`, colorClass: 'text-yellow-600', freshnessScore: 75 };
+  } else if (daysOld < 90) {
+    return { label: `${Math.floor(daysOld / 30)} months ago`, colorClass: 'text-orange-600', freshnessScore: 50 };
+  }
+  return { label: 'Outdated', colorClass: 'text-red-600', freshnessScore: 30 };
+}
+
 // Interface for market opportunity display
 export interface MarketOpportunityDisplay {
   marketSize: string;
@@ -102,6 +128,9 @@ export interface MarketOpportunityDisplay {
   ftaBenefit: boolean;
   estimatedTimeline: string;
   turkishExporterCount: number;
+  dataSource?: string;
+  lastUpdated?: string;
+  confidence?: number;
 }
 
 // Transform analysis metadata to display format
@@ -118,6 +147,25 @@ export function transformMarketIntelligence(metadata: any): MarketOpportunityDis
     tradeVolume: formatTradeVolume(mi.tradeVolumeGBP || 500),
     ftaBenefit: mi.ftaBenefit !== false,
     estimatedTimeline: formatTimelineRange(mi.timelineMin || 3, mi.timelineMax || 6),
-    turkishExporterCount: mi.turkishExporterCount || 200
+    turkishExporterCount: mi.turkishExporterCount || 200,
+    dataSource: mi.source || 'Converta Intelligence',
+    lastUpdated: mi.lastUpdated,
+    confidence: mi.confidence,
   };
+}
+
+// Get confidence badge variant
+export function getConfidenceBadgeVariant(confidence?: number): 'default' | 'secondary' | 'outline' {
+  if (!confidence) return 'outline';
+  if (confidence >= 85) return 'default';
+  if (confidence >= 70) return 'secondary';
+  return 'outline';
+}
+
+// Format confidence as label
+export function formatConfidenceLabel(confidence?: number): string {
+  if (!confidence) return 'Unknown';
+  if (confidence >= 85) return 'High';
+  if (confidence >= 70) return 'Medium';
+  return 'Low';
 }

@@ -183,30 +183,38 @@ export async function getRegulatoryUpdates(
 /**
  * Trigger a manual refresh of market data
  */
-export async function refreshMarketData(
-  sources?: string | string[]
-): Promise<{ success: boolean; message: string }> {
+export async function refreshMarketData(sources?: string | string[]): Promise<{
+  success: boolean;
+  results?: Record<string, { success: boolean; message: string }>;
+  error?: string;
+}> {
   try {
-    const { data, error } = await supabase.functions.invoke('refresh-market-data', {
-      body: { sources: sources || 'all' },
-    });
+    // Map display names to function source names
+    const sourceMapping: Record<string, string> = {
+      'Kolay İhracat': 'kolay-ihracat',
+      'GOV.UK': 'govuk-regulations',
+      'GOV.UK Regulations': 'govuk-regulations',
+    };
 
-    if (error) {
-      return { success: false, message: error.message };
+    let mappedSources: string | string[] | undefined;
+    if (sources) {
+      if (Array.isArray(sources)) {
+        mappedSources = sources.map(s => sourceMapping[s] || s);
+      } else {
+        mappedSources = sourceMapping[sources] || sources;
+      }
     }
 
-    return { 
-      success: data?.success || false, 
-      message: data?.message || 'Unknown response' 
-    };
-  } catch (err) {
-    return { 
-      success: false, 
-      message: err instanceof Error ? err.message : 'Failed to refresh' 
-    };
+    const { data, error } = await supabase.functions.invoke('refresh-market-data', {
+      body: { sources: mappedSources || 'all' },
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error refreshing market data:', error);
   }
 }
-
 /**
  * Get comprehensive market summary for an industry
  */
