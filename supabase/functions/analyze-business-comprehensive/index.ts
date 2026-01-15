@@ -364,7 +364,8 @@ serve(async (req) => {
       const endpoint = isLovable 
         ? 'https://ai.gateway.lovable.dev/v1/chat/completions'
         : 'https://api.openai.com/v1/chat/completions';
-      const model = isLovable ? 'google/gemini-3-flash-preview' : 'gpt-4o';
+      // Lovable Gateway: openai/gpt-5.2 (latest), OpenAI direct: gpt-4o
+      const model = isLovable ? 'openai/gpt-5.2' : 'gpt-4o';
       
       console.log(`Calling ${provider} AI with model ${model}...`);
       
@@ -388,7 +389,7 @@ serve(async (req) => {
               { role: 'user', content: prompt }
             ],
             max_tokens: 5000,
-            ...(isLovable ? { response_format: { type: "json_object" } } : {})
+            response_format: { type: "json_object" }
           }),
           signal: controller.signal
         });
@@ -402,31 +403,31 @@ serve(async (req) => {
       }
     };
 
-    // Try OpenAI first (primary), fallback to Lovable AI if it fails
+    // Try Lovable AI Gateway first (primary with openai/gpt-5.2), fallback to direct OpenAI gpt-4o
     let aiResponse: Response | null = null;
-    let usedProvider = 'openai';
+    let usedProvider = 'lovable';
     
-    if (openaiApiKey) {
+    if (lovableApiKey) {
       try {
-        aiResponse = await callAI('openai');
+        aiResponse = await callAI('lovable');
         
-        // If OpenAI fails and we have Lovable, try fallback
-        if (!aiResponse.ok && lovableApiKey) {
-          console.log(`OpenAI returned ${aiResponse.status}, falling back to Lovable AI...`);
-          aiResponse = await callAI('lovable');
-          usedProvider = 'lovable';
+        // If Lovable fails (401, 402, 429) and we have OpenAI, try fallback
+        if (!aiResponse.ok && openaiApiKey) {
+          console.log(`Lovable AI returned ${aiResponse.status}, falling back to OpenAI gpt-4o...`);
+          aiResponse = await callAI('openai');
+          usedProvider = 'openai';
         }
-      } catch (openaiError) {
-        if (lovableApiKey) {
-          console.log('Falling back to Lovable AI...');
-          aiResponse = await callAI('lovable');
-          usedProvider = 'lovable';
+      } catch (lovableError) {
+        if (openaiApiKey) {
+          console.log('Lovable AI failed, falling back to OpenAI gpt-4o...');
+          aiResponse = await callAI('openai');
+          usedProvider = 'openai';
         }
       }
-    } else if (lovableApiKey) {
-      // Only Lovable available
-      aiResponse = await callAI('lovable');
-      usedProvider = 'lovable';
+    } else if (openaiApiKey) {
+      // Only OpenAI available
+      aiResponse = await callAI('openai');
+      usedProvider = 'openai';
     }
 
     if (!aiResponse || !aiResponse.ok) {
