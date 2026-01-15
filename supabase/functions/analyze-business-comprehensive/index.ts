@@ -364,7 +364,7 @@ serve(async (req) => {
       const endpoint = isLovable 
         ? 'https://ai.gateway.lovable.dev/v1/chat/completions'
         : 'https://api.openai.com/v1/chat/completions';
-      const model = isLovable ? 'google/gemini-2.5-pro' : 'gpt-4o-mini';
+      const model = isLovable ? 'google/gemini-3-flash-preview' : 'gpt-4o-mini';
       
       console.log(`Calling ${provider} AI with model ${model}...`);
       
