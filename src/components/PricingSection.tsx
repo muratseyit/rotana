@@ -2,6 +2,7 @@ import { Check, Crown, Zap, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FadeUp, StaggerContainer, StaggerItem, ScaleUp } from "@/components/ScrollAnimations";
 
 interface PricingTier {
   name: string;
@@ -198,70 +199,76 @@ export function PricingSection({ onSubscribe, currentPlan }: PricingSectionProps
       <div className="container mx-auto max-w-7xl">
         {/* SME Analysis Section */}
         <div className="mb-20">
-          <div className="text-center mb-10">
+          <FadeUp className="text-center mb-10">
             <Badge className="bg-primary/10 text-primary mb-3">For SMEs</Badge>
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">For Small & Medium Enterprises</h3>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Get comprehensive UK market analysis and immediate access to our partner network
             </p>
-          </div>
+          </FadeUp>
           
-          <div className="flex justify-center">
+          <ScaleUp className="flex justify-center">
             <div className="max-w-md w-full">
               {renderPricingCard(smeAnalysis, false, true)}
             </div>
-          </div>
+          </ScaleUp>
         </div>
 
         {/* Partner Listing Section */}
         <div>
-          <div className="text-center mb-10">
+          <FadeUp className="text-center mb-10">
             <Badge className="bg-success/10 text-success mb-3">For Partners</Badge>
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">For Service Partners</h3>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Join our partner network and connect with businesses entering the UK market
             </p>
-          </div>
+          </FadeUp>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {partnerListingTiers.map((tier) => renderPricingCard(tier))}
-          </div>
+          <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {partnerListingTiers.map((tier) => (
+              <StaggerItem key={tier.name}>
+                {renderPricingCard(tier)}
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
           
-          <div className="text-center mt-8">
+          <FadeUp delay={0.4} className="text-center mt-8">
             <p className="text-sm text-muted-foreground bg-muted/50 inline-block px-4 py-2 rounded-full">
               All partner plans include 10% commission on successful matches • No hidden fees
             </p>
-          </div>
+          </FadeUp>
         </div>
 
         {/* How it works */}
-        <div className="mt-16 p-8 bg-muted/30 rounded-2xl border border-border/50">
-          <h4 className="text-lg font-semibold text-foreground text-center mb-6">How it works</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-bold text-primary">1</span>
+        <FadeUp delay={0.5}>
+          <div className="mt-16 p-8 bg-muted/30 rounded-2xl border border-border/50">
+            <h4 className="text-lg font-semibold text-foreground text-center mb-6">How it works</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-primary">1</span>
+                </div>
+                <div>
+                  <strong className="text-foreground block mb-1">For SMEs:</strong>
+                  <p className="text-sm text-muted-foreground">
+                    Pay £8 once to get your comprehensive analysis report, then access our partner directory and begin receiving services immediately.
+                  </p>
+                </div>
               </div>
-              <div>
-                <strong className="text-foreground block mb-1">For SMEs:</strong>
-                <p className="text-sm text-muted-foreground">
-                  Pay £8 once to get your comprehensive analysis report, then access our partner directory and begin receiving services immediately.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-bold text-success">2</span>
-              </div>
-              <div>
-                <strong className="text-foreground block mb-1">For Partners:</strong>
-                <p className="text-sm text-muted-foreground">
-                  Choose your listing period to join our directory, then earn from successful client matches with our 10% commission structure.
-                </p>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-success">2</span>
+                </div>
+                <div>
+                  <strong className="text-foreground block mb-1">For Partners:</strong>
+                  <p className="text-sm text-muted-foreground">
+                    Choose your listing period to join our directory, then earn from successful client matches with our 10% commission structure.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </FadeUp>
       </div>
     </section>
   );
