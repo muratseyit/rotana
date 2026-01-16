@@ -155,13 +155,13 @@ export function LeadCaptureForm({
   const getVariantStyles = () => {
     switch (variant) {
       case 'sidebar':
-        return 'max-w-sm';
+        return 'max-w-sm border-border/50 shadow-lg';
       case 'popup':
-        return 'max-w-md mx-auto';
+        return 'max-w-md mx-auto border-border/50 shadow-xl';
       case 'footer':
-        return 'max-w-2xl mx-auto bg-card/80 backdrop-blur-sm';
+        return 'max-w-2xl mx-auto bg-card/80 backdrop-blur-sm border-border/50';
       default:
-        return 'max-w-2xl mx-auto';
+        return 'max-w-2xl mx-auto bg-card/50 backdrop-blur-sm border-border/50 shadow-lg';
     }
   };
 
@@ -176,13 +176,15 @@ export function LeadCaptureForm({
   const defaultIncentive = t('leadForm.incentive');
 
   return (
-    <Card className={getVariantStyles()}>
-      <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-xl md:text-2xl">
+    <Card className={`${getVariantStyles()} hover:shadow-xl transition-shadow duration-300`}>
+      <CardHeader className="text-center pb-4">
+        <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent rounded-xl flex items-center justify-center mx-auto mb-4">
           <Zap className="h-6 w-6 text-primary" />
+        </div>
+        <CardTitle className="text-xl md:text-2xl font-semibold text-foreground">
           {title || defaultTitle}
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="text-base text-muted-foreground">
           {description || defaultDescription}
         </CardDescription>
       </CardHeader>
