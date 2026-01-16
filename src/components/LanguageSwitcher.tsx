@@ -13,9 +13,9 @@ const LanguageSwitcher = () => {
           variant={language === 'en' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setLanguage('en')}
-          className="text-xs px-2 py-1"
+          className="text-xs px-2 py-1 flex items-center gap-1"
         >
-          EN
+          <span className="text-sm">🇬🇧</span> EN
         </Button>
         <Button
           variant={language === 'tr' ? 'default' : 'ghost'}
