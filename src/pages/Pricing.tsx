@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { Badge } from "@/components/ui/badge";
+import { FadeUp, FadeIn, ScaleUp } from "@/components/ScrollAnimations";
 
 export default function Pricing() {
   const navigate = useNavigate();
@@ -143,39 +144,53 @@ export default function Pricing() {
         <div className="absolute bottom-0 left-10 w-80 h-80 bg-success/5 rounded-full blur-3xl" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <Badge className="bg-primary/10 text-primary mb-4 px-4 py-1.5">
-            <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            Simple & Transparent
-          </Badge>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            {t('pricing.title')}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Two pathways to UK market success - affordable analysis for SMEs and valuable listings for service partners
-          </p>
+          <FadeUp>
+            <Badge className="bg-primary/10 text-primary mb-4 px-4 py-1.5">
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              Simple & Transparent
+            </Badge>
+          </FadeUp>
+          <FadeUp delay={0.1}>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              {t('pricing.title')}
+            </h1>
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Two pathways to UK market success - affordable analysis for SMEs and valuable listings for service partners
+            </p>
+          </FadeUp>
         </div>
       </section>
 
       {/* Main Content */}
       <main>
-        <PricingSection 
-          onSubscribe={handleSubscribe}
-          currentPlan={currentPlan}
-        />
+        <ScaleUp>
+          <PricingSection 
+            onSubscribe={handleSubscribe}
+            currentPlan={currentPlan}
+          />
+        </ScaleUp>
 
         {/* Enterprise Contact Section */}
         <section className="py-16 bg-gradient-to-br from-primary via-primary to-primary/90">
           <div className="container mx-auto max-w-4xl px-4 text-center">
-            <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
-              {t('pricing.customSolution')}
-            </h3>
-            <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-              {t('pricing.customDesc')}
-            </p>
-            <Button size="lg" className="gap-2 bg-background text-foreground hover:bg-background/90 shadow-lg">
-              <Users className="w-4 h-4" />
-              {t('pricing.contactSales')}
-            </Button>
+            <FadeUp>
+              <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
+                {t('pricing.customSolution')}
+              </h3>
+            </FadeUp>
+            <FadeUp delay={0.1}>
+              <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+                {t('pricing.customDesc')}
+              </p>
+            </FadeUp>
+            <FadeUp delay={0.2}>
+              <Button size="lg" className="gap-2 bg-background text-foreground hover:bg-background/90 shadow-lg">
+                <Users className="w-4 h-4" />
+                {t('pricing.contactSales')}
+              </Button>
+            </FadeUp>
           </div>
         </section>
       </main>

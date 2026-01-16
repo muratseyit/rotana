@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MobileNavigation } from "@/components/MobileNavigation";
+import { FadeUp, SlideInLeft, SlideInRight, StaggerContainer, StaggerItem, ScaleUp } from "@/components/ScrollAnimations";
 
 const Features = () => {
   const navigate = useNavigate();
@@ -170,139 +171,156 @@ const Features = () => {
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="mb-8 animate-fade-in-up">
+          <FadeUp>
             <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary mb-6 shadow-sm">
               <Zap className="h-4 w-4 mr-2" />
               {t('features.badge')}
             </span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            {t('features.heroTitle')}{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-success">{t('features.heroTitleHighlight')}</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            {t('features.heroDesc')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            <Link to="/guest-analysis">
-              <Button size="lg" variant="premium" className="px-8 py-6 text-lg shadow-lg hover:shadow-xl">
-                {t('features.startAnalysis')}
-                <ArrowRight className="ml-2 h-5 w-5" />
+          </FadeUp>
+          
+          <FadeUp delay={0.1}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              {t('features.heroTitle')}{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-success">{t('features.heroTitleHighlight')}</span>
+            </h1>
+          </FadeUp>
+          
+          <FadeUp delay={0.2}>
+            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
+              {t('features.heroDesc')}
+            </p>
+          </FadeUp>
+          
+          <FadeUp delay={0.3}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/guest-analysis">
+                <Button size="lg" variant="premium" className="px-8 py-6 text-lg shadow-lg hover:shadow-xl">
+                  {t('features.startAnalysis')}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="px-8 py-6 text-lg"
+                onClick={handleScheduleDemo}
+                disabled={isSchedulingDemo}
+              >
+                {isSchedulingDemo ? t('features.scheduling') : t('features.scheduleDemo')}
               </Button>
-            </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="px-8 py-6 text-lg"
-              onClick={handleScheduleDemo}
-              disabled={isSchedulingDemo}
-            >
-              {isSchedulingDemo ? t('features.scheduling') : t('features.scheduleDemo')}
-            </Button>
-          </div>
+            </div>
+          </FadeUp>
         </div>
       </section>
 
       {/* Core Features */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               {t('features.coreTitle')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('features.coreSubtitle')}
             </p>
-          </div>
+          </FadeUp>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <StaggerContainer staggerDelay={0.1} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {features.map((feature, index) => (
-              <Card 
-                key={index}
-                className={`group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg bg-gradient-to-br ${feature.gradient}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <CardHeader className="text-center pb-4">
-                  <div className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
-                  </div>
-                  <CardTitle className="text-lg mb-2">{feature.title}</CardTitle>
-                  <CardDescription className="text-center text-sm">
-                    {feature.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2.5 text-sm text-muted-foreground">
-                    {feature.items.map((item, itemIndex) => (
-                      <li key={itemIndex} className="flex items-start space-x-2">
-                        <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <StaggerItem key={index}>
+                <Card 
+                  className={`group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg bg-gradient-to-br ${feature.gradient} h-full`}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  <CardHeader className="text-center pb-4">
+                    <div className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                      <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
+                    </div>
+                    <CardTitle className="text-lg mb-2">{feature.title}</CardTitle>
+                    <CardDescription className="text-center text-sm">
+                      {feature.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2.5 text-sm text-muted-foreground">
+                      {feature.items.map((item, itemIndex) => (
+                        <li key={itemIndex} className="flex items-start space-x-2">
+                          <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Benefits Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               {t('features.whyChoose')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('features.whyChooseSubtitle')}
             </p>
-          </div>
+          </FadeUp>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={0.15} className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <div key={index} className="text-center group">
-                <div className={`w-20 h-20 ${benefit.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <benefit.icon className="h-10 w-10 text-primary-foreground" />
+              <StaggerItem key={index}>
+                <div className="text-center group">
+                  <div className={`w-20 h-20 ${benefit.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <benefit.icon className="h-10 w-10 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">{benefit.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {benefit.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">{benefit.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary via-primary to-primary/90">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
-            {t('features.ctaTitle')}
-          </h2>
-          <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            {t('features.ctaSubtitle')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/guest-analysis">
-              <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-8 py-6 text-lg shadow-lg">
-                {t('features.startAnalysis')}
-                <ArrowRight className="ml-2 h-5 w-5" />
+          <FadeUp>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
+              {t('features.ctaTitle')}
+            </h2>
+          </FadeUp>
+          <FadeUp delay={0.1}>
+            <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+              {t('features.ctaSubtitle')}
+            </p>
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/guest-analysis">
+                <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-8 py-6 text-lg shadow-lg">
+                  {t('features.startAnalysis')}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 text-lg"
+                onClick={handleScheduleDemo}
+                disabled={isSchedulingDemo}
+              >
+                {isSchedulingDemo ? "Scheduling..." : "Schedule Consultation"}
               </Button>
-            </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 text-lg"
-              onClick={handleScheduleDemo}
-              disabled={isSchedulingDemo}
-            >
-              {isSchedulingDemo ? "Scheduling..." : "Schedule Consultation"}
-            </Button>
-          </div>
+            </div>
+          </FadeUp>
         </div>
       </section>
     </div>
