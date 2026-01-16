@@ -13,6 +13,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { StatsBar } from "@/components/StatsBar";
 import { trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 const Index = () => {
@@ -161,6 +162,9 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Stats Bar */}
+        <StatsBar />
+
         {/* Comprehensive Analysis Highlight Section */}
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-secondary/50 to-background">
           <div className="max-w-6xl mx-auto">
@@ -246,9 +250,12 @@ const Index = () => {
         </section>
 
         {/* Features Section */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-accent/5 to-background">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
+              <Badge variant="secondary" className="mb-4">
+                {t('features.badge') || 'Platform Features'}
+              </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 {t('features.title')}
               </h2>
@@ -259,19 +266,26 @@ const Index = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { icon: BarChart3, title: t('features.aiScore'), desc: t('features.aiScoreDesc'), color: 'text-primary' },
-                { icon: FileText, title: t('features.docGenerator'), desc: t('features.docGeneratorDesc'), color: 'text-success' },
-                { icon: Users, title: t('features.partnerMatching'), desc: t('features.partnerMatchingDesc'), color: 'text-brand' },
-                { icon: TrendingUp, title: t('features.smartRoadmap'), desc: t('features.smartRoadmapDesc'), color: 'text-success' },
+                { icon: BarChart3, title: t('features.aiScore'), desc: t('features.aiScoreDesc'), gradient: 'from-primary/20 to-primary/5' },
+                { icon: FileText, title: t('features.docGenerator'), desc: t('features.docGeneratorDesc'), gradient: 'from-success/20 to-success/5' },
+                { icon: Users, title: t('features.partnerMatching'), desc: t('features.partnerMatchingDesc'), gradient: 'from-brand/20 to-brand/5' },
+                { icon: TrendingUp, title: t('features.smartRoadmap'), desc: t('features.smartRoadmapDesc'), gradient: 'from-accent/40 to-accent/10' },
               ].map((feature, i) => (
-                <Card key={i} className="group card-hover border-border/50 bg-card hover:border-primary/30">
-                  <CardHeader className="text-center pb-4">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-4 group-hover:from-primary/15 group-hover:to-primary/10 transition-colors`}>
-                      <feature.icon className={`h-7 w-7 ${feature.color}`} />
+                <Card 
+                  key={i} 
+                  className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-xl transition-all duration-500 animate-fade-in-up"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {/* Gradient overlay on hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                  
+                  <CardHeader className="text-center pb-4 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-background to-secondary flex items-center justify-center mx-auto mb-4 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                      <feature.icon className="h-8 w-8 text-primary" />
                     </div>
                     <CardTitle className="text-xl font-semibold">{feature.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative z-10">
                     <CardDescription className="text-center text-muted-foreground leading-relaxed">
                       {feature.desc}
                     </CardDescription>
@@ -283,9 +297,12 @@ const Index = () => {
         </section>
 
         {/* How It Works Section */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-secondary/30 to-background">
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-secondary/30 to-background overflow-hidden">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
+              <Badge variant="secondary" className="mb-4">
+                {t('howItWorks.badge') || 'Simple Process'}
+              </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 {t('howItWorks.title')}
               </h2>
@@ -294,25 +311,50 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 relative">
-              {/* Connecting line */}
-              <div className="hidden md:block absolute top-16 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12 relative">
+              {/* Connecting lines */}
+              <div className="hidden md:block absolute top-20 left-[20%] right-[20%] h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+              <div className="hidden md:flex absolute top-20 left-[calc(33.33%-8px)] w-4 h-4 rounded-full bg-primary/30 border-2 border-primary/50 -translate-y-1.5" />
+              <div className="hidden md:flex absolute top-20 left-[calc(66.66%-8px)] w-4 h-4 rounded-full bg-primary/30 border-2 border-primary/50 -translate-y-1.5" />
               
               {[
-                { step: "1", title: t('howItWorks.step1'), desc: t('howItWorks.step1Desc'), color: 'bg-primary' },
-                { step: "2", title: t('howItWorks.step2'), desc: t('howItWorks.step2Desc'), color: 'bg-success' },
-                { step: "3", title: t('howItWorks.step3'), desc: t('howItWorks.step3Desc'), color: 'bg-brand' },
+                { step: "1", title: t('howItWorks.step1'), desc: t('howItWorks.step1Desc'), icon: FileText, color: 'from-primary to-primary/80' },
+                { step: "2", title: t('howItWorks.step2'), desc: t('howItWorks.step2Desc'), icon: BarChart3, color: 'from-success to-success/80' },
+                { step: "3", title: t('howItWorks.step3'), desc: t('howItWorks.step3Desc'), icon: Users, color: 'from-brand to-brand/80' },
               ].map((item, i) => (
-                <div key={i} className="text-center relative animate-fade-in-up" style={{ animationDelay: `${i * 0.2}s` }}>
-                  <div className={`w-16 h-16 ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg relative z-10`}>
-                    <span className="text-2xl font-bold text-primary-foreground">{item.step}</span>
+                <div 
+                  key={i} 
+                  className="text-center relative group animate-fade-in-up" 
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                >
+                  {/* Step number badge */}
+                  <div className="relative mx-auto mb-8">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 relative z-10`}>
+                      <item.icon className="h-10 w-10 text-primary-foreground" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-background border-2 border-border rounded-full flex items-center justify-center shadow-md z-20">
+                      <span className="text-sm font-bold text-foreground">{item.step}</span>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-4">{item.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                  
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed max-w-xs mx-auto">
                     {item.desc}
                   </p>
                 </div>
               ))}
+            </div>
+
+            {/* CTA below timeline */}
+            <div className="text-center mt-16">
+              <Button 
+                size="lg"
+                onClick={() => navigate('/guest-analysis')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 group"
+              >
+                {t('howItWorks.startNow') || 'Start Your Analysis'}
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
           </div>
         </section>
