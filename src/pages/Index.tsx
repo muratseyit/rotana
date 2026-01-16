@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, TrendingUp, Shield, Building2, Star, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, BarChart3, FileText, Users, Zap, CheckCircle, Globe, TrendingUp, Shield, Building2, Star, Sparkles, Linkedin, Twitter } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { MobileNavigation } from "@/components/MobileNavigation";
@@ -10,6 +11,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { LeadCaptureForm } from "@/components/LeadCaptureForm";
 import { TrustBadges } from "@/components/TrustBadges";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { TestimonialCard } from "@/components/TestimonialCard";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
 const Index = () => {
@@ -314,6 +317,47 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Testimonials Section */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-accent/10">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <Badge variant="secondary" className="mb-4">
+                {t('testimonials.badge') || 'Success Stories'}
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                {t('testimonials.title') || 'Trusted by Turkish Businesses'}
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {t('testimonials.subtitle') || 'See how we\'ve helped companies expand into the UK market'}
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <TestimonialCard
+                quote="Converta's analysis helped us understand exactly what we needed for UK compliance. We launched 3 months ahead of schedule."
+                author="Mehmet Yılmaz"
+                role="CEO"
+                company="TechExport TR"
+                rating={5}
+              />
+              <TestimonialCard
+                quote="The partner matching feature connected us with the perfect accounting firm. They understood both Turkish and UK regulations."
+                author="Ayşe Kaya"
+                role="Founder"
+                company="Organic Foods Istanbul"
+                rating={5}
+              />
+              <TestimonialCard
+                quote="We saved over £15,000 in consulting fees by using Converta's automated compliance checklist and market analysis."
+                author="Can Demir"
+                role="Operations Director"
+                company="Anatolian Textiles"
+                rating={5}
+              />
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-accent/20 to-background">
           <div className="max-w-7xl mx-auto">
@@ -334,19 +378,35 @@ const Index = () => {
         </section>
 
         {/* Footer */}
-        <footer className="bg-foreground text-background/70 py-16 px-4 sm:px-6 lg:px-8">
+        <footer className="bg-gradient-to-b from-foreground to-foreground/95 text-background/70 py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
+            {/* Newsletter Section */}
+            <div className="bg-background/5 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-background/10">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-xl font-semibold text-background mb-2">
+                    {t('footer.newsletterTitle') || 'Stay Updated'}
+                  </h3>
+                  <p className="text-background/60 text-sm">
+                    {t('footer.newsletterDesc') || 'Get the latest UK market insights and trade updates delivered to your inbox.'}
+                  </p>
+                </div>
+                <NewsletterSignup variant="dark" />
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-4 gap-12">
               <div className="md:col-span-1">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center">
                     <BarChart3 className="h-5 w-5 text-background" />
                   </div>
                   <span className="text-xl font-semibold text-background">Converta</span>
                 </div>
-                <p className="text-background/60 text-sm leading-relaxed">
+                <p className="text-background/60 text-sm leading-relaxed mb-6">
                   {t('footer.description')}
                 </p>
+                <TrustBadges variant="dark" className="justify-start" />
               </div>
               
               <div>
@@ -381,9 +441,19 @@ const Index = () => {
               <p className="text-sm text-background/50">
                 © {new Date().getFullYear()} Converta. All rights reserved.
               </p>
-              <div className="flex items-center gap-2 text-sm text-background/50">
-                <Shield className="h-4 w-4" />
-                <span>GDPR & KVKK Compliant</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-background/50">
+                  <Shield className="h-4 w-4" />
+                  <span>GDPR & KVKK Compliant</span>
+                </div>
+                <div className="flex gap-3">
+                  <a href="#" className="w-8 h-8 rounded-full bg-background/10 flex items-center justify-center hover:bg-background/20 transition-colors">
+                    <Linkedin className="h-4 w-4 text-background/70" />
+                  </a>
+                  <a href="#" className="w-8 h-8 rounded-full bg-background/10 flex items-center justify-center hover:bg-background/20 transition-colors">
+                    <Twitter className="h-4 w-4 text-background/70" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
