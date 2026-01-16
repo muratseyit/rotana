@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingSection } from "@/components/PricingSection";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CreditCard, Users } from "lucide-react";
+import { ArrowLeft, CreditCard, Users, BarChart3, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MobileNavigation } from "@/components/MobileNavigation";
+import { Badge } from "@/components/ui/badge";
 
 export default function Pricing() {
   const navigate = useNavigate();
@@ -93,20 +94,18 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
+      <header className="bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate("/")}
-                className="gap-2 hidden sm:inline-flex"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                {t('pricing.backToDashboard')}
-              </Button>
-              <h1 className="text-lg sm:text-xl font-semibold">{t('pricing.title')}</h1>
+            <div className="flex items-center gap-3">
+              <Link to="/" className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                  <BarChart3 className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-bold text-foreground hidden sm:block">Converta</span>
+              </Link>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <h1 className="text-lg font-semibold text-foreground hidden sm:block">{t('pricing.title')}</h1>
             </div>
             
             <div className="flex items-center gap-2">
@@ -138,6 +137,25 @@ export default function Pricing() {
         </div>
       </header>
 
+      {/* Hero Section */}
+      <section className="relative py-16 px-4 bg-gradient-to-br from-muted/50 via-background to-muted/30 overflow-hidden">
+        <div className="absolute top-10 right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-10 w-80 h-80 bg-success/5 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <Badge className="bg-primary/10 text-primary mb-4 px-4 py-1.5">
+            <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+            Simple & Transparent
+          </Badge>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            {t('pricing.title')}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Two pathways to UK market success - affordable analysis for SMEs and valuable listings for service partners
+          </p>
+        </div>
+      </section>
+
       {/* Main Content */}
       <main>
         <PricingSection 
@@ -146,15 +164,15 @@ export default function Pricing() {
         />
 
         {/* Enterprise Contact Section */}
-        <section className="py-16 bg-muted/50">
+        <section className="py-16 bg-gradient-to-br from-primary via-primary to-primary/90">
           <div className="container mx-auto max-w-4xl px-4 text-center">
-            <h3 className="text-2xl font-bold mb-4">
+            <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
               {t('pricing.customSolution')}
             </h3>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
               {t('pricing.customDesc')}
             </p>
-            <Button size="lg" className="gap-2">
+            <Button size="lg" className="gap-2 bg-background text-foreground hover:bg-background/90 shadow-lg">
               <Users className="w-4 h-4" />
               {t('pricing.contactSales')}
             </Button>
