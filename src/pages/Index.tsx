@@ -14,6 +14,7 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { StatsBar } from "@/components/StatsBar";
+import { CollaborationBadge } from "@/components/CollaborationBadge";
 import { FadeUp, FadeIn, SlideInLeft, SlideInRight, StaggerContainer, StaggerItem, ScaleUp } from "@/components/ScrollAnimations";
 import { trackFunnel, trackTimeOnPage, trackScrollDepth } from "@/utils/analytics";
 
@@ -92,6 +93,10 @@ const Index = () => {
               {/* Left: Content */}
               <div className="text-left">
                 <FadeUp delay={0}>
+                  <CollaborationBadge variant="hero" className="mb-6" />
+                </FadeUp>
+                
+                <FadeUp delay={0.05}>
                   <div className="inline-flex items-center px-4 py-2 rounded-full bg-background/10 backdrop-blur-sm border border-background/20 mb-6">
                     <Sparkles className="h-4 w-4 mr-2 text-background/90" />
                     <span className="text-sm font-medium text-background/90">{t('hero.badge')}</span>
@@ -526,9 +531,27 @@ const Index = () => {
             
             <FadeIn delay={0.3}>
               <div className="border-t border-background/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-sm text-background/50">
-                  © {new Date().getFullYear()} Converta. All rights reserved.
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm text-background/50">
+                    © {new Date().getFullYear()} Converta. All rights reserved.
+                  </p>
+                  {/* Turkey-UK Flags in footer */}
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-background/5 border border-background/10">
+                    <svg className="w-4 h-3 rounded-[1px]" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="60" height="40" fill="#E30A17"/>
+                      <circle cx="22.5" cy="20" r="10" fill="#fff"/>
+                      <circle cx="25" cy="20" r="8" fill="#E30A17"/>
+                      <polygon fill="#fff" points="38,20 32.5,22 33.5,17 29.5,14 35,13.5 38,9 41,13.5 46.5,14 42.5,17 43.5,22"/>
+                    </svg>
+                    <span className="text-[10px] text-background/40">↔</span>
+                    <svg className="w-4 h-3 rounded-[1px]" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="60" height="30" fill="#012169"/>
+                      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+                      <path d="M30,0 V30 M0,15 H60" stroke="#fff" strokeWidth="10"/>
+                      <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" strokeWidth="6"/>
+                    </svg>
+                  </div>
+                </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-sm text-background/50">
                     <Shield className="h-4 w-4" />

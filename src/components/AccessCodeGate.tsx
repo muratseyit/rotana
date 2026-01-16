@@ -44,6 +44,22 @@ export const AccessCodeGate = () => {
           </div>
           <h1 className="text-3xl font-bold text-foreground">Converta</h1>
           <p className="text-muted-foreground mt-2">UK Market Entry Platform</p>
+          {/* Turkey-UK Flags */}
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <svg className="w-6 h-4 rounded-sm shadow-sm" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="40" fill="#E30A17" rx="2"/>
+              <circle cx="22.5" cy="20" r="10" fill="#fff"/>
+              <circle cx="25" cy="20" r="8" fill="#E30A17"/>
+              <polygon fill="#fff" points="38,20 32.5,22 33.5,17 29.5,14 35,13.5 38,9 41,13.5 46.5,14 42.5,17 43.5,22"/>
+            </svg>
+            <span className="text-xs text-primary font-medium">→</span>
+            <svg className="w-6 h-4 rounded-sm shadow-sm" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="30" fill="#012169" rx="2"/>
+              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+              <path d="M30,0 V30 M0,15 H60" stroke="#fff" strokeWidth="10"/>
+              <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" strokeWidth="6"/>
+            </svg>
+          </div>
         </div>
 
         <Card className="w-full p-8 shadow-2xl border-border/50 bg-card/95 backdrop-blur-sm animate-fade-in-up animate-delay-100">
