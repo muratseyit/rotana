@@ -1,7 +1,6 @@
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { TrendingUp, Users, Building2, Award } from "lucide-react";
-import { CollaborationBadge } from "@/components/CollaborationBadge";
 
 interface StatsBarProps {
   className?: string;
@@ -45,11 +44,6 @@ export function StatsBar({ className = '' }: StatsBarProps) {
   return (
     <section className={`py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-background via-accent/5 to-background border-y border-border/30 ${className}`}>
       <div className="max-w-7xl mx-auto">
-        {/* Collaboration Badge */}
-        <div className="flex justify-center mb-8">
-          <CollaborationBadge variant="stacked" />
-        </div>
-        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div 
