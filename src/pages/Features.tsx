@@ -26,20 +26,131 @@ const Features = () => {
     }, 2000);
   };
 
+  const features = [
+    {
+      icon: BarChart3,
+      title: t('features.aiAnalysisTitle'),
+      description: t('features.aiAnalysisDesc'),
+      items: [
+        t('features.aiAnalysis1'),
+        t('features.aiAnalysis2'),
+        t('features.aiAnalysis3'),
+        t('features.aiAnalysis4'),
+      ],
+      gradient: "from-primary/10 to-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary"
+    },
+    {
+      icon: Users,
+      title: t('features.partnerNetworkTitle'),
+      description: t('features.partnerNetworkDesc'),
+      items: [
+        t('features.partnerNetwork1'),
+        t('features.partnerNetwork2'),
+        t('features.partnerNetwork3'),
+        t('features.partnerNetwork4'),
+      ],
+      gradient: "from-success/10 to-success/5",
+      iconBg: "bg-success/10",
+      iconColor: "text-success"
+    },
+    {
+      icon: FileText,
+      title: t('features.complianceTitle'),
+      description: t('features.complianceDesc'),
+      items: [
+        t('features.compliance1'),
+        t('features.compliance2'),
+        t('features.compliance3'),
+        t('features.compliance4'),
+      ],
+      gradient: "from-accent/10 to-accent/5",
+      iconBg: "bg-accent/10",
+      iconColor: "text-accent-foreground"
+    },
+    {
+      icon: Target,
+      title: t('features.roadmapTitle'),
+      description: t('features.roadmapDesc'),
+      items: [
+        t('features.roadmap1'),
+        t('features.roadmap2'),
+        t('features.roadmap3'),
+        t('features.roadmap4'),
+      ],
+      gradient: "from-secondary/20 to-secondary/10",
+      iconBg: "bg-secondary",
+      iconColor: "text-secondary-foreground"
+    },
+    {
+      icon: TrendingUp,
+      title: t('features.analyticsTitle'),
+      description: t('features.analyticsDesc'),
+      items: [
+        t('features.analytics1'),
+        t('features.analytics2'),
+        t('features.analytics3'),
+        t('features.analytics4'),
+      ],
+      gradient: "from-primary/10 to-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary"
+    },
+    {
+      icon: Shield,
+      title: t('features.securityTitle'),
+      description: t('features.securityDesc'),
+      items: [
+        t('features.security1'),
+        t('features.security2'),
+        t('features.security3'),
+        t('features.security4'),
+      ],
+      gradient: "from-success/10 to-success/5",
+      iconBg: "bg-success/10",
+      iconColor: "text-success"
+    },
+  ];
+
+  const benefits = [
+    {
+      icon: Clock,
+      title: t('features.saveTime'),
+      description: t('features.saveTimeDesc'),
+      color: "bg-primary"
+    },
+    {
+      icon: Award,
+      title: t('features.expertLevel'),
+      description: t('features.expertLevelDesc'),
+      color: "bg-success"
+    },
+    {
+      icon: Globe,
+      title: t('features.globalScale'),
+      description: t('features.globalScaleDesc'),
+      color: "bg-accent"
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-slate-900">Converta</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                <BarChart3 className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">Converta</span>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-slate-600 hover:text-slate-900 transition-colors">Home</Link>
-              <Link to="/features" className="text-slate-900 font-medium">Features</Link>
-              <Link to="/partners" className="text-slate-600 hover:text-slate-900 transition-colors">Partners</Link>
+              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Home</Link>
+              <Link to="/features" className="text-foreground font-medium">Features</Link>
+              <Link to="/partners" className="text-muted-foreground hover:text-foreground transition-colors">Partners</Link>
+              <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
             </nav>
             <div className="flex items-center space-x-4">
               <Button variant="outline" onClick={() => navigate('/guest-analysis')} className="hidden md:inline-flex">
@@ -52,24 +163,29 @@ const Features = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="mb-8">
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-6">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-background to-muted/30" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="mb-8 animate-fade-in-up">
+            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary mb-6 shadow-sm">
               <Zap className="h-4 w-4 mr-2" />
               {t('features.badge')}
             </span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             {t('features.heroTitle')}{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">{t('features.heroTitleHighlight')}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-success">{t('features.heroTitleHighlight')}</span>
           </h1>
-          <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             {t('features.heroDesc')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/onboarding">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <Link to="/guest-analysis">
+              <Button size="lg" variant="premium" className="px-8 py-6 text-lg shadow-lg hover:shadow-xl">
                 {t('features.startAnalysis')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -77,7 +193,7 @@ const Features = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="px-8 py-4 text-lg border-slate-300"
+              className="px-8 py-6 text-lg"
               onClick={handleScheduleDemo}
               disabled={isSchedulingDemo}
             >
@@ -88,277 +204,91 @@ const Features = () => {
       </section>
 
       {/* Core Features */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               {t('features.coreTitle')}
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('features.coreSubtitle')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* AI-Powered Business Analysis */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-blue-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.aiAnalysisTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.aiAnalysisDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.aiAnalysis1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.aiAnalysis2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.aiAnalysis3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.aiAnalysis4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Partner Ecosystem */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-green-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-green-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.partnerNetworkTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.partnerNetworkDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.partnerNetwork1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.partnerNetwork2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.partnerNetwork3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.partnerNetwork4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Compliance & Documentation */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-purple-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.complianceTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.complianceDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.compliance1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.compliance2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.compliance3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.compliance4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Smart Roadmapping */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-orange-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Target className="h-8 w-8 text-orange-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.roadmapTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.roadmapDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.roadmap1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.roadmap2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.roadmap3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.roadmap4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Real-time Analytics */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-blue-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="h-8 w-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.analyticsTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.analyticsDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.analytics1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.analytics2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.analytics3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.analytics4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Security & Privacy */}
-            <Card className="border-slate-200 hover:shadow-lg transition-all duration-300 hover:border-green-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-green-600" />
-                </div>
-                <CardTitle className="text-xl mb-2">{t('features.securityTitle')}</CardTitle>
-                <CardDescription className="text-center">
-                  {t('features.securityDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.security1')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.security2')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.security3')}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>{t('features.security4')}</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {features.map((feature, index) => (
+              <Card 
+                key={index}
+                className={`group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg bg-gradient-to-br ${feature.gradient}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <CardHeader className="text-center pb-4">
+                  <div className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                    <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
+                  </div>
+                  <CardTitle className="text-lg mb-2">{feature.title}</CardTitle>
+                  <CardDescription className="text-center text-sm">
+                    {feature.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2.5 text-sm text-muted-foreground">
+                    {feature.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-start space-x-2">
+                        <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               {t('features.whyChoose')}
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('features.whyChooseSubtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Clock className="h-10 w-10 text-white" />
+            {benefits.map((benefit, index) => (
+              <div key={index} className="text-center group">
+                <div className={`w-20 h-20 ${benefit.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <benefit.icon className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-4">{benefit.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {benefit.description}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.saveTime')}</h3>
-              <p className="text-slate-600">
-                {t('features.saveTimeDesc')}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Award className="h-10 w-10 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.expertLevel')}</h3>
-              <p className="text-slate-600">
-                {t('features.expertLevelDesc')}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Globe className="h-10 w-10 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">{t('features.globalScale')}</h3>
-              <p className="text-slate-600">
-                {t('features.globalScaleDesc')}
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-green-600">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary via-primary to-primary/90">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
             {t('features.ctaTitle')}
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
             {t('features.ctaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/onboarding">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 text-lg">
+            <Link to="/guest-analysis">
+              <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-8 py-6 text-lg shadow-lg">
                 {t('features.startAnalysis')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -366,7 +296,7 @@ const Features = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 text-lg"
               onClick={handleScheduleDemo}
               disabled={isSchedulingDemo}
             >
